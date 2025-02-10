@@ -130,9 +130,9 @@ const PurePreviewMessage = ({
                           <MultiSearch result={null} args={args} />
                         </div>
                       ) : toolName === "getMultiChainWalletPortfolio" ? (
-                        <div className="textsm">
+                        <div className="text-sm">
                           {/* <PortfolioTable result={null} args={args} /> */}
-                          Fetching portfolio...
+                          <p className="py-1">Fetching portfolio...</p>
                         </div>
                       ) : (
                         <div className="text-sm">Running {toolName}...</div>

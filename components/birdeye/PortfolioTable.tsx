@@ -31,7 +31,7 @@ const PortfolioTable: React.FC<{ result: PortfolioResponse | null }> = ({
   if (!result)
     return <div className="text-white">No portfolio data available.</div>;
 
-  console.log(result);
+  // console.log(result);
 
   // Aggregate all tokens across chains, filtering out zero-balance tokens
   const groupedTokens = Object.entries(result).reduce<{

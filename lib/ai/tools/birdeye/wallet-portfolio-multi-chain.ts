@@ -30,7 +30,7 @@ export const getMultiChainWalletPortfolio = tool({
         portfolioData[chain] = chainData;
       }
 
-      console.log("portfolio ------------ ", portfolioData);
+      // console.log("portfolio ------------ ", portfolioData);
       return portfolioData;
     } catch (error) {
       console.error("Error fetching wallet portfolio:", error);
