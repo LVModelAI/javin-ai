@@ -11,6 +11,7 @@ import { systemPrompt } from "@/lib/ai/prompts";
 import {
   deleteChatById,
   getChatById,
+  getUserMessageCount,
   saveChat,
   saveMessages,
 } from "@/lib/db/queries";
@@ -23,6 +24,7 @@ import {
 import { generateTitleFromUserMessage } from "../../actions";
 import { webSearch } from "@/lib/ai/tools/web-search";
 import { getMultiChainWalletPortfolio } from "@/lib/ai/tools/birdeye/wallet-portfolio-multi-chain";
+import { FREE_USER_MESSAGE_LIMIT } from "@/lib/constants";
 
 export const maxDuration = 60;
 
@@ -38,6 +40,14 @@ export async function POST(request: Request) {
 
   if (!session || !session.user || !session.user.id) {
     return new Response("Unauthorized", { status: 401 });
+  }
+
+  const tot_msgs = await getUserMessageCount(session.user.id);
+  if (tot_msgs >= FREE_USER_MESSAGE_LIMIT) {
+    console.log("totmsg ", tot_msgs);
+    return new Response("You have reached your free plan messages limit", {
+      status: 403,
+    });
   }
 
   const userMessage = getMostRecentUserMessage(messages);
@@ -108,7 +118,8 @@ export async function POST(request: Request) {
         sendReasoning: true,
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.log(error);
       return "Oops, an error occured!";
     },
   });

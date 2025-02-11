@@ -81,7 +81,11 @@ function PureChatHeader({
         <ConnectButton
           client={client}
           wallets={wallets}
-          connectModal={{ size: "compact" }}
+          connectModal={{
+            size: "compact",
+            title: "Connect wallet",
+            showThirdwebBranding: false,
+          }}
           //@ts-ignore
           theme={theme}
           connectButton={{ label: "Connect wallet" }}
