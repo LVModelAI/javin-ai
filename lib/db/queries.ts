@@ -1,7 +1,7 @@
 import "server-only";
 
 import { genSaltSync, hashSync } from "bcrypt-ts";
-import { and, asc, count, desc, eq, gt, gte, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, gte, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
@@ -346,17 +346,37 @@ export async function updateChatVisiblityById({
   }
 }
 
-export async function getUserMessageCount(userId: string): Promise<number> {
-  try {
-    const result = await db
-      .select({ count: count() })
-      .from(message)
-      .innerJoin(chat, eq(message.chatId, chat.id))
-      .where(eq(chat.userId, userId));
+export async function incrementMessageCount(userId: string) {
+  await db
+    .update(user)
+    .set({ messageCount: sql`${user.messageCount} + 1` })
+    .where(eq(user.id, userId));
+}
 
-    return result[0]?.count ?? 0;
-  } catch (error) {
-    console.error("Failed to get message count for user", error);
-    throw error;
+export async function getMessageCount(userId: string): Promise<number> {
+  const result = await db
+    .select({ messageCount: user.messageCount })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+
+  if (result.length === 0) {
+    throw new Error("User not found");
   }
+
+  return result[0].messageCount;
+}
+
+export async function getUserTier(userId: string) {
+  const result = await db
+    .select({ tier: user.tier })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+
+  if (result.length === 0) {
+    throw new Error("User not found");
+  }
+
+  return result[0].tier;
 }

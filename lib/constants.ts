@@ -9,4 +9,4 @@ export const birdeye_supported_chains = [
   "zksync",
 ];
 
-export const FREE_USER_MESSAGE_LIMIT = 2000;
+export const FREE_USER_MESSAGE_LIMIT = 20;

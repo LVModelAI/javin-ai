@@ -1,14 +1,9 @@
-import { compare } from 'bcrypt-ts';
-import NextAuth, { type User, type Session } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
+import { compare } from "bcrypt-ts";
+import NextAuth, { type User, type Session } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 
-import { getUser } from '@/lib/db/queries';
-
-import { authConfig } from './auth.config';
-
-interface ExtendedSession extends Session {
-  user: User;
-}
+import { getUser } from "@/lib/db/queries";
+import { authConfig } from "./auth.config";
 
 export const {
   handlers: { GET, POST },
@@ -26,6 +21,7 @@ export const {
         // biome-ignore lint: Forbidden non-null assertion.
         const passwordsMatch = await compare(password, users[0].password!);
         if (!passwordsMatch) return null;
+        // console.log("user sis ", users[0]);
         return users[0] as any;
       },
     }),
@@ -34,21 +30,16 @@ export const {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.tier = user.tier; // Add tier to the token
+        token.messageCount = user.messageCount; // Add tier to the token
       }
-
       return token;
     },
-    async session({
-      session,
-      token,
-    }: {
-      session: ExtendedSession;
-      token: any;
-    }) {
+    async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.tier = token.tier as string; // Assign tier from token to session
       }
-
       return session;
     },
   },

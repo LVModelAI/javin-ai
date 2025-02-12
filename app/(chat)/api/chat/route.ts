@@ -11,9 +11,12 @@ import { systemPrompt } from "@/lib/ai/prompts";
 import {
   deleteChatById,
   getChatById,
-  getUserMessageCount,
+  getMessageCount,
+  incrementMessageCount,
+  getUserTier,
   saveChat,
   saveMessages,
+  getUser,
 } from "@/lib/db/queries";
 import {
   generateUUID,
@@ -25,6 +28,7 @@ import { generateTitleFromUserMessage } from "../../actions";
 import { webSearch } from "@/lib/ai/tools/web-search";
 import { getMultiChainWalletPortfolio } from "@/lib/ai/tools/birdeye/wallet-portfolio-multi-chain";
 import { FREE_USER_MESSAGE_LIMIT } from "@/lib/constants";
+import { User } from "next-auth";
 
 export const maxDuration = 60;
 
@@ -42,9 +46,14 @@ export async function POST(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const tot_msgs = await getUserMessageCount(session.user.id);
-  if (tot_msgs >= FREE_USER_MESSAGE_LIMIT) {
-    console.log("totmsg ", tot_msgs);
+  const users = await getUser(session.user.email!);
+  const user_info = users[0];
+  console.log("user infor ", session.user);
+  if (
+    user_info.tier == "free" &&
+    user_info.messageCount >= FREE_USER_MESSAGE_LIMIT
+  ) {
+    console.log("totmsg ", user_info.messageCount);
     return new Response("You have reached your free plan messages limit", {
       status: 403,
     });
@@ -103,6 +112,7 @@ export async function POST(request: Request) {
                   };
                 }),
               });
+              await incrementMessageCount(session.user.id);
             } catch (error) {
               console.error("Failed to save chat");
             }
