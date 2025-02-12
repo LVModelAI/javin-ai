@@ -1,4 +1,4 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: 'avatar.vercel.sh',
+        protocol: "https",
+        hostname: "**", // Allows all external image sources
       },
     ],
   },

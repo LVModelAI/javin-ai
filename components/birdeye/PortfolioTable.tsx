@@ -83,7 +83,7 @@ const PortfolioTable: React.FC<{ result: PortfolioResponse | null }> = ({
     }
     return acc;
   }, {});
-  console.log("groupedTokens ------------", groupedTokens);
+  // console.log("groupedTokens ------------", groupedTokens);
 
   // Calculate total portfolio value
   const totalPortfolioValue = Object.values(result).reduce(

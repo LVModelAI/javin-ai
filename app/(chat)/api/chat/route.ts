@@ -27,8 +27,8 @@ import {
 import { generateTitleFromUserMessage } from "../../actions";
 import { webSearch } from "@/lib/ai/tools/web-search";
 import { getMultiChainWalletPortfolio } from "@/lib/ai/tools/birdeye/wallet-portfolio-multi-chain";
-import { FREE_USER_MESSAGE_LIMIT } from "@/lib/constants";
 import { User } from "next-auth";
+import { searchTokenMarketData } from "@/lib/ai/tools/birdeye/search-token-market-data";
 
 export const maxDuration = 60;
 
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
   console.log("user infor ", session.user);
   if (
     user_info.tier == "free" &&
-    user_info.messageCount >= FREE_USER_MESSAGE_LIMIT
+    user_info.messageCount >= Number(process.env.FREE_USER_MESSAGE_LIMIT!)
   ) {
     console.log("totmsg ", user_info.messageCount);
     return new Response("You have reached your free plan messages limit", {
@@ -86,12 +86,17 @@ export async function POST(request: Request) {
         experimental_activeTools:
           selectedChatModel === "chat-model-reasoning"
             ? []
-            : ["getMultiChainWalletPortfolio", "webSearch"],
+            : [
+                "getMultiChainWalletPortfolio",
+                "webSearch",
+                "searchTokenMarketData",
+              ],
         experimental_transform: smoothStream({ chunking: "word" }),
         experimental_generateMessageId: generateUUID,
         tools: {
           webSearch,
           getMultiChainWalletPortfolio,
+          searchTokenMarketData,
         },
         onFinish: async ({ response, reasoning }) => {
           if (session.user?.id) {

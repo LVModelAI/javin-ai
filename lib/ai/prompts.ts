@@ -131,8 +131,10 @@ const webSearchPrompt = `You are an AI web search engine called Javin, designed 
 
   ####  multichain Wallet portfolio:
   - Use this tool for getting the wallet  details of user like balances, tokens and other portfolio.
-  - Pass the users wallet address as input. if user has not provided any address. ask for it.
   - NEVER NOT try to summarize the result. just call the tool, results will be handled automatically.
+
+  ####  search token or market data:
+  - Use this tool for Search for token and market data by matching a pattern or a specific token, market address. if you couldnt find any information, ask the user for it
   
     ### Prohibited Actions:
   - Do not run tools multiple times, this includes the same tool with different parameters.
