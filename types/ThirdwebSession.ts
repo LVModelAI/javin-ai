@@ -6,6 +6,7 @@ export type ThirdwebSession = {
       id: string;
       tier: string;
       messageCount: number;
+      email?: string;
     };
   };
 };

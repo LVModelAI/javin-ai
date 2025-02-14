@@ -16,6 +16,7 @@ import { VisibilityType } from "./visibility-selector";
 import { useBlockSelector } from "@/hooks/use-block";
 import { toast } from "sonner";
 import { getUserSession, isLoggedIn } from "@/app/(auth)/actions";
+import { getUserEmail } from "thirdweb/wallets/in-app";
 
 export function Chat({
   id,
