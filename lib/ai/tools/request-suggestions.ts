@@ -1,13 +1,13 @@
 import { z } from "zod";
-import { Session } from "next-auth";
 import { DataStreamWriter, streamObject, tool } from "ai";
 import { getDocumentById, saveSuggestions } from "@/lib/db/queries";
 import { Suggestion } from "@/lib/db/schema";
 import { generateUUID } from "@/lib/utils";
 import { myProvider } from "../models";
+import { ThirdwebSession } from "@/types/ThirdwebSession";
 
 interface RequestSuggestionsProps {
-  session: Session;
+  session: ThirdwebSession;
   dataStream: DataStreamWriter;
 }
 
@@ -66,7 +66,7 @@ export const requestSuggestions = ({
         suggestions.push(suggestion);
       }
 
-      if (session.parsedJWT.ctx.id) {
+      if (session && session.parsedJWT.ctx.id) {
         const userId = session.parsedJWT.ctx.id;
 
         await saveSuggestions({

@@ -1,7 +1,7 @@
 "use client";
 import { ChevronUp } from "lucide-react";
 import Image from "next/image";
-import type { User } from "next-auth";
+import { User } from "@/types/User";
 import { useTheme } from "next-themes";
 
 import {

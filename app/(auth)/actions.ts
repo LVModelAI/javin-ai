@@ -4,7 +4,7 @@ import { privateKeyToAccount } from "thirdweb/wallets";
 import { client } from "@/lib/thirdweb/client";
 import { cookies } from "next/headers";
 import { createUser, getUser, getUserTier } from "@/lib/db/queries";
-import { ThirdwebSession } from "@/types/thirdwebSession";
+import { ThirdwebSession } from "@/types/ThirdwebSession";
 import { generateUUID } from "@/lib/utils";
 
 const privateKey = process.env.AUTH_PRIVATE_KEY || "";

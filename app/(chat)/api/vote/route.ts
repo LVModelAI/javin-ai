@@ -1,6 +1,6 @@
 import { getUserSession, isLoggedIn } from "@/app/(auth)/actions";
 import { getUser, getVotesByChatId, voteMessage } from "@/lib/db/queries";
-import { ThirdwebSession } from "@/types/thirdwebSession";
+import { ThirdwebSession } from "@/types/ThirdwebSession";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

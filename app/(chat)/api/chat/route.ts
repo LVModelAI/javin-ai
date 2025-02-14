@@ -26,7 +26,6 @@ import {
 import { generateTitleFromUserMessage } from "../../actions";
 import { webSearch } from "@/lib/ai/tools/web-search";
 import { getMultiChainWalletPortfolio } from "@/lib/ai/tools/birdeye/wallet-portfolio-multi-chain";
-import { User } from "next-auth";
 import { searchTokenMarketData } from "@/lib/ai/tools/birdeye/search-token-market-data";
 import { getUserSession, isLoggedIn } from "@/app/(auth)/actions";
 import { getUserWalletAddress } from "@/lib/ai/tools/birdeye/get-user-wallet-address";

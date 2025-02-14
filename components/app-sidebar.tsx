@@ -1,6 +1,6 @@
 "use client";
 
-import type { User } from "next-auth";
+import { User } from "@/types/User";
 import { useRouter } from "next/navigation";
 
 import { PlusIcon } from "@/components/icons";

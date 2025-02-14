@@ -6,7 +6,7 @@ import { BlockKind } from "@/components/block";
 import { DataStreamWriter } from "ai";
 import { Document } from "../db/schema";
 import { saveDocument } from "../db/queries";
-import { Session } from "next-auth";
+import { ThirdwebSession } from "@/types/ThirdwebSession";
 
 export interface SaveDocumentProps {
   id: string;
@@ -20,14 +20,14 @@ export interface CreateDocumentCallbackProps {
   id: string;
   title: string;
   dataStream: DataStreamWriter;
-  session: Session;
+  session: ThirdwebSession;
 }
 
 export interface UpdateDocumentCallbackProps {
   document: Document;
   description: string;
   dataStream: DataStreamWriter;
-  session: Session;
+  session: ThirdwebSession;
 }
 
 export interface DocumentHandler<T = BlockKind> {
@@ -51,13 +51,13 @@ export function createDocumentHandler<T extends BlockKind>(config: {
         session: args.session,
       });
 
-      if (args.session?.user?.id) {
+      if (args.session?.parsedJWT.ctx.id) {
         await saveDocument({
           id: args.id,
           title: args.title,
           content: draftContent,
           kind: config.kind,
-          userId: args.session.parsedJWT.ctx.id,
+          userId: args.session.parsedJWT.ctx?.id,
         });
       }
 
@@ -71,7 +71,7 @@ export function createDocumentHandler<T extends BlockKind>(config: {
         session: args.session,
       });
 
-      if (args.session?.user?.id) {
+      if (args.session?.parsedJWT?.ctx?.id) {
         await saveDocument({
           id: args.document.id,
           title: args.document.title,
