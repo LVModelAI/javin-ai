@@ -70,7 +70,7 @@ export const webSearch = tool({
   }) => {
     const apiKey = process.env.TAVILY_API_KEY;
     const tvly = tavily({ apiKey });
-    const includeImageDescriptions = true;
+    const includeImageDescriptions = false;
 
     console.log("Queries:", queries);
     console.log("Max Results:", maxResults);
@@ -86,8 +86,8 @@ export const webSearch = tool({
         maxResults: maxResults[index] || maxResults[0] || 10,
         searchDepth: searchDepth[index] || searchDepth[0] || "basic",
         includeAnswer: true,
-        includeImages: true,
-        includeImageDescriptions: includeImageDescriptions,
+        includeImages: false,
+        includeImageDescriptions: false,
         excludeDomains: exclude_domains,
       });
 
