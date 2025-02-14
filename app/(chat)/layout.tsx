@@ -17,10 +17,10 @@ export default async function Layout({
   const isCollapsed = cookieStore.get("sidebar:state")?.value !== "true";
   const session = await getUserSession();
   const userInfo: User = {
-    id: session.parsedJWT.ctx.id,
-    walletAddress: session.parsedJWT.sub,
-    tier: session.parsedJWT.ctx.tier,
-    messageCount: session.parsedJWT.ctx.messageCount,
+    id: session?.parsedJWT?.ctx.id,
+    walletAddress: session?.parsedJWT?.sub,
+    tier: session?.parsedJWT?.ctx.tier,
+    messageCount: session?.parsedJWT?.ctx.messageCount,
   };
   return (
     <>
