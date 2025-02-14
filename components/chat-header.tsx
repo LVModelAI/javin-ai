@@ -57,7 +57,9 @@ function PureChatHeader({
           <ModelSelector selectedModelId={selectedModelId} className="" />
         )}
       </div>
-
+      <div className="p-2">
+        <CustomConnectWalletButton />
+      </div>
       {/* {!isReadonly && (
         <VisibilitySelector
           chatId={chatId}
@@ -65,8 +67,6 @@ function PureChatHeader({
           className="order-1 md:order-3"
         />
       )} */}
-
-      <CustomConnectWalletButton />
 
       {/* <Button
         className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4 md:ml-auto"

@@ -9,10 +9,10 @@ import {
   login,
   logout,
 } from "@/app/(auth)/actions"; // we'll create this file in the next section
-
+import { useRouter } from "next/navigation";
 export default function CustomConnectWalletButton() {
   const { theme } = useTheme();
-
+  const router = useRouter();
   const wallets = [
     inAppWallet({
       auth: {
@@ -27,32 +27,35 @@ export default function CustomConnectWalletButton() {
   ];
 
   return (
-    <div>
-      <ConnectButton
-        client={client}
-        wallets={wallets}
-        connectModal={{
-          size: "wide",
-          showThirdwebBranding: false,
-          title: "Sign in",
-        }}
-        connectButton={{ label: "Sign in" }}
-        auth={{
-          isLoggedIn: async (address) => {
-            console.log("checking if logged in!", { address });
-            return await isLoggedIn();
-          },
-          doLogin: async (params) => {
-            console.log("logging in!");
-            await login(params);
-          },
-          getLoginPayload: async ({ address }) => generatePayload({ address }),
-          doLogout: async () => {
-            console.log("logging out!");
-            await logout();
-          },
-        }}
-      />
-    </div>
+    <ConnectButton
+      client={client}
+      wallets={wallets}
+      connectModal={{
+        size: "wide",
+        showThirdwebBranding: false,
+        title: "Sign in",
+      }}
+      theme={theme === "dark" ? "dark" : "light"}
+      connectButton={{ label: "Sign in" }}
+      auth={{
+        isLoggedIn: async (address) => {
+          console.log("checking if logged in!", { address });
+          return await isLoggedIn();
+        },
+        doLogin: async (params) => {
+          console.log("logging in!");
+          await login(params);
+          location.reload();
+        },
+        getLoginPayload: async ({ address }) => generatePayload({ address }),
+        doLogout: async () => {
+          console.log("logging out!");
+          //reload the page
+          await logout();
+          router.push("/");
+          location.reload();
+        },
+      }}
+    />
   );
 }

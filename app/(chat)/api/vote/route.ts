@@ -1,5 +1,4 @@
 import { getUserSession, isLoggedIn } from "@/app/(auth)/actions";
-import { auth } from "@/app/(auth)/auth";
 import { getUser, getVotesByChatId, voteMessage } from "@/lib/db/queries";
 import { ThirdwebSession } from "@/types/thirdwebSession";
 
@@ -14,14 +13,14 @@ export async function GET(request: Request) {
   const loggedIn = await isLoggedIn();
   console.log("loggedIn", loggedIn);
   if (!loggedIn) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json([], { status: 200 });
   }
 
   const session = await getUserSession();
   console.log("session", session);
 
   if (!session || !session.parsedJWT || !session.parsedJWT.sub) {
-    return new Response("Unauthorized", { status: 401 });
+    return Response.json([], { status: 200 });
   }
   const votes = await getVotesByChatId({ id: chatId });
 

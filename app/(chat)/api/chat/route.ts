@@ -5,7 +5,6 @@ import {
   streamText,
 } from "ai";
 
-import { auth } from "@/app/(auth)/auth";
 import { myProvider } from "@/lib/ai/models";
 import { systemPrompt } from "@/lib/ai/prompts";
 import {
@@ -30,6 +29,7 @@ import { getMultiChainWalletPortfolio } from "@/lib/ai/tools/birdeye/wallet-port
 import { User } from "next-auth";
 import { searchTokenMarketData } from "@/lib/ai/tools/birdeye/search-token-market-data";
 import { getUserSession, isLoggedIn } from "@/app/(auth)/actions";
+import { getUserWalletAddress } from "@/lib/ai/tools/birdeye/get-user-wallet-address";
 
 export const maxDuration = 60;
 
@@ -97,6 +97,7 @@ export async function POST(request: Request) {
                 "getMultiChainWalletPortfolio",
                 "webSearch",
                 "searchTokenMarketData",
+                "getUserWalletAddress",
               ],
         experimental_transform: smoothStream({ chunking: "word" }),
         experimental_generateMessageId: generateUUID,
@@ -104,6 +105,7 @@ export async function POST(request: Request) {
           webSearch,
           getMultiChainWalletPortfolio,
           searchTokenMarketData,
+          getUserWalletAddress,
         },
         onFinish: async ({ response, reasoning }) => {
           if (session.parsedJWT.ctx.id) {

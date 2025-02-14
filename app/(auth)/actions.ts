@@ -26,15 +26,17 @@ export async function login(payload: VerifyLoginPayloadParams) {
   if (verifiedPayload.valid) {
     const walletAddress = verifiedPayload.payload.address;
     const users = await getUser(walletAddress);
-
+    let id = "";
     if (users.length === 0) {
-      const id = generateUUID();
+      id = generateUUID();
       await createUser(id, walletAddress); // Assuming password is not needed for wallet login
+    } else {
+      id = users[0].id;
     }
     const jwt = await thirdwebAuth.generateJWT({
       payload: verifiedPayload.payload,
       context: {
-        id: users[0].id,
+        id: id,
         tier: users.length > 0 ? users[0].tier : "free",
         messageCount: users.length > 0 ? users[0].messageCount : 0,
       },

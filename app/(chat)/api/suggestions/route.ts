@@ -1,5 +1,4 @@
 import { getUserSession } from "@/app/(auth)/actions";
-import { auth } from "@/app/(auth)/auth";
 import { getSuggestionsByDocumentId } from "@/lib/db/queries";
 
 export async function GET(request: Request) {

@@ -1,5 +1,4 @@
 import { getUserSession } from "@/app/(auth)/actions";
-import { auth } from "@/app/(auth)/auth";
 import { BlockKind } from "@/components/block";
 import {
   deleteDocumentsByIdAfterTimestamp,

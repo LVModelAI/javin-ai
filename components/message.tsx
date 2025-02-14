@@ -114,6 +114,10 @@ const PurePreviewMessage = ({
                           <PortfolioTable result={result} />
                         ) : toolName === "searchTokenMarketData" ? (
                           <MarketTokenTable result={result} />
+                        ) : toolName === "getUserWalletAddress" ? (
+                          <div className="text-sm">
+                            <p className="py-1">Wallet found</p>
+                          </div>
                         ) : (
                           <div className="text-sm">Done!</div>
                         )}
@@ -136,6 +140,11 @@ const PurePreviewMessage = ({
                         <div className="text-sm">
                           {/* <PortfolioTable result={null} args={args} /> */}
                           <p className="py-1">Fetching portfolio...</p>
+                        </div>
+                      ) : toolName === "getUserWalletAddress" ? (
+                        <div className="text-sm">
+                          {/* <PortfolioTable result={null} args={args} /> */}
+                          <p className="py-1">Checking wallet...</p>
                         </div>
                       ) : (
                         <div className="text-sm">Running {toolName}...</div>

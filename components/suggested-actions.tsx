@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { ChatRequestOptions, CreateMessage, Message } from "ai";
 import { memo } from "react";
+import { getUserSession } from "@/app/(auth)/actions";
+import { toast } from "sonner";
 
 interface SuggestedActionsProps {
   chatId: string;
@@ -49,8 +51,15 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
           className={index > 1 ? "hidden sm:block" : "block"}
         >
           <Button
+            type="button"
             variant="ghost"
             onClick={async () => {
+              const session = await getUserSession();
+              if (!session || !session.parsedJWT.sub) {
+                toast.error("Please sign in to send messages");
+                return;
+              }
+
               window.history.replaceState({}, "", `/chat/${chatId}`);
 
               append({
