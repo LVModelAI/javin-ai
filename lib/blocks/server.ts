@@ -1,12 +1,12 @@
-import { codeDocumentHandler } from '@/blocks/code/server';
-import { imageDocumentHandler } from '@/blocks/image/server';
-import { sheetDocumentHandler } from '@/blocks/sheet/server';
-import { textDocumentHandler } from '@/blocks/text/server';
-import { BlockKind } from '@/components/block';
-import { DataStreamWriter } from 'ai';
-import { Document } from '../db/schema';
-import { saveDocument } from '../db/queries';
-import { Session } from 'next-auth';
+import { codeDocumentHandler } from "@/blocks/code/server";
+import { imageDocumentHandler } from "@/blocks/image/server";
+import { sheetDocumentHandler } from "@/blocks/sheet/server";
+import { textDocumentHandler } from "@/blocks/text/server";
+import { BlockKind } from "@/components/block";
+import { DataStreamWriter } from "ai";
+import { Document } from "../db/schema";
+import { saveDocument } from "../db/queries";
+import { Session } from "next-auth";
 
 export interface SaveDocumentProps {
   id: string;
@@ -57,7 +57,7 @@ export function createDocumentHandler<T extends BlockKind>(config: {
           title: args.title,
           content: draftContent,
           kind: config.kind,
-          userId: args.session.user.id,
+          userId: args.session.parsedJWT.ctx.id,
         });
       }
 
@@ -77,7 +77,7 @@ export function createDocumentHandler<T extends BlockKind>(config: {
           title: args.document.title,
           content: draftContent,
           kind: config.kind,
-          userId: args.session.user.id,
+          userId: args.session.parsedJWT.ctx.id,
         });
       }
 
@@ -96,4 +96,4 @@ export const documentHandlersByBlockKind: Array<DocumentHandler> = [
   sheetDocumentHandler,
 ];
 
-export const blockKinds = ['text', 'code', 'image', 'sheet'] as const;
+export const blockKinds = ["text", "code", "image", "sheet"] as const;

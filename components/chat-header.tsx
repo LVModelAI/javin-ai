@@ -12,10 +12,7 @@ import { useSidebar } from "./ui/sidebar";
 import { memo } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { VisibilityType, VisibilitySelector } from "./visibility-selector";
-import { ConnectButton } from "thirdweb/react";
-import { createWallet } from "thirdweb/wallets";
-import { client } from "@/lib/thirdweb/client";
-import { useTheme } from "next-themes";
+import CustomConnectWalletButton from "./connect-wallet-button";
 
 function PureChatHeader({
   chatId,
@@ -32,15 +29,7 @@ function PureChatHeader({
   const { open } = useSidebar();
 
   const { width: windowWidth } = useWindowSize();
-  const wallets = [
-    createWallet("io.metamask"),
-    createWallet("com.coinbase.wallet"),
-    createWallet("me.rainbow"),
-    createWallet("io.rabby"),
-    createWallet("io.zerion.wallet"),
-  ];
 
-  const { theme } = useTheme();
   return (
     <header className="flex sticky top-0 bg-background  items-center px-2 md:px-2 gap-2 justify-between">
       <div className="flex flex-row gap-2 items-center justify-center">
@@ -77,20 +66,7 @@ function PureChatHeader({
         />
       )} */}
 
-      <div>
-        <ConnectButton
-          client={client}
-          wallets={wallets}
-          connectModal={{
-            size: "compact",
-            title: "Connect wallet",
-            showThirdwebBranding: false,
-          }}
-          //@ts-ignore
-          theme={theme}
-          connectButton={{ label: "Connect wallet" }}
-        />
-      </div>
+      <CustomConnectWalletButton />
 
       {/* <Button
         className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4 md:ml-auto"

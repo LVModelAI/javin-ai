@@ -29,6 +29,7 @@ import { webSearch } from "@/lib/ai/tools/web-search";
 import { getMultiChainWalletPortfolio } from "@/lib/ai/tools/birdeye/wallet-portfolio-multi-chain";
 import { User } from "next-auth";
 import { searchTokenMarketData } from "@/lib/ai/tools/birdeye/search-token-market-data";
+import { getUserSession, isLoggedIn } from "@/app/(auth)/actions";
 
 export const maxDuration = 60;
 
@@ -40,20 +41,26 @@ export async function POST(request: Request) {
   }: { id: string; messages: Array<Message>; selectedChatModel: string } =
     await request.json();
 
-  const session = await auth();
-
-  if (!session || !session.user || !session.user.id) {
+  const loggedIn = await isLoggedIn();
+  console.log("loggedIn", loggedIn);
+  if (!loggedIn) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const users = await getUser(session.user.email!);
-  const user_info = users[0];
-  console.log("user infor ", session.user);
+  const session = await getUserSession();
+  console.log("session", session);
+
+  if (!session || !session.parsedJWT || !session.parsedJWT.sub) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  console.log("user infor ", session.parsedJWT.ctx);
   if (
-    user_info.tier == "free" &&
-    user_info.messageCount >= Number(process.env.FREE_USER_MESSAGE_LIMIT!)
+    session.parsedJWT.ctx.tier == "free" &&
+    session.parsedJWT.ctx.messageCount >=
+      Number(process.env.FREE_USER_MESSAGE_LIMIT!)
   ) {
-    console.log("totmsg ", user_info.messageCount);
+    console.log("totmsg ", session.parsedJWT.ctx.messageCount);
     return new Response("You have reached your free plan messages limit", {
       status: 403,
     });
@@ -69,7 +76,7 @@ export async function POST(request: Request) {
 
   if (!chat) {
     const title = await generateTitleFromUserMessage({ message: userMessage });
-    await saveChat({ id, userId: session.user.id, title });
+    await saveChat({ id, userId: session.parsedJWT.ctx.id, title });
   }
 
   await saveMessages({
@@ -99,7 +106,7 @@ export async function POST(request: Request) {
           searchTokenMarketData,
         },
         onFinish: async ({ response, reasoning }) => {
-          if (session.user?.id) {
+          if (session.parsedJWT.ctx.id) {
             try {
               const sanitizedResponseMessages = sanitizeResponseMessages({
                 messages: response.messages,
@@ -117,7 +124,7 @@ export async function POST(request: Request) {
                   };
                 }),
               });
-              await incrementMessageCount(session.user.id);
+              await incrementMessageCount(session.parsedJWT.ctx.id);
             } catch (error) {
               console.error("Failed to save chat");
             }
@@ -148,16 +155,16 @@ export async function DELETE(request: Request) {
     return new Response("Not Found", { status: 404 });
   }
 
-  const session = await auth();
+  const session = await getUserSession();
 
-  if (!session || !session.user) {
+  if (!session || !session.parsedJWT.ctx.id) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   try {
     const chat = await getChatById({ id });
 
-    if (chat.userId !== session.user.id) {
+    if (chat.userId !== session.parsedJWT.ctx.id) {
       return new Response("Unauthorized", { status: 401 });
     }
 

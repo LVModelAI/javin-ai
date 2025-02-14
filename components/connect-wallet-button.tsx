@@ -3,12 +3,12 @@ import { ConnectButton } from "thirdweb/react";
 import { createWallet, getUserEmail, inAppWallet } from "thirdweb/wallets";
 import { client } from "@/lib/thirdweb/client";
 import { useTheme } from "next-themes";
-// import {
-//   generatePayload,
-//   isLoggedIn,
-//   login,
-//   logout,
-// } from "@/app/(auth)/actions"; // we'll create this file in the next section
+import {
+  generatePayload,
+  isLoggedIn,
+  login,
+  logout,
+} from "@/app/(auth)/actions"; // we'll create this file in the next section
 
 export default function CustomConnectWalletButton() {
   const { theme } = useTheme();
@@ -16,7 +16,7 @@ export default function CustomConnectWalletButton() {
   const wallets = [
     inAppWallet({
       auth: {
-        options: ["google", "farcaster", "email", "x", "apple"],
+        options: ["google", "farcaster", "email", "x"],
       },
     }),
     createWallet("io.metamask"),
@@ -31,10 +31,27 @@ export default function CustomConnectWalletButton() {
       <ConnectButton
         client={client}
         wallets={wallets}
-        connectModal={{ size: "compact", showThirdwebBranding: false }}
-        //@ts-ignore
-        theme={theme}
-        connectButton={{ label: "Connect wallet" }}
+        connectModal={{
+          size: "wide",
+          showThirdwebBranding: false,
+          title: "Sign in",
+        }}
+        connectButton={{ label: "Sign in" }}
+        auth={{
+          isLoggedIn: async (address) => {
+            console.log("checking if logged in!", { address });
+            return await isLoggedIn();
+          },
+          doLogin: async (params) => {
+            console.log("logging in!");
+            await login(params);
+          },
+          getLoginPayload: async ({ address }) => generatePayload({ address }),
+          doLogout: async () => {
+            console.log("logging out!");
+            await logout();
+          },
+        }}
       />
     </div>
   );

@@ -3,7 +3,6 @@ import NextAuth, { type User, type Session } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 import { getUser } from "@/lib/db/queries";
-import { authConfig } from "./auth.config";
 
 export const {
   handlers: { GET, POST },
@@ -11,7 +10,6 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  ...authConfig,
   providers: [
     Credentials({
       credentials: {},
@@ -36,9 +34,9 @@ export const {
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.tier = token.tier as string; // Assign tier from token to session
+      if (session.parsedJWT.ctx.id) {
+        session.parsedJWT.ctx.id = token.id as string;
+        session.parsedJWT.ctx.id.tier = token.tier as string; // Assign tier from token to session
       }
       return session;
     },

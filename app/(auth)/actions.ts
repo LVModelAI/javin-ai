@@ -1,84 +1,79 @@
-'use server';
+"use server";
+import { VerifyLoginPayloadParams, createAuth } from "thirdweb/auth";
+import { privateKeyToAccount } from "thirdweb/wallets";
+import { client } from "@/lib/thirdweb/client";
+import { cookies } from "next/headers";
+import { createUser, getUser, getUserTier } from "@/lib/db/queries";
+import { ThirdwebSession } from "@/types/thirdwebSession";
+import { generateUUID } from "@/lib/utils";
 
-import { z } from 'zod';
+const privateKey = process.env.AUTH_PRIVATE_KEY || "";
 
-import { createUser, getUser } from '@/lib/db/queries';
+if (!privateKey) {
+  throw new Error("Missing AUTH_PRIVATE_KEY in .env file.");
+}
 
-import { signIn } from './auth';
-
-const authFormSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+const thirdwebAuth = createAuth({
+  domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
+  adminAccount: privateKeyToAccount({ client, privateKey }),
+  client: client,
 });
 
-export interface LoginActionState {
-  status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data';
+export const generatePayload = thirdwebAuth.generatePayload;
+
+export async function login(payload: VerifyLoginPayloadParams) {
+  const verifiedPayload = await thirdwebAuth.verifyPayload(payload);
+  if (verifiedPayload.valid) {
+    const walletAddress = verifiedPayload.payload.address;
+    const users = await getUser(walletAddress);
+
+    if (users.length === 0) {
+      const id = generateUUID();
+      await createUser(id, walletAddress); // Assuming password is not needed for wallet login
+    }
+    const jwt = await thirdwebAuth.generateJWT({
+      payload: verifiedPayload.payload,
+      context: {
+        id: users[0].id,
+        tier: users.length > 0 ? users[0].tier : "free",
+        messageCount: users.length > 0 ? users[0].messageCount : 0,
+      },
+    });
+    (await cookies()).set("jwt", jwt);
+  }
 }
 
-export const login = async (
-  _: LoginActionState,
-  formData: FormData,
-): Promise<LoginActionState> => {
-  try {
-    const validatedData = authFormSchema.parse({
-      email: formData.get('email'),
-      password: formData.get('password'),
-    });
-
-    await signIn('credentials', {
-      email: validatedData.email,
-      password: validatedData.password,
-      redirect: false,
-    });
-
-    return { status: 'success' };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { status: 'invalid_data' };
-    }
-
-    return { status: 'failed' };
+export async function isLoggedIn() {
+  const jwt = (await cookies()).get("jwt");
+  if (!jwt?.value) {
+    return false;
   }
-};
 
-export interface RegisterActionState {
-  status:
-    | 'idle'
-    | 'in_progress'
-    | 'success'
-    | 'failed'
-    | 'user_exists'
-    | 'invalid_data';
+  const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt.value });
+  return authResult.valid;
 }
 
-export const register = async (
-  _: RegisterActionState,
-  formData: FormData,
-): Promise<RegisterActionState> => {
-  try {
-    const validatedData = authFormSchema.parse({
-      email: formData.get('email'),
-      password: formData.get('password'),
-    });
+export async function logout() {
+  (await cookies()).delete("jwt");
+}
 
-    const [user] = await getUser(validatedData.email);
-
-    if (user) {
-      return { status: 'user_exists' } as RegisterActionState;
-    }
-    await createUser(validatedData.email, validatedData.password);
-    await signIn('credentials', {
-      email: validatedData.email,
-      password: validatedData.password,
-      redirect: false,
-    });
-
-    return { status: 'success' };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { status: 'invalid_data' };
-    }
-
-    return { status: 'failed' };
+export async function getUserSession(): Promise<ThirdwebSession> {
+  const jwt = (await cookies()).get("jwt");
+  if (!jwt?.value) {
+    return {
+      valid: false,
+      parsedJWT: {
+        sub: "",
+        ctx: {
+          id: "",
+          tier: "",
+          messageCount: 0,
+        },
+      },
+    };
   }
-};
+
+  const authResult = await thirdwebAuth.verifyJWT({ jwt: jwt.value });
+  //@ts-ignore
+  return authResult;
+}

@@ -2,7 +2,7 @@
 
 import type { Attachment, Message } from "ai";
 import { useChat } from "ai/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
 
 import { ChatHeader } from "@/components/chat-header";
@@ -15,6 +15,7 @@ import { Messages } from "./messages";
 import { VisibilityType } from "./visibility-selector";
 import { useBlockSelector } from "@/hooks/use-block";
 import { toast } from "sonner";
+import { getUserSession, isLoggedIn } from "@/app/(auth)/actions";
 
 export function Chat({
   id,
@@ -64,7 +65,11 @@ export function Chat({
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isBlockVisible = useBlockSelector((state) => state.isVisible);
-
+  useEffect(() => {
+    getUserSession().then((loggedIn) => {
+      console.log("logged in", loggedIn);
+    });
+  }, []);
   return (
     <>
       <div className="flex flex-col min-w-0 h-dvh bg-background">

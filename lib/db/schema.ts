@@ -15,8 +15,8 @@ import { blockKinds } from "../blocks/server";
 
 export const user = pgTable("User", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
-  email: varchar("email", { length: 64 }).notNull(),
-  walletAddress: varchar("walletAddress", { length: 64 }),
+  walletAddress: varchar("walletAddress", { length: 64 }).notNull(),
+  email: varchar("email", { length: 64 }),
   password: varchar("password", { length: 64 }),
   tier: varchar("tier", { length: 64 }).notNull().default("free"),
   messageCount: integer("messageCount").notNull().default(0),

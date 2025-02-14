@@ -1,10 +1,12 @@
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
 
-import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-import { auth } from '../(auth)/auth';
-import Script from 'next/script';
+import { auth } from "../(auth)/auth";
+import Script from "next/script";
+import { getUserSession } from "../(auth)/actions";
+import { User } from "next-auth";
 
 export const experimental_ppr = true;
 
@@ -13,9 +15,15 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const [session, cookieStore] = await Promise.all([auth(), cookies()]);
-  const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
-
+  const cookieStore = await cookies();
+  const isCollapsed = cookieStore.get("sidebar:state")?.value !== "true";
+  const session = await getUserSession();
+  const userInfo: User = {
+    id: session.parsedJWT.ctx.id,
+    walletAddress: session.parsedJWT.sub,
+    tier: session.parsedJWT.ctx.tier,
+    messageCount: session.parsedJWT.ctx.messageCount,
+  };
   return (
     <>
       <Script
@@ -23,7 +31,7 @@ export default async function Layout({
         strategy="beforeInteractive"
       />
       <SidebarProvider defaultOpen={!isCollapsed}>
-        <AppSidebar user={session?.user} />
+        <AppSidebar user={userInfo} />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
     </>
