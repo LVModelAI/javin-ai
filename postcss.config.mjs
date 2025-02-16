@@ -5,9 +5,6 @@ const config = {
     '@tailwindcss/nesting': {},
   },
 };
-
-
-
 export default config;
 
 
