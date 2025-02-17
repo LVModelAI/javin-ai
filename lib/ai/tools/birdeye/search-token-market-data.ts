@@ -3,10 +3,10 @@ import { z } from "zod";
 
 export const searchTokenMarketData = tool({
   description:
-    "Search for token and market data for any chain by matching a pattern or a specific token, market address",
+    "Search for token and market data for any chain providing specific token address or market address",
   parameters: z.object({
     chain: z.string().default("all").describe("Blockchain network to query"),
-    keyword: z.string().describe("Token or market address to search for"),
+    keyword: z.string().describe("Token  address to search for"),
     target: z
       .string()
       .default("token")
@@ -31,8 +31,8 @@ export const searchTokenMarketData = tool({
     limit: z
       .number()
       .min(1)
-      .max(20)
-      .default(20)
+      .max(1)
+      .default(1)
       .describe("Number of results to return"),
   }),
   execute: async ({

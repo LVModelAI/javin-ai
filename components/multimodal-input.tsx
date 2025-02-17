@@ -38,7 +38,6 @@ import {
   HoverCardTrigger,
 } from "@/components/hover-card";
 import { AnimatePresence, motion } from "framer-motion";
-import { saveSearchModeAsCookie } from "@/app/(chat)/actions";
 
 interface GroupSelectorProps {
   selectedGroup: SearchGroupId;
@@ -303,6 +302,14 @@ function PureMultimodalInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
   const session = useSession();
+
+  const MIN_HEIGHT = 72;
+  const MAX_HEIGHT = 400;
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
+  const [isFocused, setIsFocused] = useState(false);
+
   useEffect(() => {
     if (textareaRef.current) {
       adjustHeight();
@@ -350,9 +357,6 @@ function PureMultimodalInput({
     setInput(event.target.value);
     adjustHeight();
   };
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
   const submitForm = useCallback(() => {
     if (!user || !user.email) {
@@ -441,105 +445,136 @@ function PureMultimodalInput({
     async (group: SearchGroup) => {
       console.log("selectd grup", group);
       setSelectedGroup(group.id);
-      await saveSearchModeAsCookie(group.id);
     },
     [setSelectedGroup]
   );
+
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
   // console.log("selectedgroup", selectedGroup);
   return (
-    <motion.div
-      layout
-      transition={{
-        layout: { duration: 0.4 },
-        duration: 0.4,
-        ease: [0.4, 0.0, 0.2, 1],
-        width: { type: "spring", stiffness: 300, damping: 30 },
-        gap: { type: "spring", stiffness: 300, damping: 30 },
-        padding: { type: "spring", stiffness: 300, damping: 30 },
-      }}
-      className="relative w-full flex flex-col gap-4"
-    >
-      {/* {messages.length === 0 &&
-        attachments.length === 0 &&
-        uploadQueue.length === 0 && (
-          <SuggestedActions append={append} chatId={chatId} />
-        )} */}
-      <Textarea
-        ref={textareaRef}
-        placeholder="Ask a question..."
-        value={input}
-        onChange={handleInput}
-        className={cx(
-          "min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted p-5 pb-12 dark:border-zinc-700",
-          className
-        )}
-        rows={2}
-        autoFocus
-        onKeyDown={(event) => {
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-
-            if (isLoading) {
-              toast.error("Please wait for the model to finish its response!");
-            } else {
-              submitForm();
-            }
-          }
+    <>
+      <motion.div
+        layout
+        transition={{
+          layout: { duration: 0.4 },
+          duration: 0.4,
+          ease: [0.4, 0.0, 0.2, 1],
+          width: { type: "spring", stiffness: 300, damping: 30 },
+          gap: { type: "spring", stiffness: 300, damping: 30 },
+          padding: { type: "spring", stiffness: 300, damping: 30 },
         }}
-      />
-
-      <input
-        type="file"
-        className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
-        ref={fileInputRef}
-        multiple
-        onChange={handleFileChange}
-        tabIndex={-1}
-      />
-
-      {(attachments.length > 0 || uploadQueue.length > 0) && (
-        <div className="flex flex-row gap-2 overflow-x-scroll items-end">
-          {attachments.map((attachment) => (
-            <PreviewAttachment key={attachment.url} attachment={attachment} />
-          ))}
-
-          {uploadQueue.map((filename) => (
-            <PreviewAttachment
-              key={filename}
-              attachment={{
-                url: "",
-                name: filename,
-                contentType: "",
-              }}
-              isUploading={true}
-            />
-          ))}
-        </div>
-      )}
-
-      <div className="absolute bottom-0 p-3 w-fit flex flex-row justify-start gap-2 items-center">
-        <AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} />
-
-        <div className="w-full">
-          <GroupSelector
-            selectedGroup={selectedGroup}
-            onGroupSelect={handleGroupSelect}
-          />
-        </div>
-      </div>
-
-      <div className="absolute bottom-0 right-0 p-3 w-fit flex flex-row justify-end">
-        {isLoading ? (
-          <StopButton stop={stop} setMessages={setMessages} />
-        ) : (
-          <SendButton
-            input={input}
-            submitForm={submitForm}
-            uploadQueue={uploadQueue}
-          />
+        className={cn(
+          "relative w-full flex flex-col gap-2 rounded-lg transition-all duration-300 !font-sans",
+          attachments.length > 0 || uploadQueue.length > 0
+            ? "bg-gray-100/70 dark:bg-neutral-800 p-1"
+            : "bg-transparent"
         )}
-      </div>
-    </motion.div>
+      >
+        <Textarea
+          ref={textareaRef}
+          placeholder={
+            messages.length > 0 ? "Ask a new question..." : "Ask a question..."
+          }
+          value={input}
+          onChange={handleInput}
+          disabled={isLoading}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          className={cn(
+            "min-h-[72px] w-full resize-none rounded-lg",
+            "text-base leading-relaxed",
+            "bg-neutral-100 dark:bg-neutral-900",
+            "border !border-neutral-200 dark:!border-neutral-700",
+            "focus:!border-neutral-300 dark:focus:!border-neutral-600",
+            isFocused ? "!border-neutral-300 dark:!border-neutral-600" : "",
+            "text-neutral-900 dark:text-neutral-100",
+            "focus:!ring-1 focus:!ring-neutral-300 dark:focus:!ring-neutral-600",
+            "px-4 pt-4 pb-16",
+            "overflow-y-auto",
+            "touch-manipulation"
+          )}
+          style={{
+            maxHeight: `${MAX_HEIGHT}px`,
+            WebkitUserSelect: "text",
+            WebkitTouchCallout: "none",
+          }}
+          rows={1}
+          autoFocus={width ? width > 768 : true}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+
+              if (isLoading) {
+                toast.error(
+                  "Please wait for the model to finish its response!"
+                );
+              } else {
+                submitForm();
+              }
+            }
+          }}
+        />
+
+        <input
+          type="file"
+          className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
+          ref={fileInputRef}
+          multiple
+          onChange={handleFileChange}
+          tabIndex={-1}
+        />
+
+        {(attachments.length > 0 || uploadQueue.length > 0) && (
+          <div className="flex flex-row gap-2 overflow-x-scroll items-end">
+            {attachments.map((attachment) => (
+              <PreviewAttachment key={attachment.url} attachment={attachment} />
+            ))}
+
+            {uploadQueue.map((filename) => (
+              <PreviewAttachment
+                key={filename}
+                attachment={{
+                  url: "",
+                  name: filename,
+                  contentType: "",
+                }}
+                isUploading={true}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="absolute bottom-0 p-3 w-fit flex flex-row justify-start gap-2 items-center">
+          {/* <AttachmentsButton fileInputRef={fileInputRef} isLoading={isLoading} /> */}
+
+          <div className="w-full">
+            <GroupSelector
+              selectedGroup={selectedGroup}
+              onGroupSelect={handleGroupSelect}
+            />
+          </div>
+        </div>
+
+        <div className="absolute bottom-0 right-0 p-3 w-fit flex flex-row justify-end">
+          {isLoading ? (
+            <StopButton stop={stop} setMessages={setMessages} />
+          ) : (
+            <SendButton
+              input={input}
+              submitForm={submitForm}
+              uploadQueue={uploadQueue}
+            />
+          )}
+        </div>
+      </motion.div>
+    </>
   );
 }
 

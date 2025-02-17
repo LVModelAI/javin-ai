@@ -242,7 +242,7 @@ export const searchGroups = [
 
   {
     id: "on_chain" as const,
-    name: "on_chain",
+    name: "On Chain",
     description: "Indepth onchain analysis",
     icon: Network,
   },
