@@ -249,3 +249,24 @@ export const searchGroups = [
 ] as const;
 
 export type SearchGroup = (typeof searchGroups)[number];
+
+export function shortenWalletAddresses(markdownText: string) {
+  // Regex to match Ethereum-style addresses (both with and without code backticks)
+  // Matches both `0x...` and 0x... patterns
+  const walletRegex = /`?(0x[a-fA-F0-9]{40})`?/g;
+
+  return markdownText.replace(walletRegex, (match, address) => {
+    const cleanAddress = address || match;
+
+    // Get first 6 and last 6 characters
+    const start = cleanAddress.slice(0, 8); // includes '0x' plus 4 chars
+    const end = cleanAddress.slice(-6);
+
+    // If the match included backticks, preserve them
+    if (match.startsWith("`")) {
+      return `\`${start}...${end}\``;
+    }
+
+    return `${start}...${end}`;
+  });
+}
