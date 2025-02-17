@@ -36,7 +36,7 @@ function PureMessages({
   return (
     <div
       ref={messagesContainerRef}
-      className={`flex flex-col min-w-0 gap-6  overflow-y-scroll pt-4 ${
+      className={`flex flex-col min-w-0 gap-6 w-screen md:w-full overflow-y-scroll pt-4 ${
         messages.length === 0 ? "" : "flex-1"
       }`}
     >

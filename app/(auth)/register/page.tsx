@@ -43,8 +43,8 @@ export default function Page() {
   };
 
   return (
-    <div className="flex flex-col h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
-      <div className="rounded-xl p-6 flex flex-col gap-2 leading-relaxed text-center max-w-2xl">
+    <div className="flex flex-col h-dvh w-screen pt-12 md:pt-0 items-center justify-center bg-background">
+      <div className="rounded-xl p-6 flex flex-col items-center gap-2 leading-relaxed text-center max-w-2xl">
         <p className="flex flex-row justify-center gap-4 items-center text-5xl font-semibold">
           Javin.ai
         </p>
@@ -52,8 +52,8 @@ export default function Page() {
           A focused, no-nonsense AI search engine for crypto and blockchain.
         </p>
       </div>
-      <div className="w-fit overflow-hidden rounded-2xl gap-5 flex flex-col border mx-auto p-5">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16  ">
+      <div className="w-fit overflow-hidden rounded-2xl gap-5 flex flex-col border m-2 p-5">
+        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
           <h3 className="text-xl font-semibold dark:text-zinc-50">Sign Up</h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
             Create an account with your email and password
