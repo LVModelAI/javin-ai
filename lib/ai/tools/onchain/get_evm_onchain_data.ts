@@ -11,6 +11,7 @@ import zerionJson from "./zerion-openapi.json";
 import { etherscanBaseURL, zerionBaseURL } from "./constant";
 import { fetchApi } from "./api-fetch";
 import { xai } from "@ai-sdk/xai";
+import { groq } from "@ai-sdk/groq";
 
 export const getEvmOnchainData = tool({
   description: "Get real-time data from Ethereum based blockchains.",
@@ -32,6 +33,8 @@ export const getEvmOnchainData = tool({
       // choose just the path based on summary from openapi spec
       const { object } = await generateObject({
         model: myProvider.languageModel("chat-model-small"),
+        // @ts-ignore
+        // model: groq("llama-3.3-70b-versatile"),
         system: `there are 2 different api providers to fetch information about ethereum based blockchain. one is zerion and other is etherscan. you will just return the name of the api provider and its respective endpoint path in the given list of endpoint path and their summary, which can be helpfull to answers user query. do not modify it in any way.`,
         prompt: `The list of api endpoints and their summary for the api provider zerion is ${zerionAllPaths} and for the api provider etherscan is ${etherscanAllPaths} and user Query is ${userQuery}`,
         output: "array",
@@ -93,15 +96,19 @@ export const getEvmOnchainData = tool({
             url: urlToCall.apiUrl,
             apiProvider: obj.apiProvider,
           });
-          console.log("summarizeing the response...");
           // summarize the response
+          const start = performance.now();
           const { text } = await generateText({
-            model: xai("grok-2-1212"),
-            system: `you will be provided with the response from a ethereum based blockchain api. summarize the response. do not modify it in any way.`,
+            // model: xai("grok-2-1212"),
+            // @ts-ignore
+            model: groq("llama-3.3-70b-versatile"),
+            system: `you will be provided with the response from a ethereum based blockchain api. describe the information in the response in human readable way. do not modify it in any way. do not describe the response structure in technical terms. describe what it implies.`,
             prompt: `User query was = ${userQuery}. The api was = ${url}. The api response is = ${JSON.stringify(
               result
             )}.`,
           });
+          const end = performance.now();
+          console.log(`sumarised in : ${(end - start).toFixed(4)} ms`);
 
           console.log("summarised text --- ", text);
 
