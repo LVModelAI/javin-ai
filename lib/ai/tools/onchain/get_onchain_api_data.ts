@@ -10,6 +10,7 @@ import {
 import zerionJson from "./zerion-openapi.json";
 import { etherscanBaseURL, zerionBaseURL } from "./constant";
 import { fetchApi } from "./api-fetch";
+import { xai } from "@ai-sdk/xai";
 
 export const getEvmOnchainData = tool({
   description: "Get real-time data from Ethereum based blockchains.",
@@ -94,7 +95,7 @@ export const getEvmOnchainData = tool({
           });
 
           const { text } = await generateText({
-            model: myProvider.languageModel("chat-model-small"),
+            model: xai("grok-2-1212"),
             system: `you will be provided with the response from a ethereum based blockchain api. summarize the response. do not modify it in any way.`,
             prompt: `User query was = ${userQuery}. The api was = ${url}. The api response is = ${JSON.stringify(
               result
