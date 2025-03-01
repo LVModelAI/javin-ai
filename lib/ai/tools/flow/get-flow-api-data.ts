@@ -45,7 +45,7 @@ export const getFlowApiData = tool({
 
       // make the api calls
       const requests = limitedApiEndpointsArray.map((endpoint) => {
-        const fullUrl = `https://evm-testnet.flowscan.io/api/v2${endpoint}`;
+        const fullUrl = `https://evm.flowscan.io/api/v2${endpoint}`;
         return makeBlockscoutApiRequest(fullUrl); // Return the promise
       });
 

@@ -33,10 +33,10 @@ import { getVanaStats } from "@/lib/ai/tools/vana/get-stats";
 import { getVanaApiData } from "@/lib/ai/tools/vana/get-vana-api-data";
 import { getCreditcoinStats } from "@/lib/ai/tools/creditcoin/get-stats";
 import { getCreditcoinApiData } from "@/lib/ai/tools/creditcoin/get-creditcon-api-data";
-import { getEvmOnchainData } from "@/lib/ai/tools/onchain/get_onchain_api_data";
+import { getEvmOnchainData } from "@/lib/ai/tools/onchain/get_evm_onchain_data";
 import { ensToAddress } from "@/lib/ai/tools/ens-to-address";
 import { getWormholeApiData } from "@/lib/ai/tools/wormhole/get-wormhole-api-data";
-import { getFlowApiData } from "@/lib/ai/tools/flow/get-vana-api-data";
+import { getFlowApiData } from "@/lib/ai/tools/flow/get-flow-api-data";
 import { getFlowStats } from "@/lib/ai/tools/flow/get-stats";
 
 export const maxDuration = 60;

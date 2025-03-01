@@ -260,14 +260,14 @@ export const searchGroups = [
     icon: Network,
     img: "",
   },
-  {
-    id: "wormhole" as const,
-    name: "Wormhole",
-    description:
-      "Access all the information you need to develop secure multichain applications powered by Wormhole",
-    icon: Network,
-    img: "/images/icon/wormhole-logo.png",
-  },
+  // {
+  //   id: "wormhole" as const,
+  //   name: "Wormhole",
+  //   description:
+  //     "Access all the information you need to develop secure multichain applications powered by Wormhole",
+  //   icon: Network,
+  //   img: "/images/icon/wormhole-logo.png",
+  // },
 
   {
     id: "creditcoin" as const,

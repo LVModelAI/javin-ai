@@ -31,7 +31,7 @@ export const fetchApi = async ({
       const response = await fetch(`${url}`);
       const t = await response.json();
       apiResult = t.result;
-      console.log("apiResult ==== ", apiResult);
+      // console.log("apiResult ==== ", apiResult);
     } else {
       const options = {
         method: "GET",

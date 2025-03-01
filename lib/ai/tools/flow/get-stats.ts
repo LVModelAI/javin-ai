@@ -9,7 +9,7 @@ export const getFlowStats = tool({
     try {
       console.log("fetching Flow stats ");
       const response = await getStatPageScreenshot(
-        "https://evm-testnet.flowscan.io/stats"
+        "https://evm.flowscan.io/stats"
       );
 
       if (!response) {
