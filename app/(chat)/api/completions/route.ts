@@ -96,6 +96,17 @@ export const maxDuration = 60;
 // }
 
 export async function POST(request: Request) {
+  const EXTERNALAPIKEY = process.env.SENTIENT_EXTERNAL_APIKEY;
+
+  const authHeader = request.headers.get("Authorization");
+
+  if (!authHeader || authHeader !== `Bearer ${EXTERNALAPIKEY}`) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const { model, prompt }: { model: string; prompt: string } =
     await request.json();
   const { tools: activeTools, systemPrompt } = await getGroupConfig("on_chain");
@@ -140,12 +151,10 @@ export async function POST(request: Request) {
           console.log("chunk = ", chunk);
           const message = {
             id: generateUUID(),
-            object: "chat.completion.chunk",
+            object: "text_completion",
             created: Math.floor(Date.now() / 1000),
+            choices: [{ text: chunk, index: 0, finish_reason: null }],
             model,
-            choices: [
-              { delta: { content: chunk }, index: 0, finish_reason: null },
-            ],
           };
 
           controller.enqueue(
@@ -156,12 +165,10 @@ export async function POST(request: Request) {
         // Send stop signal
         const stopMessage = {
           id: generateUUID(),
-          object: "chat.completion.chunk",
+          object: "text_completion",
           created: Math.floor(Date.now() / 1000),
+          choices: [{ text: null, index: 0, finish_reason: "stop" }],
           model,
-          choices: [
-            { delta: { content: null }, index: 0, finish_reason: "stop" },
-          ],
         };
 
         controller.enqueue(
