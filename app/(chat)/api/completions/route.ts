@@ -29,6 +29,7 @@ import { getWormholeApiData } from "@/lib/ai/tools/wormhole/get-wormhole-api-dat
 import { getFlowApiData } from "@/lib/ai/tools/flow/get-flow-api-data";
 import { getFlowStats } from "@/lib/ai/tools/flow/get-stats";
 import { openai } from "@ai-sdk/openai";
+import { translateTransactions } from "@/lib/ai/tools/translate-transactions";
 
 export const maxDuration = 60;
 
@@ -110,10 +111,10 @@ export async function POST(request: Request) {
           maxSteps: 10,
           experimental_activeTools:
             model === "chat-model-reasoning" ? [] : [...activeTools],
-            onChunk: async ({ chunk }) => {
-                // MAKE THIS INTO OPENAI API STANDARD MESSAGE AND PUSH IN CONTROLLER
-                console.log("onChunk = ", chunk);
-            },
+          onChunk: async ({ chunk }) => {
+            // MAKE THIS INTO OPENAI API STANDARD MESSAGE AND PUSH IN CONTROLLER
+            console.log("onChunk = ", chunk);
+          },
           tools: {
             webSearch,
             getEvmMultiChainWalletPortfolio,
@@ -130,6 +131,7 @@ export async function POST(request: Request) {
             getWormholeApiData,
             getFlowApiData,
             getFlowStats,
+            translateTransactions,
           },
           experimental_transform: smoothStream({ chunking: "word" }),
           experimental_generateMessageId: generateUUID,
