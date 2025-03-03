@@ -1,0 +1,17 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node-dev --respawn api/index.ts",
+    "build": "tsc",
+    "start": "vercel start"
+  },
+  "dependencies": {
+    "@vercel/node": "5.1.10"
+  },
+  "devDependencies": {
+    "vercel": "^41.3.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}

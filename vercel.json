@@ -1,0 +1,19 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "apps/javin/next.config.ts",
+            "use": "@vercel/next"
+        },
+        {
+            "src": "apps/api/index.ts",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/completions",
+            "dest": "/apps/api/api/index.ts"
+        }
+    ]
+}
