@@ -1,0 +1,474 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Translate API",
+    "description": "Translate raw blockchain transactions into human-friendly, enriched form. Powered by Noves.",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://translate.noves.fi/"
+    }
+  ],
+  "paths": {
+    "/evm/{chain}/tx/{txHash}": {
+      "get": {
+        "tags": [
+          "Evm"
+        ],
+        "summary": "/evm/{chain}/tx/{txHash}",
+        "description": "Returns all of the available transaction information for the chain and transaction hash requested, from the perspective of the wallet passed in as the viewAsWalletHash parameter.",
+        "parameters": [
+          {
+            "name": "viewAsAccountAddress",
+            "in": "query",
+            "description": "Results are returned with the view/perspective of this wallet address.",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "txHash",
+            "in": "path",
+            "description": "Hash of the transaction.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "0x1cd4d61b9750632da36980329c240a5d2d2219a8cb3daaaebfaed4ae7b4efa22",
+              "example": "0x1cd4d61b9750632da36980329c240a5d2d2219a8cb3daaaebfaed4ae7b4efa22"
+            }
+          },
+          {
+            "name": "chain",
+            "in": "path",
+            "description": "Name of the chain.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "eth",
+              "example": "eth"
+            }
+          },
+          {
+            "name": "v5Format",
+            "in": "query",
+            "description": "If true, the response will be in the v5 transaction format. Optional.",
+            "style": "form",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "apiKey",
+            "in": "header",
+            "description": "API Key for Translate API. To generate an API Key, visit https://noves.fi/pricing",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "demokey"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EVMClassifiedTransaction"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EVMClassifiedTransaction"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EVMClassifiedTransaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/evm/{chain}/txs/{accountAddress}": {
+      "get": {
+        "tags": [
+          "Evm"
+        ],
+        "summary": "/evm/{chain}/txs/{accountAddress}",
+        "description": "Returns a list of the available transaction information for the chain and wallet requested, from the perspective of the wallet passed in as the viewAsWalletHash parameter.\r\n<br />\r\nProvide either a block range or a timestamp range, not both.\r\n<br /><b>Note:</b> For pagination, use the <i>nextPageUrl</i> link that will be returned as part of the output.",
+        "parameters": [
+          {
+            "name": "viewAsAccountAddress",
+            "in": "query",
+            "description": "Results are returned with the view/perspective of this wallet address. Optional.",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startTimestamp",
+            "in": "query",
+            "description": "Start timestamp to filter by. Optional.",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "endTimestamp",
+            "in": "query",
+            "description": "End timestamp to filter by. Optional.",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "accountAddress",
+            "in": "path",
+            "description": "Hash address of the Wallet.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "0x9B1054d24dC31a54739B6d8950af5a7dbAa56815",
+              "example": "0x9B1054d24dC31a54739B6d8950af5a7dbAa56815"
+            }
+          },
+          {
+            "name": "chain",
+            "in": "path",
+            "description": "Name of the chain.",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "eth",
+              "example": "eth"
+            }
+          },
+          {
+            "name": "startBlock",
+            "in": "query",
+            "description": "Start block to filter by. Optional.",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": "14637919",
+              "example": "14637919"
+            }
+          },
+          {
+            "name": "endBlock",
+            "in": "query",
+            "description": "End block to filter by. Optional.",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": "15289488",
+              "example": "15289488"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The order of the transactions to sort by timestamp. desc | asc. Optional",
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "default": "desc"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Number of transactions to return per page. Optional.",
+            "style": "form",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "liveData",
+            "in": "query",
+            "description": "Enables retrieval of recent data - defined as transactions that have been confirmed in the last 5 minutes.\r\n            When enabled, the overall response time might be slower.\r\n            When disabled, the endTimestamp parameter will default to 5 minutes in the past (if no values are passed for endTimestamp or endBlock).\r\n            Optional.",
+            "style": "form",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "v5Format",
+            "in": "query",
+            "description": "If true, the response will be in the v5 transaction format. Optional.",
+            "style": "form",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "viewAsTransactionSender",
+            "in": "query",
+            "description": "If true, the transaction will use the perspective of the sender of the transaction.",
+            "style": "form",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "apiKey",
+            "in": "header",
+            "description": "API Key for Translate API. To generate an API Key, visit https://noves.fi/pricing",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "default": "demokey"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EVMClassifiedTransactionPagedResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EVMClassifiedTransactionPagedResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EVMClassifiedTransactionPagedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EVMClassifiedTransaction": {
+        "type": "object",
+        "properties": {
+          "txTypeVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "chain": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "classificationData": {
+            "nullable": true
+          },
+          "rawTransactionData": {
+            "$ref": "#/components/schemas/RawTransactionData"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": {}
+      },
+      "RawTransactionData": {
+        "type": "object",
+        "properties": {
+          "transactionHash": {
+            "type": "string",
+            "nullable": true
+          },
+          "fromAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "toAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "blockNumber": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "gas": {
+            "type": "string",
+            "example": "bigInteger"
+          },
+          "gasPrice": {
+            "type": "string",
+            "example": "bigInteger"
+          },
+          "transactionFee": {
+            "type": "string",
+            "example": "bigInteger"
+          },
+          "timestamp": {
+            "type": "string",
+            "example": "bigInteger"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EVMClassifiedTransactionPagedResult": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EVMClassifiedTransaction"
+            },
+            "nullable": true
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "hasNextPage": {
+            "type": "boolean"
+          },
+          "nextPageUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

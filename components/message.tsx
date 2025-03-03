@@ -127,10 +127,17 @@ const PurePreviewMessage = ({
                           <PortfolioTable result={result} />
                         ) : toolName === "getCreditcoinApiData" ||
                           toolName === "getVanaApiData" ||
-                          toolName === "getEvmOnchainData" ? (
+                          toolName === "getEvmOnchainDataUsingZerion" ? (
                           <div className="text-sm">
                             <p className="flex flex-row gap-1 items-center">
                               Exploring the blockchain
+                              <Check size={14} className="text-green-500" />
+                            </p>
+                          </div>
+                        ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
+                          <div className="text-sm">
+                            <p className="flex flex-row gap-1 items-center">
+                              Exploring ethereum
                               <Check size={14} className="text-green-500" />
                             </p>
                           </div>
@@ -138,6 +145,13 @@ const PurePreviewMessage = ({
                           <div className="text-sm">
                             <p className="flex flex-row gap-1 items-center">
                               Looking for you in the blockchain
+                              <Check size={14} className="text-green-500" />
+                            </p>
+                          </div>
+                        ) : toolName === "translateTransactions" ? (
+                          <div className="text-sm">
+                            <p className="flex flex-row gap-1 items-center">
+                              Summarizing transactions
                               <Check size={14} className="text-green-500" />
                             </p>
                           </div>
@@ -171,9 +185,13 @@ const PurePreviewMessage = ({
                         </div>
                       ) : toolName === "getCreditcoinApiData" ||
                         toolName === "getVanaApiData" ||
-                        toolName === "getEvmOnchainData" ? (
+                        toolName === "getEvmOnchainDataUsingZerion" ? (
                         <div className="text-sm">
                           <p className="py-1">Exploring the blockchain...</p>
+                        </div>
+                      ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
+                        <div className="text-sm">
+                          <p className="py-1">Exploring ethereum...</p>
                         </div>
                       ) : toolName === "creditCoinApiFetch" ||
                         toolName === "vanaApiFetch" ||
@@ -185,6 +203,12 @@ const PurePreviewMessage = ({
                         <div className="text-sm">
                           <p className="py-1">
                             Looking for you in the blockchain...
+                          </p>
+                        </div>
+                      ) : toolName === "translateTransactions" ? (
+                        <div className="text-sm">
+                          <p className="flex flex-row gap-1 items-center">
+                            Summarizing transactions...
                           </p>
                         </div>
                       ) : (

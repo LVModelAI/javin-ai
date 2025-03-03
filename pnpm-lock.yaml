@@ -11,6 +11,9 @@ importers:
       '@ai-sdk/fireworks':
         specifier: ^0.1.8
         version: 0.1.8(zod@3.23.8)
+      '@ai-sdk/groq':
+        specifier: ^1.1.11
+        version: 1.1.11(zod@3.23.8)
       '@ai-sdk/openai':
         specifier: 1.1.9
         version: 1.1.9(zod@3.23.8)
@@ -299,6 +302,12 @@ packages:
 
   '@ai-sdk/fireworks@0.1.8':
     resolution: {integrity: sha512-3/xrROoWl3K6YA9VMej4p1M2eMS54xz7Z0x7QC7+q9ULLNhiZOpkbHVxDjsBayOlwiXH1MyZlKyDd4jJsgDzgg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.0.0
+
+  '@ai-sdk/groq@1.1.11':
+    resolution: {integrity: sha512-Y5WUyWuxkQarl4AVGeIMbNSp4/XiwW/mxp9SKeagfDhflVnQHd2ggISVD6HiOBQhznusITjWYYC66DJeBn0v6A==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
@@ -5203,6 +5212,12 @@ snapshots:
       '@ai-sdk/openai-compatible': 0.1.8(zod@3.23.8)
       '@ai-sdk/provider': 1.0.7
       '@ai-sdk/provider-utils': 2.1.6(zod@3.23.8)
+      zod: 3.23.8
+
+  '@ai-sdk/groq@1.1.11(zod@3.23.8)':
+    dependencies:
+      '@ai-sdk/provider': 1.0.9
+      '@ai-sdk/provider-utils': 2.1.10(zod@3.23.8)
       zod: 3.23.8
 
   '@ai-sdk/openai-compatible@0.1.12(zod@3.23.8)':
