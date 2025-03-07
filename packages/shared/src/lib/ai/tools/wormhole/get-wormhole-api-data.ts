@@ -31,7 +31,7 @@ export const getWormholeApiData = tool({
 
       console.log("use prompt is -- ", userQuery);
       const { object: apiEndpointsArray } = await generateObject({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         output: "array",
         schema: z.string().describe("the api endpoint"),
         system: `\n
@@ -59,7 +59,7 @@ export const getWormholeApiData = tool({
       const results = await Promise.all(requests); // Wait for all requests to complete
 
       const { text } = await generateText({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         system: `you will be provided with the response from wormhole. summarize the response. do not modify it in any way.`,
         prompt: `User query was = ${userQuery}. The apis were = ${limitedApiEndpointsArray}. The api response is = ${JSON.stringify(
           results

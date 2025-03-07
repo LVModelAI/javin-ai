@@ -27,6 +27,7 @@ import MultiSearch from "./multi-search";
 import PortfolioTable from "./birdeye/PortfolioTable";
 import TokenInfoTable from "./birdeye/TokenInfoTable";
 import { Check } from "lucide-react";
+import ReasonSearch from "./reason-search";
 
 const PurePreviewMessage = ({
   chatId,
@@ -103,6 +104,12 @@ const PurePreviewMessage = ({
               <div className="flex flex-col gap-4">
                 {message.toolInvocations.map((toolInvocation) => {
                   const { toolName, toolCallId, state, args } = toolInvocation;
+                  console.log("toolInvocation ============ ", toolInvocation);
+                  console.log("tool called is  ============ ", toolName);
+                  const updates =
+                    message?.annotations
+                      ?.filter((a: any) => a.type === "search_update")
+                      ?.map((a: any) => a.data) || [];
 
                   if (state === "result") {
                     const { result } = toolInvocation;
@@ -152,6 +159,8 @@ const PurePreviewMessage = ({
                               <Check size={14} className="text-green-500" />
                             </p>
                           </div>
+                        ) : toolName == "deepSearch" ? (
+                          <ReasonSearch updates={updates} />
                         ) : (
                           <div className="text-sm">
                             <p className="flex flex-row gap-1 items-center">
@@ -165,12 +174,7 @@ const PurePreviewMessage = ({
                   }
                   // else when tool is loading
                   return (
-                    <div
-                      key={toolCallId}
-                      className={cx({
-                        skeleton: ["getWeather"].includes(toolName),
-                      })}
-                    >
+                    <div key={toolCallId}>
                       {toolName === "webSearch" ? (
                         <div className="mt-4">
                           <MultiSearch result={null} args={args} />
@@ -196,6 +200,8 @@ const PurePreviewMessage = ({
                         <div className="text-sm">
                           <p className="py-1">Fetching data...</p>
                         </div>
+                      ) : toolName === "deepSearch" ? (
+                        <ReasonSearch updates={updates} />
                       ) : toolName === "ensToAddress" ? (
                         <div className="text-sm">
                           <p className="py-1">
@@ -275,25 +281,7 @@ const PurePreviewMessage = ({
   );
 };
 
-export const PreviewMessage = memo(
-  PurePreviewMessage,
-  (prevProps, nextProps) => {
-    if (prevProps.isLoading !== nextProps.isLoading) return false;
-    if (prevProps.message.reasoning !== nextProps.message.reasoning)
-      return false;
-    if (prevProps.message.content !== nextProps.message.content) return false;
-    if (
-      !equal(
-        prevProps.message.toolInvocations,
-        nextProps.message.toolInvocations
-      )
-    )
-      return false;
-    if (!equal(prevProps.vote, nextProps.vote)) return false;
-
-    return true;
-  }
-);
+export const PreviewMessage = PurePreviewMessage;
 
 export const ThinkingMessage = () => {
   const role = "assistant";

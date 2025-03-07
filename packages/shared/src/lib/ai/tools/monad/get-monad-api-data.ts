@@ -32,7 +32,7 @@ export const getMonadApiData = tool({
       const allPaths = await getAllPathDetails(openapidata);
       // console.log("allPaths", allPaths);
       const { object: apiEndpointsArray } = await generateObject({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         output: "array",
         schema: z.string().describe("the api path"),
         system: `\n

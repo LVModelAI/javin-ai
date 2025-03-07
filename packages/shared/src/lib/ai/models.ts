@@ -5,19 +5,23 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from "ai";
+import { perplexity } from "@ai-sdk/perplexity";
+import { xai } from "@ai-sdk/xai";
 
-export const DEFAULT_CHAT_MODEL: string = "chat-model-small";
+export const DEFAULT_CHAT_MODEL: string = "gpt-4o-mini";
 
+//@ts-ignore
 export const myProvider = customProvider({
   languageModels: {
-    "chat-model-small": openai("gpt-4o-mini"),
-    "chat-model-large": openai("gpt-4o"),
+    "gpt-4o-mini": openai("gpt-4o-mini"),
+    "gpt-4o": openai("gpt-4o"),
     "chat-model-reasoning": wrapLanguageModel({
       model: fireworks("accounts/fireworks/models/deepseek-r1"),
       middleware: extractReasoningMiddleware({ tagName: "think" }),
     }),
     "title-model": openai("gpt-4-turbo"),
-    "block-model": openai("gpt-4o-mini"),
+    //@ts-ignore
+    "grok-2": xai("grok-2-1212"),
   },
   imageModels: {
     "small-model": openai.image("dall-e-2"),
@@ -33,15 +37,31 @@ interface ChatModel {
 
 export const chatModels: Array<ChatModel> = [
   {
-    id: "chat-model-small",
-    name: "gpt-4o-mini",
+    id: "grok-2",
+    name: "Grok 2.0",
+    description: "Large model for complex, multi-step tasks",
+  },
+  {
+    id: "gpt-4o-mini",
+    name: "Gpt 4o Mini",
     description: "Small model for fast, lightweight tasks",
   },
   {
-    id: "chat-model-large",
-    name: "gpt-4o",
+    id: "gpt-4o",
+    name: "Gpt 4o",
     description: "Large model for complex, multi-step tasks",
   },
+  {
+    id: "sonar-pro",
+    name: "Sonar Pro",
+    description: "Large model for complex, multi-step tasks",
+  },
+  {
+    id: "sonar",
+    name: "Sonar",
+    description: "Large model for complex, multi-step tasks",
+  },
+
   // {
   //   id: 'chat-model-reasoning',
   //   name: 'Reasoning model',

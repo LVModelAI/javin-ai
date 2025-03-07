@@ -108,6 +108,7 @@ const groupTools = {
     "getFlowStats",
     "getFlowApiData",
   ] as const,
+  trenches: ["deepSearch"],
   aptos: [
     "webSearch",
     "getSiteContent",
@@ -127,34 +128,6 @@ const groupTools = {
     "getMonadApiData",
   ] as const,
 } as const;
-
-export const allTools = {
-  webSearch,
-  getEvmMultiChainWalletPortfolio,
-  getSolanaChainWalletPortfolio,
-  searchSolanaTokenMarketData,
-  searchEvmTokenMarketData,
-  getSiteContent,
-  getCreditcoinApiData,
-  getVanaApiData,
-  getVanaStats,
-  getCreditcoinStats,
-  getEvmOnchainDataUsingZerion,
-  getEvmOnchainDataUsingEtherscan,
-  ensToAddress,
-  getWormholeApiData,
-  getFlowApiData,
-  getFlowStats,
-  translateTransactions,
-  // zeta
-  getZetaStats,
-  getZetaApiData,
-  // monad
-  getMonadStats,
-  getMonadApiData,
-  getAptosStats,
-  getAptosApiData,
-};
 
 const groupPrompts = {
   search: `
@@ -193,7 +166,7 @@ Comply with user requests to the best of your abilities using the appropriate to
   If the tool returns no data, assume the input is a token address and proceed to get the token data using searchTokenMarketData tool.
 
   ## Ens lookup: If user enters a ENS name, like somename.eth or someName.someChain.eth then use the ensToAddress tool to get the corresponding address. use this address for further queries.
-  `,
+    `,
 
   on_chain: `
 Role & Functionality
@@ -256,7 +229,24 @@ Get list of all available gas prices
 
 ## translate transactions to human readable format: 
 always use the translateTransactions tool to convert the raw transaction details into human readable format. pass the transaction details, chain name and user query to the tool. the supported chain names are ${novesSupportedChains}.
-`,
+    `,
+
+  trenches: `
+  Role & Functionality
+  Today's Date: ${new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    weekday: "short",
+  })}
+
+    ### Reason Search Tool:
+    - Your primary tool is deepSearch, which allows for:
+      - Multi-step search planning
+      - Parallel web and on-chain searches
+      - Deep analysis of findings
+      - Cross-referencing and validation
+    `,
 
   wormhole: `
 Role & Functionality
@@ -285,7 +275,7 @@ Always assume information being asked is related to ethereum and other evm based
   If the user wants to fetch any wormhole guardian or the explorer data, use the getWormholeApiData tool. pass the user query to the tool. modify the query to be more meaningfull and gramatically correct and pass it to the tool. the result will contain data necessary to answer user query summarise the results for the user.  
 
 
-`,
+    `,
 
   creditcoin: `Role & Functionality
 You are an AI-powered Creditcoin search agent, specifically designed to assist users in understanding and navigating the Creditcoin ecosystem. You provide accurate, real-time, and AI-driven insights on various aspects of Creditcoin, including lending, borrowing, token utilities, ecosystem updates, security, and on-chain data.
@@ -585,7 +575,7 @@ export const systemPrompt = ({
 export async function getGroupConfig(groupId: SearchGroupId = "search") {
   "use server";
   const tools = groupTools[groupId];
-  const systemPrompt = `${regularPrompt} , ${groupPrompts[groupId]} `;
+  const systemPrompt = `${regularPrompt} \n\n ${groupPrompts[groupId]} `;
   return {
     tools,
     systemPrompt,
