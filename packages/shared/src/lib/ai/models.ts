@@ -5,7 +5,6 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from "ai";
-import { perplexity } from "@ai-sdk/perplexity";
 import { xai } from "@ai-sdk/xai";
 
 export const DEFAULT_CHAT_MODEL: string = "gpt-4o-mini";

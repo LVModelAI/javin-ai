@@ -115,6 +115,7 @@ export async function POST(request: Request) {
         system: systemPrompt,
         prompt: prompt,
         maxSteps: 10,
+        //@ts-ignore
         experimental_activeTools:
           model === "chat-model-reasoning" ? [] : [...activeTools],
         tools: allTools,
@@ -154,6 +155,7 @@ export async function POST(request: Request) {
             system: systemPrompt,
             prompt: prompt,
             maxSteps: 10,
+            //@ts-ignore
             experimental_activeTools:
               model === "chat-model-reasoning" ? [] : [...activeTools],
             onChunk: async ({ chunk }) => {
