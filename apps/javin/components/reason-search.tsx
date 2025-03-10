@@ -130,7 +130,7 @@ const ResearchStep = ({
         )}
         layout
       >
-        <div
+        {/* <div
           className={cn(
             "flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors duration-300",
             update.status === "completed"
@@ -143,7 +143,7 @@ const ResearchStep = ({
           ) : (
             <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
           )}
-        </div>
+        </div> */}
 
         <button
           onClick={onToggle}

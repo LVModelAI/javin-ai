@@ -104,8 +104,6 @@ const PurePreviewMessage = ({
               <div className="flex flex-col gap-4">
                 {message.toolInvocations.map((toolInvocation) => {
                   const { toolName, toolCallId, state, args } = toolInvocation;
-                  console.log("toolInvocation ============ ", toolInvocation);
-                  console.log("tool called is  ============ ", toolName);
                   const updates =
                     message?.annotations
                       ?.filter((a: any) => a.type === "search_update")

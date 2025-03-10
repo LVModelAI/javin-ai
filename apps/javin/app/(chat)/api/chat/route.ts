@@ -194,6 +194,9 @@ export async function POST(request: Request) {
                         - "web": General web search
                         - "zerion": Search through Zerion for on-chain data
                         - "ens": Search for ENS names, like name.eth and get corresponding addresses. pass the ens name as query
+                        - "x": Search through X/Twitter for relevant tweets
+                        
+                        Ensure each search query has a clear rationale and priority level.
                         
                         Do not use floating numbers, use whole numbers only in the priority field!!
                         Do not keep the numbers too low or high, make them reasonable in between.

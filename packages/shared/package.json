@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts ",
     "lint": "eslint \"**/*.ts*\""
   },
   "dependencies": {
