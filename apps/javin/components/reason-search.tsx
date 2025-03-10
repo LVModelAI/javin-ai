@@ -247,7 +247,7 @@ const ResearchStep = ({
                                 variant="secondary"
                                 className="text-[10px]"
                               >
-                                zerion
+                                on-chain
                               </Badge>
                             )}
                             {query.source === "both" && (
@@ -255,7 +255,7 @@ const ResearchStep = ({
                                 variant="secondary"
                                 className="text-[10px]"
                               >
-                                web + zerion
+                                web + on-chain
                               </Badge>
                             )}
                             {query.source === "x" && (
@@ -577,7 +577,7 @@ const AllSourcesView = ({
     type === "web"
       ? "Web Sources"
       : type === "zerion"
-      ? "Academic Sources"
+      ? "On-chain data"
       : "X Posts";
 
   if (isDesktop) {
@@ -681,7 +681,7 @@ const EmptyState = ({
 
   const messages = {
     web: "Web sources will appear here once found",
-    zerion: "Academic sources will appear here once found",
+    zerion: "On-chain data will appear here once found",
     analysis: "Analysis results will appear here once complete",
     x: isLoading ? "Searching X..." : "X posts will appear here once found",
   };
@@ -1003,7 +1003,7 @@ const ReasonSearch = ({ updates }: { updates: StreamUpdate[] }) => {
                 >
                   <div className="flex items-center gap-1.5">
                     <BookA className="h-3 w-3" />
-                    <span className="hidden sm:inline">Academic</span>
+                    <span className="hidden sm:inline">On-chain</span>
                     {sourceGroups.zerion.length > 0 && (
                       <Badge variant="secondary" className="h-4 px-1">
                         {sourceGroups.zerion.length}

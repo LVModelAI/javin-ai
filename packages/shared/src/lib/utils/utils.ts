@@ -272,6 +272,7 @@ export const searchGroups = [
     name: "Trenches",
     description: "Deep search.",
     icon: Telescope,
+    img: "",
   },
 ] as const;
 
