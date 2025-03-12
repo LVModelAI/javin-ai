@@ -146,11 +146,12 @@ export async function POST(request: Request) {
                   overwrite: true,
                 },
               });
+
               console.log("generating search plan");
               // Now generate the search plan
               const { object: searchPlan } = await generateObject({
                 //@ts-ignore
-                model: xai("grok-beta"),
+                model: openai("gpt-4"),
                 temperature: 0,
                 schema: z.object({
                   search_queries: z
@@ -347,7 +348,7 @@ export async function POST(request: Request) {
                   );
 
                   const aiAgentResponse = await generateText({
-                    model: myProvider.languageModel("grok-2"),
+                    model: myProvider.languageModel("gpt-4o-mini"),
                     system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
                     
                       ## How to Process User Queries:
@@ -367,7 +368,8 @@ export async function POST(request: Request) {
                       ## **Final Response Format:**  
                       - Always provide a **clear, structured, human-readable answer** to the user.  
                       - Do **not** return raw JSON unless explicitly requested.  
-                      - If no relevant data is found, respond appropriately instead of returning an empty result.  
+                      - If no relevant data is found, respond appropriately instead of returning an empty result. 
+                       
                       `,
                     prompt: JSON.stringify(
                       `User query: "${userQuery}". Available API paths and descriptions: ${zerionAllPathsAndDesc}. Base URL: ${zerionBaseURL}`
