@@ -22,13 +22,18 @@ import { useLocalStorage, useWindowSize } from "usehooks-ts";
 
 import { sanitizeUIMessages } from "@javin/shared/lib/utils/utils";
 
-import { ArrowUpIcon, PaperclipIcon, StopIcon } from "../icons";
+import { ArrowUpIcon, JavinMan, PaperclipIcon, StopIcon } from "../icons";
 import { PreviewAttachment } from "../preview-attachment";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { useSession } from "next-auth/react";
 import { User } from "next-auth";
-import { cn, SearchGroup, SearchGroupId, searchGroups } from "@javin/shared/lib/utils/utils";
+import {
+  cn,
+  SearchGroup,
+  SearchGroupId,
+  searchGroups,
+} from "@javin/shared/lib/utils/utils";
 import {
   HoverCard,
   HoverCardContent,
@@ -95,17 +100,26 @@ function PureSendButton({
   input: string;
   uploadQueue: Array<string>;
 }) {
+  const isDisabled = input.length === 0 || uploadQueue.length > 0;
+
   return (
-    <Button
-      className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
-      onClick={(event) => {
-        event.preventDefault();
-        submitForm();
-      }}
-      disabled={input.length === 0 || uploadQueue.length > 0}
+    <motion.div
+      whileHover={!isDisabled ? { rotate: 90, scale: 1.1 } : {}}
+      style={{ display: "inline-block" }}
     >
-      <ArrowUpIcon size={14} />
-    </Button>
+      <Button
+        className="rounded-full p-2 h-fit bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 hover:bg-black dark:hover:bg-white"
+        onClick={(event) => {
+          event.preventDefault();
+          submitForm();
+        }}
+        disabled={isDisabled}
+      >
+        {/* <ArrowUpIcon size={14} /> */}
+
+        <JavinMan size={18} />
+      </Button>
+    </motion.div>
   );
 }
 
@@ -368,7 +382,7 @@ function PureMultimodalInput({
             "text-neutral-900 dark:text-neutral-100",
             "focus:!ring-1 focus:!ring-neutral-300 dark:focus:!ring-neutral-600",
             "px-4 pt-4 pb-16",
-            "overflow-y-auto custom-scrollbar",
+            "overflow-hidden",
             "touch-manipulation"
           )}
           style={{

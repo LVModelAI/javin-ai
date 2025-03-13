@@ -864,6 +864,7 @@ export const JavinMan = ({ size = 20 }: { size?: number }) => {
       alt="ai icon"
       width={size}
       height={size}
+      className=""
     />
   );
 };
