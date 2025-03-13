@@ -8,7 +8,7 @@ import {
 
 export const DEFAULT_CHAT_MODEL: string = "chat-model-small";
 
-export const myProvider = customProvider({
+export const myProvider: any = customProvider({
   languageModels: {
     "chat-model-small": openai("gpt-4o-mini"),
     "chat-model-large": openai("gpt-4o"),
@@ -18,6 +18,9 @@ export const myProvider = customProvider({
     }),
     "title-model": openai("gpt-4-turbo"),
     "block-model": openai("gpt-4o-mini"),
+    "sentient-dobby-unhinged": fireworks.completionModel(
+      "accounts/sentientfoundation/models/dobby-unhinged-llama-3-3-70b-new"
+    ),
   },
   imageModels: {
     "small-model": openai.image("dall-e-2"),
@@ -41,6 +44,11 @@ export const chatModels: Array<ChatModel> = [
     id: "chat-model-large",
     name: "gpt-4o",
     description: "Large model for complex, multi-step tasks",
+  },
+  {
+    id: "sentient-dobby-unhinged",
+    name: "dobby-unhinged",
+    description: "model created by Sentient",
   },
   // {
   //   id: 'chat-model-reasoning',
