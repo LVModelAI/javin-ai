@@ -113,22 +113,22 @@ export async function POST(request: Request) {
             description:
               "Perform a reasoned web and on-chain search with multiple steps and sources.",
             parameters: z.object({
-              topic: z
+              user_query: z
                 .string()
-                .describe("The main topic or question to answer"),
+                .describe("The main user_query or question to answer"),
               depth: z
                 .enum(["basic", "advanced"])
                 .describe("Search depth level")
                 .default("basic"),
             }),
             execute: async ({
-              topic,
+              user_query,
               depth,
             }: {
-              topic: string;
+              user_query: string;
               depth: "basic" | "advanced";
             }) => {
-              console.log("deepsearch topic ", topic);
+              console.log("user query ", user_query);
               console.log("deepsearch depth ", depth);
               const apiKey = process.env.TAVILY_API_KEY;
               const tvly = tavily({ apiKey });
@@ -175,7 +175,7 @@ export async function POST(request: Request) {
                     )
                     .max(8),
                 }),
-                prompt: `Create a focused search plan for the topic: "${topic}". 
+                prompt: `Create a focused search plan for the user query: "${user_query}". 
                         
                         Today's date and day of the week: ${new Date().toLocaleDateString(
                           "en-US",
@@ -609,6 +609,500 @@ export async function POST(request: Request) {
                   timestamp: Date.now(),
                 },
               });
+              // After all analyses are complete, analyze limitations and gaps
+              const { object: gapAnalysis } = await generateObject({
+                model: openai("gpt-4o-mini"),
+                temperature: 0,
+                schema: z.object({
+                  limitations: z.array(
+                    z.object({
+                      type: z.string(),
+                      description: z.string(),
+                      severity: z.number().min(2).max(10),
+                      potential_solutions: z.array(z.string()),
+                    })
+                  ),
+                  knowledge_gaps: z.array(
+                    z.object({
+                      topic: z.string(),
+                      reason: z.string(),
+                      additional_queries: z.array(z.string()),
+                    })
+                  ),
+                  recommended_followup: z.array(
+                    z.object({
+                      action: z.string(),
+                      rationale: z.string(),
+                      priority: z.number().min(2).max(10),
+                    })
+                  ),
+                }),
+                prompt: `Analyze the research results and check whether the user query can be answered with the current results, if not, , and recommended follow-up actions.
+                  Consider:
+                  - Limitations of the current research
+                  - What additional data is needed to answer the user query
+                  - Recommended follow-up actions to address these gaps
+                  
+                  When suggesting additional_queries for knowledge gaps, keep in mind these will be used to search:
+                  - "web": General web search
+                  - "zerion": Search through Zerion for on-chain data
+                  - "ens": Search for ENS names, like name.eth and get corresponding addresses. pass the ens name as query
+                  - "x": Search through X/Twitter for relevant tweets
+                  
+                  Design your additional_queries to work well across these different source types.
+                  User Query: "${user_query}"
+                  Research results: ${JSON.stringify(searchResults)}
+                  Analysis findings: ${JSON.stringify(
+                    stepIds.analysisSteps.map((step) => ({
+                      type: step.analysis.type,
+                      description: step.analysis.description,
+                      importance: step.analysis.importance,
+                    }))
+                  )}`,
+              });
+
+              // Send gap analysis update
+              dataStream.writeMessageAnnotation({
+                type: "research_update",
+                data: {
+                  id: "gap-analysis",
+                  type: "analysis",
+                  status: "completed",
+                  title: "Research Gaps and Limitations",
+                  analysisType: "gaps",
+                  findings: gapAnalysis.limitations.map((l) => ({
+                    insight: l.description,
+                    evidence: l.potential_solutions,
+                    confidence: (6 - l.severity) / 5,
+                  })),
+                  gaps: gapAnalysis.knowledge_gaps,
+                  recommendations: gapAnalysis.recommended_followup,
+                  message: `Identified ${gapAnalysis.limitations.length} limitations and ${gapAnalysis.knowledge_gaps.length} knowledge gaps`,
+                  timestamp: Date.now(),
+                  overwrite: true,
+                  completedSteps: completedSteps + 1,
+                  totalSteps: totalSteps + (depth === "advanced" ? 2 : 1),
+                },
+              });
+
+              let synthesis;
+
+              // If there are significant gaps and depth is 'advanced', perform additional research
+              if (
+                depth === "advanced" &&
+                gapAnalysis.knowledge_gaps.length > 0
+              ) {
+                // For important gaps, create 'all' source queries to be comprehensive
+                const additionalQueries = gapAnalysis.knowledge_gaps.flatMap(
+                  (gap) =>
+                    gap.additional_queries.map((query, idx) => {
+                      // For critical gaps, use 'all' sources for the first query
+                      // Distribute others across different source types for efficiency
+                      const sourceTypes = [
+                        "web",
+                        "zerion",
+                        "x",
+                        "all",
+                      ] as const;
+                      let source: "web" | "zerion" | "x" | "all";
+
+                      // Use 'all' for the first query of each gap, then rotate through specific sources
+                      if (idx === 0) {
+                        source = "all";
+                      } else {
+                        source = sourceTypes[idx % (sourceTypes.length - 1)] as
+                          | "web"
+                          | "zerion"
+                          | "x";
+                      }
+
+                      return {
+                        query,
+                        rationale: gap.reason,
+                        source,
+                        priority: 3,
+                      };
+                    })
+                );
+
+                // Execute additional searches for gaps
+                for (const query of additionalQueries) {
+                  // Generate a unique ID for this gap search
+                  const gapSearchId = `gap-search-${searchIndex++}`;
+
+                  // Execute search based on source type
+                  if (query.source === "web" || query.source === "all") {
+                    // Execute web search
+                    const webResults = await tvly.search(query.query, {
+                      searchDepth: depth,
+                      includeAnswer: true,
+                      maxResults: 5,
+                    });
+
+                    // Add to search results
+                    searchResults.push({
+                      type: "web",
+                      query: {
+                        query: query.query,
+                        rationale: query.rationale,
+                        source: "web",
+                        priority: query.priority,
+                      },
+                      results: webResults.results.map((r) => ({
+                        source: "web",
+                        title: r.title,
+                        url: r.url,
+                        content: r.content,
+                      })),
+                    });
+
+                    // Send completed annotation for web search
+                    dataStream.writeMessageAnnotation({
+                      type: "research_update",
+                      data: {
+                        id:
+                          query.source === "all"
+                            ? `gap-search-web-${searchIndex - 3}`
+                            : gapSearchId,
+                        type: "web",
+                        status: "completed",
+                        title: `Additional web search for "${query.query}"`,
+                        query: query.query,
+                        results: webResults.results.map((r) => ({
+                          source: "web",
+                          title: r.title,
+                          url: r.url,
+                          content: r.content,
+                        })),
+                        message: `Found ${webResults.results.length} results`,
+                        timestamp: Date.now(),
+                        overwrite: true,
+                      },
+                    });
+                  }
+
+                  if (query.source === "zerion" || query.source === "all") {
+                    const zerionSearchId =
+                      query.source === "all"
+                        ? `gap-search-zerion-${searchIndex++}`
+                        : gapSearchId;
+
+                    // Send running annotation for zerion search if it's for 'all' source
+                    if (query.source === "all") {
+                      dataStream.writeMessageAnnotation({
+                        type: "research_update",
+                        data: {
+                          id: zerionSearchId,
+                          type: "zerion",
+                          status: "running",
+                          title: `Additional zerion search for "${query.query}"`,
+                          query: query.query,
+                          message: `Searching zerion sources to fill knowledge gap: ${query.rationale}`,
+                          timestamp: Date.now(),
+                        },
+                      });
+                    }
+
+                    // use another smaller model to fetch the data from zerion
+                    const userQuery = query.query;
+                    console.log("searching zerion for query ", userQuery);
+                    const apiKey = getZerionApiKey();
+                    if (!apiKey) {
+                      throw Error("zerion api key not found");
+                    }
+
+                    const zerionOpenapidata = await loadOpenAPIFromJson(
+                      zerionJson
+                    );
+                    const zerionAllPathsAndDesc = await getAllPathsAndDesc(
+                      zerionOpenapidata
+                    );
+
+                    const aiAgentResponse = await generateText({
+                      model: myProvider.languageModel("gpt-4o-mini"),
+                      system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
+                    
+                      ## How to Process User Queries:
+                      1. **Match User Query to API Path**:  
+                         - Analyze the user's question.  
+                         - Select the API path whose description best matches the intent of the query.  
+                    
+                      2. **Retrieve Required Parameters**:  
+                         - Use the **getPathParameters** tool to fetch all necessary parameters.  
+                         - pass The API path, e.g., '/v1/wallets/{address}/charts/{chart_period}'
+                         - If any required parameters are missing, prompt the user for input.  
+                    
+                      3. **Construct and Execute API Call**:  
+                         - Form a complete API URL using the **base URL** (${zerionBaseURL}) and the retrieved parameters.  
+                         - Use the **makeApiCall** tool to fetch data.
+                      
+                      ## **Final Response Format:**  
+                      - Always provide a **clear, structured, human-readable answer** to the user.  
+                      - Do **not** return raw JSON unless explicitly requested.  
+                      - If no relevant data is found, respond appropriately instead of returning an empty result. 
+                       
+                      `,
+                      prompt: JSON.stringify(
+                        `User query: "${userQuery}". Available API paths and descriptions: ${zerionAllPathsAndDesc}. Base URL: ${zerionBaseURL}`
+                      ),
+                      tools: {
+                        getPathParameters: tool({
+                          description:
+                            "Retrieve all parameters required for a given API path.",
+                          parameters: z.object({
+                            path: z
+                              .string()
+                              .describe(
+                                "The API path, e.g., '/v1/wallets/{address}/charts/{chart_period}'"
+                              ),
+                          }),
+                          execute: async ({ path }) => {
+                            console.log("Fetching parameters for path:", path);
+                            const zerionPathsDetails = await getPathDetails(
+                              zerionOpenapidata,
+                              path
+                            );
+                            return zerionPathsDetails;
+                          },
+                        }),
+                        makeApiCall: tool({
+                          description:
+                            "Fetch real-time blockchain data from Zerion API.",
+                          parameters: z.object({
+                            url: z.string().describe("The full API query URL."),
+                          }),
+                          execute: async ({ url }) => {
+                            try {
+                              console.log("fetching --- ", url);
+                              const options = {
+                                method: "GET",
+                                headers: {
+                                  accept: "application/json",
+                                  authorization: `Basic ${apiKey}`,
+                                },
+                              };
+                              const response = await fetch(url, options);
+                              if (!response.ok)
+                                throw new Error(
+                                  `API call failed with status ${response.status}`
+                                );
+                              const json = await response.json();
+                              // console.log("Fetched API response:", json);
+                              return json; // Return parsed JSON data for further processing
+                            } catch (error) {
+                              console.error("Error fetching API data:", error);
+                              return {
+                                error: "Failed to fetch data from the API.",
+                              };
+                            }
+                          },
+                        }),
+                      },
+                      maxSteps: 5,
+                    });
+
+                    console.log(`AI response is `, aiAgentResponse.text);
+
+                    // Add to search results
+                    searchResults.push({
+                      type: "zerion",
+                      query: {
+                        query: query.query,
+                        rationale: query.rationale,
+                        source: "zerion",
+                        priority: query.priority,
+                      },
+                      results: [
+                        {
+                          source: "zerion" as const,
+                          title: userQuery,
+                          url: "",
+                          content: aiAgentResponse.text,
+                          tweetId: "zerion",
+                        },
+                      ],
+                    });
+
+                    // Send completed annotation for academic search
+                    dataStream.writeMessageAnnotation({
+                      type: "research_update",
+                      data: {
+                        id: zerionSearchId,
+                        type: "zerion",
+                        status: "completed",
+                        title: `Additional zerion search for "${query.query}"`,
+                        query: query.query,
+                        results: {
+                          source: "zerion",
+                          title: "",
+                          url: "",
+                          content: aiAgentResponse.text,
+                        },
+                        message: `Found 1 result`,
+                        timestamp: Date.now(),
+                        overwrite: query.source === "all" ? true : false,
+                      },
+                    });
+                  }
+
+                  if (query.source === "x" || query.source === "all") {
+                    const xSearchId =
+                      query.source === "all"
+                        ? `gap-search-x-${searchIndex++}`
+                        : gapSearchId;
+
+                    // Send running annotation for X search if it's for 'all' source
+                    if (query.source === "all") {
+                      dataStream.writeMessageAnnotation({
+                        type: "research_update",
+                        data: {
+                          id: xSearchId,
+                          type: "x",
+                          status: "running",
+                          title: `Additional X/Twitter search for "${query.query}"`,
+                          query: query.query,
+                          message: `Searching X/Twitter to fill knowledge gap: ${query.rationale}`,
+                          timestamp: Date.now(),
+                        },
+                      });
+                    }
+
+                    // Extract tweet ID from URL
+                    const extractTweetId = (url: string): string | null => {
+                      const match = url.match(
+                        /(?:twitter\.com|x\.com)\/\w+\/status\/(\d+)/
+                      );
+                      return match ? match[1] : null;
+                    };
+
+                    // Execute X/Twitter search
+                    const xResults = await exa.searchAndContents(query.query, {
+                      type: "keyword",
+                      numResults: 5,
+                      text: true,
+                      highlights: true,
+                      includeDomains: ["twitter.com", "x.com"],
+                    });
+
+                    // Process tweets to include tweet IDs - properly handling undefined
+                    const processedTweets = xResults.results
+                      .map((result) => {
+                        const tweetId = extractTweetId(result.url);
+                        if (!tweetId) return null; // Skip entries without valid tweet IDs
+
+                        return {
+                          source: "x" as const,
+                          title: result.title || result.author || "Tweet",
+                          url: result.url,
+                          content: result.text || "",
+                          tweetId, // Now it's definitely string, not undefined
+                        };
+                      })
+                      .filter(
+                        (
+                          tweet
+                        ): tweet is {
+                          source: "x";
+                          title: string;
+                          url: string;
+                          content: string;
+                          tweetId: string;
+                        } => tweet !== null
+                      );
+
+                    // Add to search results
+                    searchResults.push({
+                      type: "x",
+                      query: {
+                        query: query.query,
+                        rationale: query.rationale,
+                        source: "x",
+                        priority: query.priority,
+                      },
+                      results: processedTweets,
+                    });
+
+                    // Send completed annotation for X search
+                    dataStream.writeMessageAnnotation({
+                      type: "research_update",
+                      data: {
+                        id: xSearchId,
+                        type: "x",
+                        status: "completed",
+                        title: `Additional X/Twitter search for "${query.query}"`,
+                        query: query.query,
+                        results: processedTweets,
+                        message: `Found ${processedTweets.length} results`,
+                        timestamp: Date.now(),
+                        overwrite: query.source === "all" ? true : false,
+                      },
+                    });
+                  }
+                }
+
+                // Send running state for final synthesis
+                dataStream.writeMessageAnnotation({
+                  type: "research_update",
+                  data: {
+                    id: "final-synthesis",
+                    type: "analysis",
+                    status: "running",
+                    title: "Final Research Synthesis",
+                    analysisType: "synthesis",
+                    message: "Synthesizing all research findings...",
+                    timestamp: Date.now(),
+                  },
+                });
+
+                // Perform final synthesis of all findings
+                const { object: finalSynthesis } = await generateObject({
+                  model: openai("gpt-4o-mini"),
+                  temperature: 0,
+                  schema: z.object({
+                    key_findings: z.array(
+                      z.object({
+                        finding: z.string(),
+                        confidence: z.number().min(0).max(1),
+                        supporting_evidence: z.array(z.string()),
+                      })
+                    ),
+                    remaining_uncertainties: z.array(z.string()),
+                  }),
+                  prompt: `Synthesize all research findings, including gap analysis and follow-up research.
+          Highlight key conclusions and remaining uncertainties.
+          Stick to the types of the schema, do not add any other fields or types.
+          
+          Original results: ${JSON.stringify(searchResults)}
+          Gap analysis: ${JSON.stringify(gapAnalysis)}
+          Additional findings: ${JSON.stringify(additionalQueries)}`,
+                });
+
+                synthesis = finalSynthesis;
+
+                // Send final synthesis update
+                dataStream.writeMessageAnnotation({
+                  type: "research_update",
+                  data: {
+                    id: "final-synthesis",
+                    type: "analysis",
+                    status: "completed",
+                    title: "Final Research Synthesis",
+                    analysisType: "synthesis",
+                    findings: finalSynthesis.key_findings.map((f) => ({
+                      insight: f.finding,
+                      evidence: f.supporting_evidence,
+                      confidence: f.confidence,
+                    })),
+                    uncertainties: finalSynthesis.remaining_uncertainties,
+                    message: `Synthesized ${finalSynthesis.key_findings.length} key findings`,
+                    timestamp: Date.now(),
+                    overwrite: true,
+                    completedSteps:
+                      totalSteps + (depth === "advanced" ? 2 : 1) - 1,
+                    totalSteps: totalSteps + (depth === "advanced" ? 2 : 1),
+                  },
+                });
+              }
 
               // Final progress update
               const finalProgress = {

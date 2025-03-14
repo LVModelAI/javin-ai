@@ -19,6 +19,7 @@ export { getEvmOnchainDataUsingEtherscan } from "@javin/shared/lib/ai/tools/onch
 //aptos
 export { getAptosApiData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-api-data";
 export { getAptosStats } from "@javin/shared/lib/ai/tools/aptos/get-stats";
+export { aptosNames } from "@javin/shared/lib/ai/tools/aptos/aptos-names";
 //monad
 export { getMonadApiData } from "@javin/shared/lib/ai/tools/monad/get-monad-api-data";
 export { getMonadStats } from "@javin/shared/lib/ai/tools/monad/get-stats";

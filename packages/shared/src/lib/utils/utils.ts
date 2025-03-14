@@ -216,6 +216,13 @@ export const searchGroups = [
     icon: Network,
     img: "",
   },
+  {
+    id: "trenches" as const,
+    name: "Trenches",
+    description: "Deep search for indepth analysis",
+    icon: Telescope,
+    img: "",
+  },
   // {
   //   id: "wormhole" as const,
   //   name: "Wormhole",
@@ -266,13 +273,6 @@ export const searchGroups = [
     description: "Everything Monad. Search, transactions and more.",
     icon: Network,
     img: "/images/icon/monad/monad-logo.jpg",
-  },
-  {
-    id: "trenches" as const,
-    name: "Trenches",
-    description: "Deep search.",
-    icon: Telescope,
-    img: "",
   },
 ] as const;
 
