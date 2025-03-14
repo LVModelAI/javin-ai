@@ -1,3 +1,4 @@
+import { aptosNames } from "@javin/shared/lib/ai/tools/aptos/aptos-names";
 import { SearchGroupId } from "../utils/utils";
 import { getAptosApiData } from "./tools/aptos/get-aptos-api-data";
 import { getAptosStats } from "./tools/aptos/get-stats";
@@ -114,6 +115,7 @@ const groupTools = {
     "getSiteContent",
     "getAptosStats",
     "getAptosApiData",
+    "aptosNames",
   ] as const,
   zeta: [
     "webSearch",
@@ -501,6 +503,9 @@ All numeric values returned by the API are scaled up by
 Use APT (Aptos) as the unit (instead of ETH).
 Summarize the results for the user in a clear, concise way.
 For any other information, use web search.
+
+  ## Aptos name service lookup: If user enters a Aptos name name, like somename.apt or  then use the aptosNames tool to get the corresponding address. use this address for further queries.
+
 `,
 
   monad: `Role & Functionality
