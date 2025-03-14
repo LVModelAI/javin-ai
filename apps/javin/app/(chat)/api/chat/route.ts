@@ -23,6 +23,8 @@ import {
   getZerionApiKey,
   sanitizeResponseMessages,
 } from "@javin/shared/lib/utils/utils";
+
+import * as allTools from "@javin/shared/lib/ai/tools/tools";
 import { generateTitleFromUserMessage } from "../../actions";
 import { tavily } from "@tavily/core";
 import { generateObject, tool } from "ai";
@@ -35,7 +37,6 @@ import { getAllPathsAndDesc } from "@javin/shared/lib/utils/openapi";
 import { getPathDetails } from "@javin/shared/lib/utils/openapi";
 import zerionJson from "@javin/shared/lib/ai/tools/onchain/zerion-openapi.json";
 import { multichainEnsLookup } from "@javin/shared/lib/utils/multichain-ens-lookup";
-import * as allTools from "@javin/shared/lib/ai/tools/tools";
 
 export const maxDuration = 60;
 
@@ -556,6 +557,7 @@ export async function POST(request: Request) {
                 });
 
                 const { object: analysisResult } = await generateObject({
+                  //@ts-ignore
                   model: openai("gpt-4"),
                   temperature: 0.5,
                   schema: z.object({
