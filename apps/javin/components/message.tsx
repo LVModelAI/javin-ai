@@ -138,7 +138,8 @@ const PurePreviewMessage = ({
                               <Check size={14} className="text-green-500" />
                             </p>
                           </div>
-                        ) : toolName === "ensToAddress" ? (
+                        ) : toolName === "ensToAddress" ||
+                          toolName === "aptosNames" ? (
                           <div className="text-sm">
                             <p className="flex flex-row gap-1 items-center">
                               Looking for you in the blockchain
@@ -196,7 +197,8 @@ const PurePreviewMessage = ({
                         <div className="text-sm">
                           <p className="py-1">Fetching data...</p>
                         </div>
-                      ) : toolName === "ensToAddress" ? (
+                      ) : toolName === "ensToAddress" ||
+                        toolName === "aptosNames" ? (
                         <div className="text-sm">
                           <p className="py-1">
                             Looking for you in the blockchain...

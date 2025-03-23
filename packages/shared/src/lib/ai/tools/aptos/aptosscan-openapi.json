@@ -1,0 +1,3613 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "title": "Aptoscan.com Public APIs v1.0.0",
+      "description": "<p>Provide advanced APIs about Accounts, Tokens, NFT Marketplace<br/> Requests litmit: 150 per minute, 10,000 per month</p>",
+      "termsOfService": "https://aptoscan.com/term-of-services",
+      "contact": {
+        "email": "admin@aptscan.ai"
+      },
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "https://api.aptoscan.com/public/v1.0"
+      }
+    ],
+    "paths": {
+      "/accounts/{address}/resources": {
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "The ID of the account",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Account"
+          ],
+          "summary": "Get resources of a specific account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "success": true,
+                    "data": [
+                      {
+                        "type": "0x1::account::Account",
+                        "data": {
+                          "authentication_key": "0xaaa9c5fb3b4855e1569321041febcc1146b44af3f08893d4ce41846cc7e25645",
+                          "coin_register_events": {
+                            "counter": "1",
+                            "guid": {
+                              "id": {
+                                "addr": "0xaaa9c5fb3b4855e1569321041febcc1146b44af3f08893d4ce41846cc7e25645",
+                                "creation_num": "0"
+                              }
+                            }
+                          },
+                          "guid_creation_num": "4",
+                          "key_rotation_events": {
+                            "counter": "0",
+                            "guid": {
+                              "id": {
+                                "addr": "0xaaa9c5fb3b4855e1569321041febcc1146b44af3f08893d4ce41846cc7e25645",
+                                "creation_num": "1"
+                              }
+                            }
+                          },
+                          "rotation_capability_offer": {
+                            "for": {
+                              "vec": []
+                            }
+                          },
+                          "sequence_number": "44",
+                          "signer_capability_offer": {
+                            "for": {
+                              "vec": []
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
+                        "data": {
+                          "coin": {
+                            "value": "963836050098710"
+                          },
+                          "deposit_events": {
+                            "counter": "5",
+                            "guid": {
+                              "id": {
+                                "addr": "0xaaa9c5fb3b4855e1569321041febcc1146b44af3f08893d4ce41846cc7e25645",
+                                "creation_num": "2"
+                              }
+                            }
+                          },
+                          "frozen": false,
+                          "withdraw_events": {
+                            "counter": "44",
+                            "guid": {
+                              "id": {
+                                "addr": "0xaaa9c5fb3b4855e1569321041febcc1146b44af3f08893d4ce41846cc7e25645",
+                                "creation_num": "3"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "metadata": {
+                      "next_cursor": ""
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/accounts/{address}/sc-modules": {
+        "get": {
+          "tags": [
+            "Account"
+          ],
+          "summary": "Get modules of a specific account",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "The address of the account",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "success": true,
+                    "data": [
+                      {
+                        "extension": {
+                          "vec": []
+                        },
+                        "name": "moon_coin",
+                        "source": "0x1f8b08000000000002ff6550c10e82300cbdef2b26070389c96e1e2ae1e259f90432a19045e8cc366222e1dfdda662d09e5e5f5fdf6b2a046ca018b42636e866ec919f3c3e6a450081ad6a0ff9c4b82febcc58bb45c0a79945be1d892b52ae7a39a416a941037c6b554768b2f77a287973da56ad9103deb5b9fa0c49b2c326c6000417257bf5c0fc9352a4cb72bc217aef56dc2509621ed4c9dfa42ccf3fe47eddb6b2b7f8a5b24384339b9910b97f4efccd138065fd5b27010000",
+                        "source_map": "0x",
+                        "assembly_code": "0x1f8b0800000000000003a550416b8330183d9b5ff19d8605594d349a64a5b01576ea2e83ed524a89492c821ad058e846fffba2edbaadd705121e2fdff71eefcde7f0620f068aa333ca6a03078a1aab87da004e39613c663449939c2a4214d5ac285466f24c1a99f1322b794231f12ca638cd7951f24295a54e3025f97d636dbb53b66ae1130dbd81f87f070bd1c856ee8d9e441f1042bdeb06e57c00dbaece3e811e9ae6b82b2b536b0185b5353a2154b595db9d53858fdd3e1670d757fbd67433bff2140b14786aac616dd526dedecca0000b58eb956d7b37febe1be56c17beb199800d8f20cf23c0185f9f38828444905de9984ef4d62b911f257ca3949e95727eb96c9c4fc6f93716661ea7237e96756f504005ac645dc3ef4684187356b2ae3ecce2bb9365788911c161725b0c6cf9170f2c9a9af216998057e37c6527f405bc4457a719020000"
+                      }
+                    ],
+                    "metadata": {}
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/accounts/{address}/coins": {
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Account"
+          ],
+          "summary": "Get coin list of a specific account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "success": true,
+                    "data": [
+                      {
+                        "owner_address": "0xd6881b0c670c4594b622eb3974a9ea657b6f2de4f01f587cbe4dc19e224b5486",
+                        "coin_type_hash": "91ceb1308a98389691e05158b07ed5f079ab78461a6bb8d5a4054b1bb5cb8bb6",
+                        "coin_type": "0x1::aptos_coin::AptosCoin",
+                        "amount": "181572800",
+                        "last_transaction_version": 33339955,
+                        "last_transaction_timestamp": "2022-11-17T16:10:18.000Z",
+                        "coin_name": "Aptos Coin",
+                        "coin_symbol": "APT",
+                        "coin_decimals": 8
+                      },
+                      {
+                        "owner_address": "0xd6881b0c670c4594b622eb3974a9ea657b6f2de4f01f587cbe4dc19e224b5486",
+                        "coin_type_hash": "f3f82889c5c74d207f9b944cadca25273dd02e090f5bee17e7314c2a5854f345",
+                        "coin_type": "0x881ac202b1f1e6ad4efcff7a1d0579411533f2502417a19211cfc49751ddb5f4::coin::MOJO",
+                        "amount": "16264800000000",
+                        "last_transaction_version": 9431649,
+                        "last_transaction_timestamp": "2022-10-23T14:00:26.000Z",
+                        "coin_name": "Mojito",
+                        "coin_symbol": "MOJO",
+                        "coin_decimals": 8
+                      }
+                    ],
+                    "metadata": {}
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/accounts/{address}/tokens": {
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Account"
+          ],
+          "summary": "Get token list of a specific account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_trans": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "amount": {
+                                  "type": "integer"
+                                },
+                                "owner_address": {
+                                  "type": "string"
+                                },
+                                "token": {
+                                  "type": "object",
+                                  "properties": {
+                                    "collection_data_id_hash": {
+                                      "type": "string"
+                                    },
+                                    "collection_name": {
+                                      "type": "string"
+                                    },
+                                    "creator_address": {
+                                      "type": "string"
+                                    },
+                                    "last_transaction_timestamp": {
+                                      "type": "string"
+                                    },
+                                    "last_transaction_version": {
+                                      "type": "integer"
+                                    },
+                                    "metadata_uri": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "property_version": {
+                                      "type": "integer"
+                                    },
+                                    "token_data_id_hash": {
+                                      "type": "string"
+                                    },
+                                    "metadata": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "description": {
+                                          "type": "string"
+                                        },
+                                        "external_url": {
+                                          "type": "string"
+                                        },
+                                        "attributes": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "trait_type": {
+                                                "type": "string"
+                                              },
+                                              "value": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "image": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "holders": {
+                                      "type": "integer"
+                                    },
+                                    "last_trade": {
+                                      "type": "object",
+                                      "properties": {
+                                        "price": {
+                                          "type": "integer"
+                                        },
+                                        "version": {
+                                          "type": "integer"
+                                        },
+                                        "trans_time": {
+                                          "type": "string"
+                                        },
+                                        "event_index": {
+                                          "type": "integer"
+                                        },
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "market": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/accounts/{address}/transactions": {
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Account"
+          ],
+          "summary": "Get transactions of a specific account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_trans": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "trans_version": {
+                                  "type": "integer"
+                                },
+                                "block_height": {
+                                  "type": "integer"
+                                },
+                                "trans_hash": {
+                                  "type": "string"
+                                },
+                                "trans_time": {
+                                  "type": "string"
+                                },
+                                "sender": {
+                                  "type": "string"
+                                },
+                                "send_to": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "function": {
+                                  "type": "string"
+                                },
+                                "amount": {
+                                  "type": "object",
+                                  "properties": {
+                                    "amount": {
+                                      "type": "integer"
+                                    },
+                                    "coin_type": {
+                                      "type": "string"
+                                    },
+                                    "transfer_type": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "gas_used": {
+                                  "type": "integer"
+                                },
+                                "gas_unit_price": {
+                                  "type": "integer"
+                                },
+                                "success": {
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/accounts/{address}/coin-transfers": {
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Account"
+          ],
+          "summary": "Get coin transfers of a specific account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_trans": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "trans_version": {
+                                  "type": "integer",
+                                  "description": "Transfer version"
+                                },
+                                "block_height": {
+                                  "type": "integer",
+                                  "description": "Block height"
+                                },
+                                "trans_hash": {
+                                  "type": "string",
+                                  "description": "Transfer hash"
+                                },
+                                "trans_time": {
+                                  "type": "string",
+                                  "description": "Transfer time"
+                                },
+                                "sender": {
+                                  "type": "string",
+                                  "description": "Sender address"
+                                },
+                                "send_to": {
+                                  "type": "string",
+                                  "description": "Recipient address"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "description": "Transfer type"
+                                },
+                                "coin_type": {
+                                  "type": "string",
+                                  "description": "Coin type"
+                                },
+                                "token": {
+                                  "type": "string",
+                                  "description": "Token"
+                                },
+                                "amount": {
+                                  "type": "string",
+                                  "description": "Transfer amount"
+                                },
+                                "gas_used": {
+                                  "type": "integer",
+                                  "description": "Gas used"
+                                },
+                                "gas_unit_price": {
+                                  "type": "integer",
+                                  "description": "Gas unit price"
+                                },
+                                "success": {
+                                  "type": "boolean",
+                                  "description": "Indicates the success status of the transfer"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/accounts/{address}/token-transfers": {
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Account"
+          ],
+          "summary": "Get token transfers of a specific account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_trans": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "trans_version": {
+                                  "type": "integer",
+                                  "description": "Transaction version"
+                                },
+                                "block_height": {
+                                  "type": "integer",
+                                  "description": "Block height of the transaction"
+                                },
+                                "trans_hash": {
+                                  "type": "string",
+                                  "description": "Transaction hash"
+                                },
+                                "trans_time": {
+                                  "type": "string",
+                                  "description": "Transaction time"
+                                },
+                                "sender": {
+                                  "type": "string",
+                                  "description": "Sender address"
+                                },
+                                "send_to": {
+                                  "type": "string",
+                                  "description": "Recipient address"
+                                },
+                                "type": {
+                                  "type": "string",
+                                  "description": "Transaction type"
+                                },
+                                "coin_type": {
+                                  "type": "string",
+                                  "description": "Coin type (optional)"
+                                },
+                                "token": {
+                                  "type": "string",
+                                  "description": "Token information"
+                                },
+                                "amount": {
+                                  "type": "string",
+                                  "description": "Transaction amount"
+                                },
+                                "gas_used": {
+                                  "type": "integer",
+                                  "description": "Gas used for the transaction"
+                                },
+                                "gas_unit_price": {
+                                  "type": "integer",
+                                  "description": "Gas unit price"
+                                },
+                                "success": {
+                                  "type": "boolean",
+                                  "description": "Indicates if the transaction was successful or not"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/coins/{coin_type}": {
+        "get": {
+          "tags": [
+            "Coin"
+          ],
+          "summary": "Get overview information of a coin",
+          "description": "Get overview information of a coin",
+          "operationId": "CoinInfo",
+          "parameters": [
+            {
+              "name": "coin_type",
+              "in": "path",
+              "description": "address values that need to be considered for filter",
+              "required": true,
+              "explode": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "coin_type": {
+                            "type": "string",
+                            "description": "The coin type.",
+                            "example": "0x1::aptos_coin::AptosCoin"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the coin.",
+                            "example": "Aptos Coin"
+                          },
+                          "symbol": {
+                            "type": "string",
+                            "description": "The symbol of the coin.",
+                            "example": "APT"
+                          },
+                          "decimals": {
+                            "type": "integer",
+                            "description": "The number of decimal places for the coin.",
+                            "example": 8
+                          },
+                          "current_price": {
+                            "type": "number",
+                            "description": "The current price of the coin.",
+                            "example": 7.94
+                          },
+                          "change24h_price": {
+                            "type": "number",
+                            "description": "The change in price over the last 24 hours.",
+                            "example": -1.85
+                          },
+                          "current_num_holder": {
+                            "type": "integer",
+                            "description": "The current number of coin holders.",
+                            "example": 3058814
+                          },
+                          "total_transfer": {
+                            "type": "integer",
+                            "description": "The total number of coin transfers.",
+                            "example": 9579199
+                          },
+                          "total_supply": {
+                            "type": "number",
+                            "description": "The total supply of the coin.",
+                            "example": 1028014388.12853
+                          },
+                          "logo_url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "The URL of the coin's logo.",
+                            "example": "https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/APT.webp"
+                          },
+                          "project_url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "The URL of the project related to the coin.",
+                            "example": "https://aptoslabs.com/"
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "number",
+                        "example": 200
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": "true | false",
+                        "description": "Provide status of this request.",
+                        "enum": [
+                          true,
+                          false
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/coins/{coin_type}/holders": {
+        "get": {
+          "tags": [
+            "Coin"
+          ],
+          "summary": "Get holders of a specific coin",
+          "description": "Get the list of holders for a specific coin.",
+          "operationId": "CoinHolders",
+          "parameters": [
+            {
+              "name": "coin_type",
+              "in": "path",
+              "description": "The address of the coin.",
+              "required": true,
+              "explode": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Indicates the success of the request."
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "coin_info": {
+                            "type": "object",
+                            "properties": {
+                              "coin_type": {
+                                "type": "string",
+                                "description": "The coin type.",
+                                "example": "0x1::aptos_coin::AptosCoin"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "The name of the coin.",
+                                "example": "Aptos Coin"
+                              },
+                              "symbol": {
+                                "type": "string",
+                                "description": "The symbol of the coin.",
+                                "example": "APT"
+                              },
+                              "decimals": {
+                                "type": "integer",
+                                "description": "The number of decimal places for the coin.",
+                                "example": 8
+                              },
+                              "logo_url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "The URL of the coin's logo.",
+                                "example": "https://raw.githubusercontent.com/hippospace/aptos-coin-list/main/icons/APT.webp"
+                              },
+                              "project_url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "The URL of the project related to the coin.",
+                                "example": "https://aptoslabs.com/"
+                              }
+                            }
+                          },
+                          "coin_holders_list": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "owner_address": {
+                                  "type": "string",
+                                  "description": "The address of the coin holder."
+                                },
+                                "amount": {
+                                  "type": "string",
+                                  "description": "The amount of coins held by the holder."
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "sum_amount_holder": {
+                        "type": "string",
+                        "description": "The total amount held by all coin holders."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/coins/{coin_type}/transactions": {
+        "get": {
+          "tags": [
+            "Coin"
+          ],
+          "summary": "Get transactions for a specific coin",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "coin_type",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "The type of coin (e.g., 0xe9c192ff55cffab3963c695cff6dbf9dad6aff2bb5ac19a6415cad26a81860d9::mee_coin::MeeCoin)"
+            },
+            {
+              "in": "query",
+              "name": "page",
+              "schema": {
+                "type": "integer"
+              },
+              "required": false,
+              "description": "The page number of results"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "list_trans": [
+                        {
+                          "trans_version": 149493763,
+                          "block_height": 57936336,
+                          "trans_hash": "0xb12a9fa9c7b744727a753534f2f5548876880d3029b8268b391b15eec8d4b564",
+                          "trans_time": "1685308394011241"
+                        },
+                        {
+                          "trans_version": 149327551,
+                          "block_height": 57878359,
+                          "trans_hash": "0xa7bdb2a3928acc0f6860ebce2608d630f3a126c65192660def9eaddd0a785637",
+                          "trans_time": "1685283923721870"
+                        },
+                        {
+                          "trans_version": 149327263,
+                          "block_height": 57878271,
+                          "trans_hash": "0xae78efedf26ac87070eba279df3ddb0d73f838c21993fac23cb2de9b5fd2ed00",
+                          "trans_time": "1685283890782567"
+                        }
+                      ],
+                      "count": 0
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/coins/{coin_type}/transfers": {
+        "parameters": [
+          {
+            "name": "coin_type",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Coin"
+          ],
+          "summary": "Get coin transfers for an account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_trans": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "trans_version": {
+                                  "type": "integer"
+                                },
+                                "block_height": {
+                                  "type": "integer"
+                                },
+                                "trans_hash": {
+                                  "type": "string"
+                                },
+                                "trans_time": {
+                                  "type": "string"
+                                },
+                                "sender": {
+                                  "type": "string"
+                                },
+                                "send_to": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "coin_type": {
+                                  "type": "string"
+                                },
+                                "token": {
+                                  "type": "string"
+                                },
+                                "amount": {
+                                  "type": "string"
+                                },
+                                "gas_used": {
+                                  "type": "integer"
+                                },
+                                "gas_unit_price": {
+                                  "type": "integer"
+                                },
+                                "success": {
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/fungible_assets/{address}": {
+        "get": {
+          "tags": [
+            "Fungible asset"
+          ],
+          "summary": "Get overview information of a fungible asset",
+          "description": "Get overview information of a fungible asset",
+          "operationId": "FaInfo",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "address values that need to be considered for filter",
+              "required": true,
+              "explode": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "coin_type": {
+                            "type": "string",
+                            "description": "The Fungible asset address.",
+                            "example": "0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the FA.",
+                            "example": "Tether USD"
+                          },
+                          "symbol": {
+                            "type": "string",
+                            "description": "The symbol of the FA.",
+                            "example": "USDt"
+                          },
+                          "decimals": {
+                            "type": "integer",
+                            "description": "The number of decimal places for the FA.",
+                            "example": 6
+                          },
+                          "current_price": {
+                            "type": "number",
+                            "description": "The current price of the FA.",
+                            "example": 1.001
+                          },
+                          "change24h_price": {
+                            "type": "number",
+                            "description": "The change in price over the last 24 hours.",
+                            "example": -1.85
+                          },
+                          "current_num_holder": {
+                            "type": "integer",
+                            "description": "The current number of FA holders.",
+                            "example": 3058814
+                          },
+                          "total_transfer": {
+                            "type": "integer",
+                            "description": "The total number of FA transfers.",
+                            "example": 9579199
+                          },
+                          "total_supply": {
+                            "type": "number",
+                            "description": "The total supply of the FA.",
+                            "example": 1028014388.12853
+                          },
+                          "logo_url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "The URL of the FA's logo.",
+                            "example": "https://raw.githubusercontent.com/PanoraExchange/Aptos-Tokens/main/logos/USDT.svg"
+                          },
+                          "project_url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "The URL of the project related to the coin.",
+                            "example": "https://tether.to"
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "number",
+                        "example": 200
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": "true | false",
+                        "description": "Provide status of this request.",
+                        "enum": [
+                          true,
+                          false
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/fungible_assets/{address}/holders": {
+        "get": {
+          "tags": [
+            "Fungible asset"
+          ],
+          "summary": "Get holders of a specific coin",
+          "description": "Get the list of holders for a specific FA.",
+          "operationId": "CoinHolders",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "The address of the FA.",
+              "required": true,
+              "explode": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Indicates the success of the request."
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "fa_info": {
+                            "type": "object",
+                            "properties": {
+                              "coin_type": {
+                                "type": "string",
+                                "description": "The FA address.",
+                                "example": "0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "The name of the FA.",
+                                "example": "Tether USD"
+                              },
+                              "symbol": {
+                                "type": "string",
+                                "description": "The symbol of the FA.",
+                                "example": "USDt"
+                              },
+                              "decimals": {
+                                "type": "integer",
+                                "description": "The number of decimal places for the FA.",
+                                "example": 6
+                              },
+                              "logo_url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "The URL of the FA's logo.",
+                                "example": "https://raw.githubusercontent.com/PanoraExchange/Aptos-Tokens/main/logos/USDT.svg"
+                              },
+                              "project_url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "The URL of the project related to the FA.",
+                                "example": "https://tether.to"
+                              }
+                            }
+                          },
+                          "fa_holders_list": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "owner_address": {
+                                  "type": "string",
+                                  "description": "The address of the FA holder."
+                                },
+                                "amount": {
+                                  "type": "string",
+                                  "description": "The amount of FA held by the holder."
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "sum_amount_holder": {
+                        "type": "string",
+                        "description": "The total amount held by all FA holders."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/fungible_assets/{address}/transactions": {
+        "get": {
+          "tags": [
+            "Fungible asset"
+          ],
+          "summary": "Get transactions for a specific Fungible asset",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "address",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "The type of FA (e.g., 0x357b0b74bc833e95a115ad22604854d6b0fca151cecd94111770e5d6ffc9dc2b)"
+            },
+            {
+              "in": "query",
+              "name": "page",
+              "schema": {
+                "type": "integer"
+              },
+              "required": false,
+              "description": "The page number of results"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "list_trans": [
+                        {
+                          "trans_version": 149493763,
+                          "block_height": 57936336,
+                          "trans_hash": "0xb12a9fa9c7b744727a753534f2f5548876880d3029b8268b391b15eec8d4b564",
+                          "trans_time": "1685308394011241"
+                        },
+                        {
+                          "trans_version": 149327551,
+                          "block_height": 57878359,
+                          "trans_hash": "0xa7bdb2a3928acc0f6860ebce2608d630f3a126c65192660def9eaddd0a785637",
+                          "trans_time": "1685283923721870"
+                        },
+                        {
+                          "trans_version": 149327263,
+                          "block_height": 57878271,
+                          "trans_hash": "0xae78efedf26ac87070eba279df3ddb0d73f838c21993fac23cb2de9b5fd2ed00",
+                          "trans_time": "1685283890782567"
+                        }
+                      ],
+                      "count": 0
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/fungible_assets/{address}/transfers": {
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Fungible asset"
+          ],
+          "summary": "Get FA transfers for an account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_trans": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "trans_version": {
+                                  "type": "integer"
+                                },
+                                "block_height": {
+                                  "type": "integer"
+                                },
+                                "trans_hash": {
+                                  "type": "string"
+                                },
+                                "trans_time": {
+                                  "type": "string"
+                                },
+                                "sender": {
+                                  "type": "string"
+                                },
+                                "send_to": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "coin_type": {
+                                  "type": "string"
+                                },
+                                "token": {
+                                  "type": "string"
+                                },
+                                "amount": {
+                                  "type": "string"
+                                },
+                                "gas_used": {
+                                  "type": "integer"
+                                },
+                                "gas_unit_price": {
+                                  "type": "integer"
+                                },
+                                "success": {
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/fungible_assets/{address}/balance-change": {
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Fungible asset"
+          ],
+          "summary": "Get FA balances changes for an account",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_trans": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "trans_version": {
+                                  "type": "integer"
+                                },
+                                "block_height": {
+                                  "type": "integer"
+                                },
+                                "trans_time": {
+                                  "type": "string"
+                                },
+                                "account": {
+                                  "type": "string"
+                                },
+                                "change_type": {
+                                  "type": "string"
+                                },
+                                "event_type": {
+                                  "type": "string"
+                                },
+                                "change_amount": {
+                                  "type": "integer"
+                                },
+                                "asset_address": {
+                                  "type": "string"
+                                },
+                                "asset_type": {
+                                  "type": "string"
+                                },
+                                "post_balance": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "metadata": {}
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/collections": {
+        "get": {
+          "tags": [
+            "NFT Collection"
+          ],
+          "summary": "Get list of collections in Aptos",
+          "description": "Get list of collections in Aptos",
+          "operationId": "CollectionList",
+          "parameters": [
+            {
+              "name": "page",
+              "in": "query",
+              "description": "Get data by page, each page contains 20 collections.",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "collection_data_id_hash": {
+                              "type": "string"
+                            },
+                            "collection_name": {
+                              "type": "string"
+                            },
+                            "creator_address": {
+                              "type": "string"
+                            },
+                            "holders": {
+                              "type": "integer"
+                            },
+                            "total_items": {
+                              "type": "integer"
+                            },
+                            "floor_price": {
+                              "type": "number"
+                            },
+                            "volume_24h": {
+                              "type": "number"
+                            },
+                            "markets": {
+                              "type": "string"
+                            },
+                            "firstMint": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "page": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/collections/{address}": {
+        "get": {
+          "tags": [
+            "NFT Collection"
+          ],
+          "summary": "Get information of a specific collection",
+          "description": "Get info about Collection",
+          "operationId": "CollectionInfo",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "Collection address value that needs to be considered for filtering",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "collection_data_id_hash": {
+                            "type": "string"
+                          },
+                          "collection_name": {
+                            "type": "string"
+                          },
+                          "creator_address": {
+                            "type": "string"
+                          },
+                          "metadata_uri": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "holders": {
+                            "type": "integer"
+                          },
+                          "total_items": {
+                            "type": "integer"
+                          },
+                          "floor_price": {
+                            "type": "object",
+                            "properties": {
+                              "floor_price": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "stats": {
+                            "type": "object",
+                            "properties": {
+                              "volume_24": {
+                                "type": "number"
+                              },
+                              "markets": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "firstMint": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/collections/{address}/tokens": {
+        "get": {
+          "tags": [
+            "NFT Collection"
+          ],
+          "summary": "Get NFT list of a specific collection",
+          "description": "Get list NFT tokens of one collection",
+          "operationId": "ListNFTCollectionInfo",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "Collection address value that need to be considered for filter",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "page",
+              "description": "Get data by page, each page contains 20 NFT tokens.",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "type": "number",
+                "minimum": 1
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_nft": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "collection_data_id_hash": {
+                                  "type": "string"
+                                },
+                                "collection_name": {
+                                  "type": "string"
+                                },
+                                "creator_address": {
+                                  "type": "string"
+                                },
+                                "token_data_id_hash": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "supply": {
+                                  "type": "number"
+                                },
+                                "metadata_uri": {
+                                  "type": "string"
+                                },
+                                "last_listing": {
+                                  "type": "object",
+                                  "properties": {
+                                    "event_index": {
+                                      "type": "number"
+                                    },
+                                    "market": {
+                                      "type": "string"
+                                    },
+                                    "price": {
+                                      "type": "number"
+                                    },
+                                    "trans_time": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string"
+                                    },
+                                    "version": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "last_trade": {
+                                  "type": "object",
+                                  "properties": {
+                                    "event_index": {
+                                      "type": "number"
+                                    },
+                                    "market": {
+                                      "type": "string"
+                                    },
+                                    "price": {
+                                      "type": "number"
+                                    },
+                                    "trans_time": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string"
+                                    },
+                                    "version": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "description": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/collections/{address}/activities": {
+        "get": {
+          "tags": [
+            "NFT Collection"
+          ],
+          "summary": "Get activities of a specific collection",
+          "description": "Get activities of collection by time descending",
+          "operationId": "CollectionActivity",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "Collection address value that needs to be considered for filtering",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "page",
+              "description": "Get data by page, each page contains 20 activities",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "type": "number",
+                "minimum": 1
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "list_acts": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "action_type": {
+                                  "type": "string"
+                                },
+                                "amount": {
+                                  "type": "number"
+                                },
+                                "collection_id": {
+                                  "type": "string"
+                                },
+                                "from": {
+                                  "type": "string"
+                                },
+                                "module_id": {
+                                  "type": "string"
+                                },
+                                "price": {
+                                  "type": "number"
+                                },
+                                "to": {
+                                  "type": "string"
+                                },
+                                "token_id": {
+                                  "type": "string"
+                                },
+                                "transaction_time": {
+                                  "type": "string"
+                                },
+                                "transaction_version": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "page": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/collections/{address}/holders": {
+        "get": {
+          "tags": [
+            "NFT Collection"
+          ],
+          "summary": "Get holders of a specific collection",
+          "description": "Get addresses who holding NFT tokens of one NFT collection",
+          "operationId": "CollectionHolder",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "Collection address value that needs to be considered for filtering",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "page",
+              "description": "Get data by page, each page contains 20 holders",
+              "required": false,
+              "in": "query",
+              "schema": {
+                "type": "number",
+                "minimum": 1
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "_id": {
+                              "type": "string"
+                            },
+                            "amount": {
+                              "type": "number"
+                            },
+                            "owner_address": {
+                              "type": "string"
+                            },
+                            "percentage": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "page": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/tokens/{address}/0": {
+        "get": {
+          "tags": [
+            "NFT Token"
+          ],
+          "summary": "Get information of a specific NFT",
+          "description": "Get info about NFT token",
+          "operationId": "NFTInfo",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "NFT token address that needs to be considered for filtering",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "collection_data_id_hash": {
+                            "type": "string"
+                          },
+                          "collection_detail": {
+                            "type": "object",
+                            "properties": {
+                              "collection_data_id_hash": {
+                                "type": "string"
+                              },
+                              "collection_name": {
+                                "type": "string"
+                              },
+                              "creator_address": {
+                                "type": "string"
+                              },
+                              "floor_price": {
+                                "type": "object",
+                                "properties": {
+                                  "floor_price": {
+                                    "type": "number"
+                                  },
+                                  "from_market": {
+                                    "type": "string"
+                                  },
+                                  "from_tx": {
+                                    "type": "string"
+                                  },
+                                  "from_tx_time": {
+                                    "type": "integer"
+                                  },
+                                  "token_data_id_hash": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "stats": {
+                                "type": "object",
+                                "properties": {
+                                  "updated_time": {
+                                    "type": "number"
+                                  },
+                                  "volume_7d": {
+                                    "type": "number"
+                                  },
+                                  "volume_24": {
+                                    "type": "number"
+                                  },
+                                  "volume_30d": {
+                                    "type": "number"
+                                  },
+                                  "markets": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "collection_name": {
+                            "type": "string"
+                          },
+                          "creator_address": {
+                            "type": "string"
+                          },
+                          "default_properties": {
+                            "type": "object"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "holders": {
+                            "type": "number"
+                          },
+                          "last_listing": {
+                            "type": "object",
+                            "properties": {
+                              "event_index": {
+                                "type": "number"
+                              },
+                              "market": {
+                                "type": "string"
+                              },
+                              "price": {
+                                "type": "number"
+                              },
+                              "trans_time": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "version": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "last_trade": {
+                            "type": "object",
+                            "properties": {
+                              "event_index": {
+                                "type": "number"
+                              },
+                              "market": {
+                                "type": "string"
+                              },
+                              "price": {
+                                "type": "number"
+                              },
+                              "trans_time": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "version": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "last_transaction_timestamp": {
+                            "type": "string"
+                          },
+                          "last_transaction_version": {
+                            "type": "number"
+                          },
+                          "maximum": {
+                            "type": "string"
+                          },
+                          "metadata": {
+                            "type": "object",
+                            "properties": {
+                              "attributes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "trait_type": {
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "external_url": {
+                                "type": "string"
+                              },
+                              "image": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "metadata_uri": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "property_version": {
+                            "type": "number"
+                          },
+                          "supply": {
+                            "type": "string"
+                          },
+                          "token_data_id_hash": {
+                            "type": "string"
+                          },
+                          "token_properties": {
+                            "type": "object"
+                          },
+                          "transfers": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/transactions": {
+        "get": {
+          "tags": [
+            "Transaction"
+          ],
+          "summary": "Get last transactions of blockchain",
+          "description": "Get list last transactions of blockchain. Max 200 last transactions.",
+          "operationId": "transaction",
+          "parameters": [
+            {
+              "name": "page",
+              "in": "query",
+              "description": "Get data by page, each page contains 20 transactions",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "list_trans": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "object",
+                              "properties": {
+                                "amount": {
+                                  "type": "number",
+                                  "example": 0
+                                },
+                                "coin_type": {
+                                  "type": "string",
+                                  "example": "0x1::aptos_coin::AptosCoin"
+                                },
+                                "transfer_type": {
+                                  "type": "string",
+                                  "example": ""
+                                }
+                              }
+                            },
+                            "block_height": {
+                              "type": "number",
+                              "example": 57369856
+                            },
+                            "function": {
+                              "type": "string",
+                              "example": "0x54ad3d30af77b60d939ae356e6606de9a4da67583f02b962d2d3f2e481484e90::uln_receive::relayer_verify"
+                            },
+                            "gas_unit_price": {
+                              "type": "number",
+                              "example": 120
+                            },
+                            "gas_used": {
+                              "type": "number",
+                              "example": 452
+                            },
+                            "send_to": {
+                              "type": "string",
+                              "example": "0x54ad3d30af77b60d939ae356e6606de9a4da67583f02b962d2d3f2e481484e90"
+                            },
+                            "sender": {
+                              "type": "string",
+                              "example": "0x1d8727df513fa2a8785d0834e40b34223daff1affc079574082baadb74b66ee4"
+                            },
+                            "success": {
+                              "type": "boolean",
+                              "example": true
+                            },
+                            "trans_hash": {
+                              "type": "string",
+                              "example": "0xd1baadcd0cfdc0892dbf9696a21afbc45b685e7d5759b9f88c47297562436003"
+                            },
+                            "trans_time": {
+                              "type": "string",
+                              "example": "1685072689933432"
+                            },
+                            "trans_version": {
+                              "type": "number",
+                              "example": 147870919
+                            },
+                            "type": {
+                              "type": "string",
+                              "example": "user_transaction"
+                            }
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "page": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/transactions/{address}": {
+        "get": {
+          "tags": [
+            "Transaction"
+          ],
+          "summary": "Get detail informaton of a transaction",
+          "description": "Get detail of a transaction",
+          "operationId": "TransactionDetail",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "Version value that needs to be considered for filtering",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "accumulator_root_hash": {
+                            "type": "string"
+                          },
+                          "block_height": {
+                            "type": "string"
+                          },
+                          "changes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "changes": {
+                                  "type": "object",
+                                  "properties": {
+                                    "address": {
+                                      "type": "string"
+                                    },
+                                    "data": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "object",
+                                          "properties": {
+                                            "coin": {
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "string",
+                                                  "example": "1558066982487"
+                                                }
+                                              }
+                                            },
+                                            "deposit_events": {
+                                              "type": "object",
+                                              "properties": {
+                                                "counter": {
+                                                  "type": "string",
+                                                  "example": "1304363"
+                                                },
+                                                "guid": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "id": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "addr": {
+                                                          "type": "string"
+                                                        },
+                                                        "creation_num": {
+                                                          "type": "number"
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "frozen": {
+                                                  "type": "boolean"
+                                                }
+                                              }
+                                            },
+                                            "withdraw_events": {
+                                              "type": "object",
+                                              "properties": {
+                                                "counter": {
+                                                  "type": "string",
+                                                  "example": "926076"
+                                                },
+                                                "guid": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "id": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "addr": {
+                                                          "type": "string"
+                                                        },
+                                                        "creation_num": {
+                                                          "type": "number"
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "type": {
+                                              "type": "string",
+                                              "example": "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "state_key_hash": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string"
+                                    },
+                                    "wrs_index": {
+                                      "type": "number"
+                                    }
+                                  }
+                                },
+                                "coin_changes": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "account": {
+                                        "type": "string"
+                                      },
+                                      "amount": {
+                                        "type": "number"
+                                      },
+                                      "change_type": {
+                                        "type": "string"
+                                      },
+                                      "coin_type": {
+                                        "type": "string"
+                                      },
+                                      "event_index": {
+                                        "type": "number"
+                                      },
+                                      "gas": {
+                                        "type": "number"
+                                      },
+                                      "post_balance": {
+                                        "type": "number"
+                                      },
+                                      "wrs_index": {
+                                        "type": "number"
+                                      }
+                                    }
+                                  }
+                                },
+                                "event_root_hash": {
+                                  "type": "string"
+                                },
+                                "events": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "data": {
+                                        "type": "object",
+                                        "properties": {
+                                          "local_address": {
+                                            "type": "string"
+                                          },
+                                          "nonce": {
+                                            "type": "string"
+                                          },
+                                          "remote_address": {
+                                            "type": "string"
+                                          },
+                                          "remote_chain_id": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "event_index": {
+                                        "type": "number"
+                                      },
+                                      "guid": {
+                                        "type": "object",
+                                        "properties": {
+                                          "account_address": {
+                                            "type": "string"
+                                          },
+                                          "creation_number": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "sequence_number": {
+                                        "type": "string"
+                                      },
+                                      "type": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                },
+                                "expiration_timestamp_secs": {
+                                  "type": "string"
+                                },
+                                "gas_unit_price": {
+                                  "type": "number"
+                                },
+                                "gas_used": {
+                                  "type": "number"
+                                },
+                                "hash": {
+                                  "type": "string"
+                                },
+                                "interacted_accounts": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "example": "0x1d8727df513fa2a8785d0834e40b34223daff1affc079574082baadb74b66ee4"
+                                  }
+                                },
+                                "interacted_coins": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "example": "0x1::aptos_coin::AptosCoin"
+                                  }
+                                },
+                                "interacted_function": {
+                                  "type": "string"
+                                },
+                                "interacted_modules": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "example": "0x54ad3d30af77b60d939ae356e6606de9a4da67583f02b962d2d3f2e481484e90::channel::MsgEvent"
+                                  }
+                                },
+                                "interacted_tokens": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "max_gas_amount": {
+                                  "type": "string"
+                                },
+                                "payload": {
+                                  "type": "object",
+                                  "properties": {
+                                    "arguments": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "function": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string"
+                                    },
+                                    "type_arguments": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "real_payload": {
+                                      "type": "object"
+                                    }
+                                  }
+                                },
+                                "receiver": {
+                                  "type": "object",
+                                  "properties": {
+                                    "function": {
+                                      "type": "string"
+                                    },
+                                    "receiver": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "sender": {
+                                  "type": "string"
+                                },
+                                "sequence_number": {
+                                  "type": "string"
+                                },
+                                "signature": {
+                                  "type": "object",
+                                  "properties": {
+                                    "public_key": {
+                                      "type": "string"
+                                    },
+                                    "signature": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "spec_data": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "state_change_hash": {
+                            "type": "string"
+                          },
+                          "state_checkpoint_hash": {
+                            "type": "string"
+                          },
+                          "success": {
+                            "type": "boolean"
+                          },
+                          "timestamp": {
+                            "type": "string"
+                          },
+                          "token_changes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "trans_tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "transfers": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "string"
+                          },
+                          "vm_status": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "page": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/blocks": {
+        "get": {
+          "tags": [
+            "Block"
+          ],
+          "summary": "Get information about last blocks",
+          "description": "Get list last locks. Max 200 last blocks.",
+          "operationId": "LastBlock",
+          "parameters": [
+            {
+              "name": "page",
+              "in": "query",
+              "description": "Get data by page, each page contains 20 blocks",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "block_height": {
+                              "type": "string"
+                            },
+                            "block_hash": {
+                              "type": "string"
+                            },
+                            "block_timestamp": {
+                              "type": "string"
+                            },
+                            "first_version": {
+                              "type": "string"
+                            },
+                            "last_version": {
+                              "type": "string"
+                            },
+                            "transactions": {
+                              "type": "string"
+                            },
+                            "qty_tx": {
+                              "type": "number"
+                            },
+                            "proposer": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "page": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/blocks/{address}": {
+        "get": {
+          "tags": [
+            "Block"
+          ],
+          "summary": "Get detail information of a specific block",
+          "description": "Detail information of given block",
+          "operationId": "BlockInfo",
+          "parameters": [
+            {
+              "name": "address",
+              "in": "path",
+              "description": "Block value that needs to be considered for filtering",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "block_hash": {
+                            "type": "string"
+                          },
+                          "block_height": {
+                            "type": "string"
+                          },
+                          "block_timestamp": {
+                            "type": "string"
+                          },
+                          "first_version": {
+                            "type": "string"
+                          },
+                          "last_version": {
+                            "type": "string"
+                          },
+                          "proposer": {
+                            "type": "string"
+                          },
+                          "qty_tx": {
+                            "type": "number"
+                          },
+                          "transactions": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "accumulator_root_hash": {
+                                  "type": "string"
+                                },
+                                "changes": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "address": {
+                                        "type": "string"
+                                      },
+                                      "data": {
+                                        "type": "object",
+                                        "properties": {
+                                          "data": {
+                                            "type": "object",
+                                            "properties": {
+                                              "epoch_interval": {
+                                                "type": "string"
+                                              },
+                                              "height": {
+                                                "type": "string"
+                                              },
+                                              "new_block_events": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "counter": {
+                                                    "type": "string"
+                                                  },
+                                                  "guid": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "id": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "addr": {
+                                                            "type": "string"
+                                                          },
+                                                          "creation_num": {
+                                                            "type": "string"
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "update_epoch_interval_events": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "counter": {
+                                                    "type": "string"
+                                                  },
+                                                  "guid": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "id": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "addr": {
+                                                            "type": "string"
+                                                          },
+                                                          "creation_num": {
+                                                            "type": "string"
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "type": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          },
+                                          "state_key_hash": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "epoch": {
+                                  "type": "string"
+                                },
+                                "event_root_hash": {
+                                  "type": "string"
+                                },
+                                "events": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "data": {
+                                        "type": "object",
+                                        "properties": {
+                                          "epoch": {
+                                            "type": "string"
+                                          },
+                                          "failed_proposer_indices": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "hash": {
+                                            "type": "string"
+                                          },
+                                          "height": {
+                                            "type": "string"
+                                          },
+                                          "previous_block_votes_bitvec": {
+                                            "type": "string"
+                                          },
+                                          "proposer": {
+                                            "type": "string"
+                                          },
+                                          "round": {
+                                            "type": "string"
+                                          },
+                                          "time_microseconds": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "guid": {
+                                        "type": "object",
+                                        "properties": {
+                                          "account_address": {
+                                            "type": "string"
+                                          },
+                                          "creation_number": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "sequence_number": {
+                                        "type": "string"
+                                      },
+                                      "type": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                },
+                                "failed_proposer_indices": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "gas_used": {
+                                  "type": "string"
+                                },
+                                "hash": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "previous_block_votes_bitvec": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "number"
+                                  }
+                                },
+                                "proposer": {
+                                  "type": "string"
+                                },
+                                "round": {
+                                  "type": "string"
+                                },
+                                "state_change_hash": {
+                                  "type": "string"
+                                },
+                                "state_checkpoint_hash": {
+                                  "type": "string"
+                                },
+                                "success": {
+                                  "type": "boolean"
+                                },
+                                "timestamp": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "version": {
+                                  "type": "string"
+                                },
+                                "vm_status": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "page": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/validators": {
+        "get": {
+          "tags": [
+            "Validator"
+          ],
+          "summary": "Get list of all validators",
+          "description": "Get list all validators",
+          "operationId": "AllValidator",
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "active_validators": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "addr": {
+                                  "type": "string"
+                                },
+                                "config": {
+                                  "type": "object",
+                                  "properties": {
+                                    "consensus_pubkey": {
+                                      "type": "string"
+                                    },
+                                    "fullnode_addresses": {
+                                      "type": "string"
+                                    },
+                                    "network_addresses": {
+                                      "type": "string"
+                                    },
+                                    "validator_index": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "stats_validator": {
+                                  "type": "object",
+                                  "properties": {
+                                    "apt_rewards_distributed": {
+                                      "type": "number"
+                                    },
+                                    "governance_voting_record": {
+                                      "type": "string"
+                                    },
+                                    "last_epoch": {
+                                      "type": "number"
+                                    },
+                                    "last_epoch_performance": {
+                                      "type": "string"
+                                    },
+                                    "liveness": {
+                                      "type": "number"
+                                    },
+                                    "location_stats": {
+                                      "type": "object",
+                                      "properties": {
+                                        "city": {
+                                          "type": "string"
+                                        },
+                                        "country": {
+                                          "type": "string"
+                                        },
+                                        "epoch": {
+                                          "type": "number"
+                                        },
+                                        "latitude": {
+                                          "type": "number"
+                                        },
+                                        "longitude": {
+                                          "type": "number"
+                                        },
+                                        "peer_id": {
+                                          "type": "string"
+                                        },
+                                        "region": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "operator_address": {
+                                      "type": "string"
+                                    },
+                                    "owner_address": {
+                                      "type": "string"
+                                    },
+                                    "rewards_growth": {
+                                      "type": "number"
+                                    }
+                                  }
+                                },
+                                "voting_power": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "apy": {
+                            "type": "number"
+                          },
+                          "consensus_scheme": {
+                            "type": "number"
+                          },
+                          "epoch": {
+                            "type": "number"
+                          },
+                          "epochProcess": {
+                            "type": "number"
+                          },
+                          "pending_active": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "pending_inactive": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "total_joining_power": {
+                            "type": "string"
+                          },
+                          "total_voting_power": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "code": {
+                        "type": "integer",
+                        "example": 200
+                      },
+                      "page": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Provides the status of the request:\n- `true` for success\n- `false` for failure\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request"
+            },
+            "401": {
+              "description": "Authentication failed"
+            },
+            "429": {
+              "description": "Too Many Requests"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      }
+    }
+  }

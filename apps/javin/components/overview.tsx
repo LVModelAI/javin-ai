@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 
 export const Overview = () => {
-  const { theme } = useTheme();
-  console.log(theme);
+  const { resolvedTheme } = useTheme();
+  console.log(resolvedTheme);
   return (
     <motion.div
       key="overview"
@@ -14,14 +14,14 @@ export const Overview = () => {
       transition={{ delay: 0.5 }}
     >
       <div className="rounded-xl p-6 flex flex-col items-center gap-2 leading-relaxed text-center max-w-2xl">
-        {theme == "dark" ? (
+        {resolvedTheme == "dark" ? (
           <img
             alt="Javin.ai"
             src="/images/javin/banner/javin-banner-white.svg"
             className=" w-32 sm:w-48 h-auto"
           />
         ) : (
-          theme == "light" && (
+          resolvedTheme == "light" && (
             <img
               alt="Javin.ai"
               src="/images/javin/banner/javin-banner-black.svg"

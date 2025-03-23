@@ -47,6 +47,23 @@ export async function getAllPaths(openapiData: any) {
     )
   );
 }
+
+export async function getAllPathsAndSummary(openapiData: any) {
+  return JSON.stringify(
+    Object.entries(openapiData.paths || {}).map(
+      ([path, methods]: [string, any]) => {
+        // Get the first available HTTP method (e.g., GET, POST, etc.)
+        const firstMethod = Object.keys(methods)[0];
+        const summary = firstMethod
+          ? methods[firstMethod]?.summary || "No summary available"
+          : "No summary available";
+
+        return { path, summary };
+      }
+    )
+  );
+}
+
 export async function getAllPathsAndDesc(openapiData: any) {
   return JSON.stringify(
     Object.entries(openapiData.paths || {})
@@ -104,11 +121,16 @@ export async function getPathDetails(openapiData: any, pathUrl: string) {
         }
         return param;
       });
+      const mainServerUrl = openapiData.servers?.[0]?.url;
 
+      const servers = methodDetails?.servers || [];
+      const serverUrl = servers[0]?.url || mainServerUrl;
+      console.log("server url is ", serverUrl);
       return {
         method: method.toUpperCase(),
         description,
         parameters,
+        baseUrl: serverUrl,
       };
     }
   );

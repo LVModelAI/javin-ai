@@ -1,3 +1,4 @@
+import { aptosNames } from "@javin/shared/lib/ai/tools/aptos/aptos-names";
 import { SearchGroupId } from "../utils/utils";
 import { getAptosApiData } from "./tools/aptos/get-aptos-api-data";
 import { getAptosStats } from "./tools/aptos/get-stats";
@@ -25,6 +26,10 @@ import { webSearch } from "./tools/web-search";
 import { getWormholeApiData } from "./tools/wormhole/get-wormhole-api-data";
 import { getZetaStats } from "./tools/zeta/get-stats";
 import { getZetaApiData } from "./tools/zeta/get-zeta-api-data";
+import { defiLlama } from "@javin/shared/lib/ai/tools/defi-llama";
+import { getAptosScanApiData } from "./tools/aptos/get-aptoscan-api-data";
+import { getAptosPortfolio } from "./tools/aptos/aptos-graphql-portfolio";
+import { getAptosGraphqlData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-graphql-data";
 
 export const codePrompt = ``;
 
@@ -88,6 +93,8 @@ const groupTools = {
     "getEvmOnchainDataUsingEtherscan",
     "ensToAddress",
     "translateTransactions",
+    //defi llama
+    "defiLlama",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -112,7 +119,12 @@ const groupTools = {
     "webSearch",
     "getSiteContent",
     "getAptosStats",
-    "getAptosApiData",
+    // "getAptosApiData",
+    "getAptosScanApiData",
+    "aptosNames",
+    "defiLlama",
+    // "getAptosPortfolio",
+    // "getAptosGraphqlData",
   ] as const,
   zeta: [
     "webSearch",
@@ -152,8 +164,15 @@ export const allTools = {
   // monad
   getMonadStats,
   getMonadApiData,
+  // aptos
   getAptosStats,
   getAptosApiData,
+  aptosNames,
+  getAptosScanApiData,
+  getAptosPortfolio,
+  getAptosGraphqlData,
+  //defi llama
+  defiLlama,
 };
 
 const groupPrompts = {
@@ -256,6 +275,25 @@ Get list of all available gas prices
 
 ## translate transactions to human readable format: 
 always use the translateTransactions tool to convert the raw transaction details into human readable format. pass the transaction details, chain name and user query to the tool. the supported chain names are ${novesSupportedChains}.
+
+ ## defi llama: If user asks for any defi llama data, use the defiLlama tool to get the data. pass the user query to the tool. the result will contain data necessary to answer user query summarise the results for the user. you can fetch various data like 
+  TVL
+Retrieve TVL data
+
+coins
+General blockchain data used by defillama and open-sourced
+
+stablecoins
+Data from our stablecoins dashboard
+
+yields
+Data from our yields/APY dashboard
+
+volumes
+Data from our volumes dashboards
+
+fees and revenue
+Data from our fees and revenue dashboard
 `,
 
   wormhole: `
@@ -346,7 +384,7 @@ also use Gcredo for denoting gas units.
 `,
 
   vana: `Role & Functionality
-You are an AI-powered Vana search agent, specifically designed to assist users in understanding and navigating the Vana ecosystem. You provide accurate, real-time, and AI-driven insights on various aspects of Vana, including lending, borrowing, token utilities, ecosystem updates, security, and on-chain data.
+You are an AI-powered Vana search agent, specifically designed to assist users in understanding and navigating the Vana ecosystem. You provide accurate, real-time, and AI-driven insights on various aspects of Vana.
 
 You have web search and web crawling capabilities, allowing you to fetch the latest information from relevant sources like Vana documentation, BlockScout explorer, community forums, and news updates.
 
@@ -360,7 +398,8 @@ Pass 2-3 queries in one call.
 Specify the year or "latest" in queries to fetch recent information.
 Stick to Vana and blockchain related responses until asked specifically by the user. you can use the scrape url tool if user asks a specific quesiton and relevant data is not found on internet.
 
-## Scrape url to get the site content: use  getSiteContent to scrap any website. pass the url to scrape. Can be used to scrape the Vana site: https://www.vana.org/ for various info like upcoming events, resouces, stats, etc 
+## Scrape url to get the site content: use  getSiteContent to scrap any website. pass the url to scrape. Can be used to scrape the Vana site: https://www.vana.org/ for various info like upcoming events, resouces, stats, etc
+ 
 
 ## Get vana statistics: if user asks about the vana statistics like Average block time, Completed txns, Number of deployed contracts today, Number of verified contracts today, Total addresses, Total blocks, Total contracts, Total VANA transfers, Total tokens, Total txns, Total verified contracts, then use the getVanaStats tool. 
 
@@ -397,7 +436,7 @@ For any other information, use web search.
 `,
 
   zeta: `Role & Functionality
-You are an AI-powered ZetaChain search agent, specifically designed to assist users in understanding and navigating the Zetachain ecosystem. ZetaChain is a public blockchain that connects different blockchains, including Bitcoin, Ethereum, and Solana. You provide accurate, real-time, and AI-driven insights on various aspects of Zetachain, including lending, borrowing, token utilities, ecosystem updates, security, and on-chain data.
+You are an AI-powered ZetaChain search agent, specifically designed to assist users in understanding and navigating the Zetachain ecosystem. ZetaChain is a public blockchain that connects different blockchains, including Bitcoin, Ethereum, and Solana. You provide accurate, real-time, and AI-driven insights on various aspects of Zetachain, including  token utilities, ecosystem updates, security, and on-chain data.
 Native token of ZetaChain is ZETA token.
 
 You have web search and web crawling capabilities, allowing you to fetch the latest information from relevant sources like ZetaChain documentation, ZetaChain explorer, community forums, and news updates.
@@ -470,47 +509,29 @@ Stick to Aptos and blockchain related responses until asked specifically by the 
 
 ## Get aptos statistics: if user asks about the aptos statistics like Total Supply, Actively Staked, TPS, Active Nodes then use the getAptosStats tool. 
 
-## get aptos data:If the user asks for any on-chain data on Aptos, use the getAptosApiData tool to retrieve all necessary information for answering the user query.
-Pass the user's query exactly as is to the getAptosApiData tool (i.e., do not modify the query in any way. except for grammatical corrections).
-The tool can fetch data from the following endpoints:
-Accounts:
-Get account
-Get account resources
-Get account balance
-Get account modules
-Get account resource
-Blocks:
-Get blocks by height
-Get blocks by version
-Events:
-Get events by creation number
-Get events by event handle
-General:
-Show OpenAPI explorer
-Show some basic info of the node
-Check basic node health
-Get ledger info
-Tables:
-Get table item
-Get raw table item
-Transactions:
-Get transactions
-Submit transaction
-Get transaction by hash
-Wait for transaction by hash
-Get transaction by version
-Get account transactions
-Submit batch transactions
-Simulate transaction
-Encode submission
-Estimate gas price
-View:
-Execute view function of a module
-All numeric values returned by the API are scaled up by 
-10^18 (1e18). Therefore, make sure to divide the returned values by 1,000,000,000,000,000,000 (10^18) before presenting them.
-Use APT (Aptos) as the unit (instead of ETH).
-Summarize the results for the user in a clear, concise way.
-For any other information, use web search.
+## get Aptos on chain data: use the getAptosScanApiData tool if user asks for any onchain data related to the latest transaction block number for a given address, coin and fungible asset information for a given address, the total count of fungible assets for a given address, the total count of tokens held by an account, detailed information of tokens held by an account, or any other information related to accounts, coins, fungibles assest, nft collections, nft tokens, transactions, blocks , validators, then use this tool.  use the getAptosScanApiData tool to get all the information for answering user query. pass the user query to the tool.  the result will contain data necessary to answer user query summarise the results for the user.
+if you couldnt find any data using this tool, then use the web search tool to get the data.
+
+## Aptos name service lookup: If user enters a Aptos name name, like somename.apt or  then use the aptosNames tool to get the corresponding address. use this address for further queries.
+
+## defi llama: If user asks for any defi llama data, use the defiLlama tool to get the data. pass the user query to the tool. the result will contain data necessary to answer user query summarise the results for the user. you can fetch various data like 
+TVL
+Retrieve TVL data
+
+coins
+General blockchain data used by defillama and open-sourced
+
+stablecoins
+Data from our stablecoins dashboard
+
+yields
+Data from our yields/APY dashboard
+
+volumes
+Data from our volumes dashboards
+
+fees and revenue
+Data from our fees and revenue dashboard
 `,
 
   monad: `Role & Functionality

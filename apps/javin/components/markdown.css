@@ -1,0 +1,11 @@
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (min-width: 640px) {
+  /* Tailwind's sm breakpoint is 640px */
+  .markdown-body img {
+    max-width: 50%;
+  }
+}

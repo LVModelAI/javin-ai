@@ -84,7 +84,10 @@ export const translateTransactions = tool({
     "Translate raw blockchain transactions into human-friendly, enriched form.",
   parameters: z.object({
     transactionDetails: z.string().describe("Details of the transaction."),
-    chain: z.enum(novesSupportedChains).describe("Evm chain name"),
+    chain: z
+      .enum(novesSupportedChains)
+      .describe("Evm chain name")
+      .default("eth"),
     userQuery: z.string().describe("query of the user"),
   }),
   execute: async ({ transactionDetails, chain, userQuery }) => {

@@ -9,12 +9,41 @@ import {
   loadOpenAPI,
 } from "../../../utils/openapi";
 
-function scaleLargeNumbersInJson(jsonString: string): string {
-  return jsonString.replace(/"(\d{10,})"/g, (_match, num) => {
-    const scaledNum = (Number(num) / 1e18).toFixed(8) + " (scaled)";
-    return `"${scaledNum} (scaled)"`;
-  });
+//@ts-ignore
+function scaleLargeNumbers(data: any) {
+  const SCALE_FACTOR = 10n ** 8n; // 10^8 as a BigInt
+
+  if (typeof data === "bigint" && data >= SCALE_FACTOR) {
+    return data / SCALE_FACTOR;
+  } else if (typeof data === "number" && data >= Number(SCALE_FACTOR)) {
+    return data / Number(SCALE_FACTOR);
+  } else if (Array.isArray(data)) {
+    return data.map(scaleLargeNumbers);
+  } else if (typeof data === "object" && data !== null) {
+    return Object.fromEntries(
+      //@ts-ignore
+      Object.entries(data).map(([key, value]) => [
+        key,
+        scaleLargeNumbers(value),
+      ])
+    );
+  }
+  return data;
 }
+
+// Recursive function to process numbers in the response
+const processNumbers = (data: any): any => {
+  if (typeof data === "number" && data >= 10_000_000) {
+    return data / 10 ** 8;
+  } else if (Array.isArray(data)) {
+    return data.map(processNumbers);
+  } else if (typeof data === "object" && data !== null) {
+    return Object.fromEntries(
+      Object.entries(data).map(([key, value]) => [key, processNumbers(value)])
+    );
+  }
+  return data;
+};
 
 export const getAptosApiData = tool({
   description: "Get real-time Aptos blockchain data.",
@@ -35,18 +64,15 @@ export const getAptosApiData = tool({
         model: myProvider.languageModel("chat-model-small"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant aptos blockchain data in a user-friendly format.
       
-        ## How to Process User Queries:
-        1. **Match User Query to API Path**:  
-           - Analyze the user's question.  
-           - Select the API path whose description best matches the intent of the query.  
-      
-        2. **Retrieve Required Parameters**:  
-           - Use the **getPathParameters** tool to fetch all necessary parameters.  
+         you can use the below tools to get the required data:
+        you have access to public apis which can be called to get the required data, you need to follow below steps to get the required data:
+         1. **Retrieve Required Parameters**:  
+           - Use the **getPathParametersAndBaseUrl** tool to fetch all necessary parameters.  
            - pass The API path, e.g., '/accounts/{address}'
            - If any required parameters are missing, prompt the user for input.
            - make sure to use all the parameters needed to get user answer for the API path like limit, offset, etc.  
       
-        3. **Construct and Execute API Call**:  
+         2. **Construct and Execute API Call**:  
            - Form a complete API URL using the **base URL** (${aptosBaseUrl}) and the retrieved parameters.  
            - Use the **makeApiCall** tool to fetch data.
         
@@ -59,7 +85,7 @@ export const getAptosApiData = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${allPathsAndDesc}. Base URL: ${aptosBaseUrl}`
         ),
         tools: {
-          getPathParameters: tool({
+          getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",
             parameters: z.object({
@@ -77,6 +103,7 @@ export const getAptosApiData = tool({
               return aptosPathDetails;
             },
           }),
+
           makeApiCall: tool({
             description: "Fetch real-time blockchain data from Aptos API.",
             parameters: z.object({
@@ -97,8 +124,11 @@ export const getAptosApiData = tool({
                     `API call failed with status ${response.status}`
                   );
                 const json = await response.json();
-                console.log("Fetched API response");
-                return json; // Return parsed JSON data for further processing
+
+                const scaledData = scaleLargeNumbers(json);
+                console.log("processedData", scaledData);
+
+                return scaledData;
               } catch (error) {
                 console.error("Error fetching aptos API data:", error);
                 return { error: "Failed to fetch data from the API." };

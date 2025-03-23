@@ -1,0 +1,77 @@
+{
+  "data": {
+    "__schema": {
+      "queryType": {
+        "name": "query_root"
+      },
+      "mutationType": null,
+      "subscriptionType": {
+        "name": "subscription_root"
+      },
+      "types": [
+        {
+          "kind": "OBJECT",
+          "name": "Query",
+          "fields": [
+            {
+              "name": "account_transactions",
+              "description": "Get the latest transaction block number for a given address.",
+              "args": [
+                { "name": "address", "type": "String!" },
+                { "name": "limit", "type": "Int" },
+                { "name": "offset", "type": "Int" }
+              ],
+              "type": "[AccountTransaction!]!"
+            },
+            {
+              "name": "current_fungible_asset_balances",
+              "description": "Get coin and fungible asset information held by an account.",
+              "args": [
+                { "name": "owner_address", "type": "String!" },
+                { "name": "limit", "type": "Int" },
+                { "name": "offset", "type": "Int" }
+              ],
+              "type": "[FungibleAsset!]!"
+            },
+            {
+              "name": "current_fungible_asset_balances_aggregate",
+              "description": "Get the total count of fungible assets for an account.",
+              "args": [{ "name": "address", "type": "String!" }],
+              "type": "Int!"
+            },
+            {
+              "name": "current_token_ownerships_v2_aggregate",
+              "description": "Get the total count of tokens held by an account.",
+              "args": [
+                {
+                  "name": "where_condition",
+                  "type": "current_token_ownerships_v2_bool_exp"
+                },
+                { "name": "offset", "type": "Int" },
+                { "name": "limit", "type": "Int" }
+              ],
+              "type": "Int!"
+            },
+            {
+              "name": "getOwnedTokens",
+              "description": "Get detailed information of tokens held by an account.",
+              "args": [
+                {
+                  "name": "where_condition",
+                  "type": "current_token_ownerships_v2_bool_exp!"
+                },
+                { "name": "offset", "type": "Int" },
+                { "name": "limit", "type": "Int" },
+                {
+                  "name": "order_by",
+                  "type": "[current_token_ownerships_v2_order_by!]"
+                }
+              ],
+              "type": "[CurrentTokenOwnershipFields!]!"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

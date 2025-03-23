@@ -42,7 +42,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
                  - Select the API path whose description best matches the intent of the query.  
             
               2. **Retrieve Required Parameters**:  
-                 - Use the **getPathParameters** tool to fetch all necessary parameters.  
+                 - Use the **getPathParametersAndBaseUrl** tool to fetch all necessary parameters.  
                  - pass The API path, e.g., '/?module=account&action=balance'
                  - If any required parameters are missing, prompt the user for input.  
             
@@ -59,7 +59,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}`
         ),
         tools: {
-          getPathParameters: tool({
+          getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",
             parameters: z.object({

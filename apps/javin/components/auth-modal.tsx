@@ -23,7 +23,7 @@ export default function AuthModal({
   setMode: (mode: "login" | "signup") => void;
 }) {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [isSuccessful, setIsSuccessful] = useState(false);
 
@@ -93,14 +93,14 @@ export default function AuthModal({
       ) : (
         <div className="flex flex-col h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
           <div className="rounded-xl p-6 flex flex-col gap-2 leading-relaxed text-center max-w-2xl">
-            {theme == "dark" ? (
+            {resolvedTheme == "dark" ? (
               <img
                 alt="Javin.ai"
                 src="/images/javin/banner/javin-banner-white.svg"
                 className=" w-32 sm:w-48 h-auto"
               />
             ) : (
-              theme == "light" && (
+              resolvedTheme == "light" && (
                 <img
                   alt="Javin.ai"
                   src="/images/javin/banner/javin-banner-black.svg"

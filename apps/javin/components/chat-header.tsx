@@ -33,7 +33,7 @@ function PureChatHeader({
 }) {
   const router = useRouter();
   const { open } = useSidebar();
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   const { width: windowWidth } = useWindowSize();
   // console.log("user in chat header", user);
@@ -69,14 +69,14 @@ function PureChatHeader({
       </div>
       {messages.length > 0 && (
         <Link href={"/"} className="font-semibold">
-          {theme == "dark" ? (
+          {resolvedTheme == "dark" ? (
             <img
               alt="Javin.ai"
               src="/images/javin/banner/javin-banner-white.svg"
               className="w-48 h-auto"
             />
           ) : (
-            theme == "light" && (
+            resolvedTheme == "light" && (
               <img
                 alt="Javin.ai"
                 src="/images/javin/banner/javin-banner-black.svg"

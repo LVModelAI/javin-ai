@@ -3,11 +3,14 @@ import React, { memo } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CodeBlock } from "./code-block";
+import "./markdown.css";
 
 const components: Partial<Components> = {
   // @ts-expect-error
   code: CodeBlock,
-  small: ({ children }) => <small className="break-long-words">{children}</small>,
+  small: ({ children }) => (
+    <small className="break-long-words">{children}</small>
+  ),
   pre: ({ children }) => <>{children}</>,
 
   span: ({ children }) => <span className="break-long-words">{children}</span>,
@@ -123,9 +126,11 @@ const remarkPlugins = [remarkGfm];
 
 const NonMemoizedMarkdown = ({ children }: { children: string }) => {
   return (
-    <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
-      {children}
-    </ReactMarkdown>
+    <div className="markdown-body">
+      <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
+        {children}
+      </ReactMarkdown>
+    </div>
   );
 };
 
