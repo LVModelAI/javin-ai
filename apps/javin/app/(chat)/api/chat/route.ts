@@ -2,6 +2,7 @@
 import {
   type Message,
   createDataStreamResponse,
+  generateText,
   smoothStream,
   streamText,
 } from "ai";
@@ -24,6 +25,22 @@ import {
 import { generateTitleFromUserMessage } from "../../actions";
 
 export const maxDuration = 60;
+
+interface ChatCompletionStreaming {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  system_fingerprint: string;
+  choices: Array<{
+    index: number;
+    delta: {
+      role?: string;
+      content?: string;
+    };
+    finish_reason: string | null;
+  }>;
+}
 
 export async function POST(request: Request) {
   const {
@@ -78,24 +95,107 @@ export async function POST(request: Request) {
   });
 
   return createDataStreamResponse({
-    execute: (dataStream) => {
-      const result = streamText({
-        model: myProvider.languageModel(selectedChatModel),
-        system: systemPrompt,
-        messages,
-        maxSteps: 5,
-        experimental_activeTools:
-          selectedChatModel === "chat-model-reasoning" ? [] : [...activeTools],
-        experimental_transform: smoothStream({ chunking: "word" }),
-        experimental_generateMessageId: generateUUID,
-        tools: allTools,
-        onFinish: async ({ response, reasoning }) => {
-          if (session.user?.id) {
-            try {
+    execute: async (dataStream) => {
+      if (selectedChatModel !== "sentient-dobby-unhinged") {
+        // NORMAL FLOW
+        const result = streamText({
+          model: myProvider.languageModel(selectedChatModel),
+          system: systemPrompt,
+          messages,
+          maxSteps: 5,
+          experimental_activeTools:
+            selectedChatModel === "chat-model-reasoning"
+              ? []
+              : [...activeTools],
+          experimental_transform: smoothStream({ chunking: "word" }),
+          experimental_generateMessageId: generateUUID,
+          tools: allTools,
+          onFinish: async ({ response, reasoning }) => {
+            if (session.user?.id) {
+              try {
+                const sanitizedResponseMessages = sanitizeResponseMessages({
+                  messages: response.messages,
+                  reasoning,
+                });
+
+                await saveMessages({
+                  messages: sanitizedResponseMessages.map((message) => {
+                    return {
+                      id: message.id,
+                      chatId: id,
+                      role: message.role,
+                      content: message.content,
+                      createdAt: new Date(),
+                    };
+                  }),
+                });
+                await incrementMessageCount(session.user.id);
+              } catch (error) {
+                console.error("Failed to save chat");
+              }
+            }
+          },
+          experimental_telemetry: {
+            isEnabled: true,
+            functionId: "stream-text",
+          },
+        });
+
+        result.mergeIntoDataStream(dataStream, {
+          sendReasoning: true,
+        });
+      } else {
+        // GENERATE SUMMARY FROM DOBBY
+        console.log("GENERATING SUMMARY FROM DOBBY");
+        try {
+          const result = await generateText({
+            model: myProvider.languageModel("chat-model-small"),
+            system: systemPrompt,
+            messages,
+            maxSteps: 5,
+            tools: allTools,
+            experimental_activeTools: [...activeTools],
+            experimental_generateMessageId: generateUUID,
+            // TODO SUPPORT STREAMING OF TOOL RESULT
+            // onStepFinish(event) {
+            //   console.log("onStepFinish");
+            //   console.log("toolCalls ", event.toolCalls);
+            //   console.log("toolResults ", event.toolResults);
+            //   const chunkData = {
+            //     id: generateUUID(),
+            //     role: "assistant",
+            //     toolInvocations: event.toolCalls.map((call, idx) => ({
+            //       toolName: call.toolName,
+            //       toolCallId: call.toolCallId,
+            //       state: "result",
+            //       args: call.args,
+            //       result: event.toolResults[idx] || null,
+            //     })),
+            //   };
+            //   dataStream.write(`0:${JSON.stringify(chunkData)}\n`);
+            // },
+          });
+
+          // Set up the system prompt and user message for summarization.
+          const summarizationSystemPrompt =
+            `You are a helpful assistant that will convert the text given to you in your own words. Do not reduce the information in the text. Write it correctly formatted and be kinda unhinged.  \n\n The text is:\n\n${result.text}`;
+          const summaryResult = streamText({
+            model: myProvider.languageModel(selectedChatModel),
+            prompt: summarizationSystemPrompt,
+            experimental_transform: smoothStream({ chunking: "word" }),
+            experimental_generateMessageId: generateUUID,
+            onChunk: async ({ chunk }) => {
+              console.log("onChunk = ", chunk);
+            },
+            onFinish: async ({ response, reasoning }) => {
               const sanitizedResponseMessages = sanitizeResponseMessages({
                 messages: response.messages,
                 reasoning,
               });
+              console.log(
+                "SAVING MESSAGES FOR DOBBY = ",
+                sanitizedResponseMessages
+              );
 
               await saveMessages({
                 messages: sanitizedResponseMessages.map((message) => {
@@ -109,20 +209,16 @@ export async function POST(request: Request) {
                 }),
               });
               await incrementMessageCount(session.user.id);
-            } catch (error) {
-              console.error("Failed to save chat");
-            }
-          }
-        },
-        experimental_telemetry: {
-          isEnabled: true,
-          functionId: "stream-text",
-        },
-      });
+            },
+          });
 
-      result.mergeIntoDataStream(dataStream, {
-        sendReasoning: true,
-      });
+          console.log("merging into datastream");
+          // Merge the summarization stream into the original data stream.
+          summaryResult.mergeIntoDataStream(dataStream);
+        } catch (err) {
+          console.error("Failed to generate summary from dobby", err);
+        }
+      }
     },
     onError: (error: any) => {
       console.log(error);

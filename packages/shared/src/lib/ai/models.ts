@@ -18,7 +18,7 @@ export const myProvider: any = customProvider({
     }),
     "title-model": openai("gpt-4-turbo"),
     "block-model": openai("gpt-4o-mini"),
-    "sentient-dobby-unhinged": fireworks.completionModel(
+    "sentient-dobby-unhinged": fireworks.chatModel(
       "accounts/sentientfoundation/models/dobby-unhinged-llama-3-3-70b-new"
     ),
   },
@@ -47,7 +47,7 @@ export const chatModels: Array<ChatModel> = [
   },
   {
     id: "sentient-dobby-unhinged",
-    name: "dobby-unhinged",
+    name: "Dobby Unhinged",
     description: "model created by Sentient",
   },
   // {
