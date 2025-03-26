@@ -1,0 +1,2281 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "Birdeye Data Services APIs",
+    "description": "To utilize the Birdeye Data Services APIs, an API key is required for authentication. You can obtain an API key by signing up for a bds.birdeye.so account and generating an API key in your account settings. Include this API key in the headers of your API requests for authentication.\n\nHere's a step-by-step guide on how to obtain an API key: [Birdeye Data Services Authentication and API Keys](https://docs.birdeye.so/docs/authentication-api-keys)"
+  },
+  "servers": [
+    {
+      "url": "public-api.birdeye.so"
+    }
+  ],
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Token APIs"
+    },
+    {
+      "name": "Wallet APIs (Beta)"
+    },
+    {
+      "name": "Trader APIs"
+    }
+  ],
+  "paths": {
+    "/defi/token_overview": {
+      "get": {
+        "tags": [
+          "Token APIs"
+        ],
+        "summary": "Token - Overview",
+        "description": "Get overview of a token.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/xChainParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenAddressParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/DefiTokenOverview"
+          },
+          "400": {
+            "description": "Bad Request",
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403",
+            "description": "Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500",
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/defi/v3/token/market-data": {
+      "get": {
+        "tags": [
+          "Token APIs"
+        ],
+        "summary": "Token - Market Data (Single)",
+        "description": "Get market data of single token",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/xChainParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenAddressParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/DefiTokenMarketDataSingle"
+          },
+          "400": {
+            "description": "Bad Request",
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403",
+            "description": "Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500",
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/defi/v3/token/trade-data/single": {
+      "get": {
+        "tags": [
+          "Token APIs"
+        ],
+        "summary": "Token - Trade Data (Single)",
+        "description": "Get trade data of single token",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/xChainParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenAddressParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/DefiTokenTradeDataSingle"
+          },
+          "400": {
+            "description": "Bad Request",
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403",
+            "description": "Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500",
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/defi/v2/tokens/top_traders": {
+      "get": {
+        "tags": [
+          "Token APIs"
+        ],
+        "summary": "Token - Top traders",
+        "description": "Get top traders of given token.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/xChainParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenAddressParam"
+          },
+          {
+            "$ref": "#/components/parameters/timeFrameParam"
+          },
+          {
+            "$ref": "#/components/parameters/sortTypeParam"
+          },
+          {
+            "$ref": "#/components/parameters/sortByTopTradersParam"
+          },
+          {
+            "$ref": "#/components/parameters/offset10kParam"
+          },
+          {
+            "$ref": "#/components/parameters/limit10Param"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/DefiTokenTopTraded"
+          },
+          "400": {
+            "description": "Bad Request",
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403",
+            "description": "Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500",
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/v1/wallet/token_balance": {
+      "get": {
+        "tags": [
+          "Wallet APIs (Beta)"
+        ],
+        "summary": "Wallet - Token Balance",
+        "description": "",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/walletApiXChainParam"
+          },
+          {
+            "$ref": "#/components/parameters/walletApiWalletParam"
+          },
+          {
+            "$ref": "#/components/parameters/walletApiTokenAddressParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/WalletTokenBalance"
+          },
+          "400": {
+            "description": "Bad Request",
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401",
+            "description": "Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/403",
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500",
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/v1/wallet/tx_list": {
+      "get": {
+        "tags": [
+          "Wallet APIs (Beta)"
+        ],
+        "summary": "Wallet Transaction History",
+        "description": "",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/walletApiXChainParam"
+          },
+          {
+            "$ref": "#/components/parameters/walletApiWalletParam"
+          },
+          {
+            "$ref": "#/components/parameters/walletApiLimitParam"
+          },
+          {
+            "$ref": "#/components/parameters/walletApiBeforeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/WalletTxList"
+          },
+          "400": {
+            "description": "Bad Request",
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401",
+            "description": "Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/403",
+            "description": "Forbidden"
+          },
+          "422": {
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500",
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/trader/gainers-losers": {
+      "get": {
+        "tags": [
+          "Trader APIs"
+        ],
+        "summary": "Trader - Gainers/Losers",
+        "description": "The API provides detailed information top gainers/losers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/xChainParam"
+          },
+          {
+            "$ref": "#/components/parameters/typeTopGainerLoserParam"
+          },
+          {
+            "$ref": "#/components/parameters/sortByTopGainerLoserParam"
+          },
+          {
+            "$ref": "#/components/parameters/sortTypeParam"
+          },
+          {
+            "$ref": "#/components/parameters/offset10kParam"
+          },
+          {
+            "$ref": "#/components/parameters/limit10Param"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "$ref": "#/components/responses/TraderGainerLoserList"
+          },
+          "400": {
+            "description": "Bad Request",
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403",
+            "description": "Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "$ref": "#/components/responses/500",
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CommonResponseType": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "DefiTokenMarketDataSingleResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DefiTokenMarketDataObject"
+          }
+        }
+      },
+      "DefiTokenMarketDataObject": {
+        "type": "object",
+        "required": [
+          "address",
+          "price",
+          "liquidity",
+          "total_supply",
+          "circulating_supply",
+          "market_cap",
+          "fdv"
+        ],
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "liquidity": {
+            "type": "number"
+          },
+          "total_supply": {
+            "type": "number"
+          },
+          "circulating_supply": {
+            "type": "number"
+          },
+          "market_cap": {
+            "type": "number"
+          },
+          "fdv": {
+            "type": "number"
+          }
+        }
+      },
+      "DefiTokenTradeDataSingleResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DefiTokenTradeDataObject"
+          }
+        }
+      },
+      "DefiTokenTradeDataObject": {
+        "type": "object",
+        "required": [
+          "address",
+          "liquidity",
+          "last_trade_unix_time",
+          "last_trade_human_time",
+          "price",
+          "history_30m_price",
+          "price_change_30m_percent",
+          "history_1h_price",
+          "price_change_1h_percent",
+          "history_2h_price",
+          "price_change_2h_percent",
+          "history_4h_price",
+          "price_change_4h_percent",
+          "history_6h_price",
+          "price_change_6h_percent",
+          "history_8h_price",
+          "price_change_8h_percent",
+          "history_12h_price",
+          "price_change_12h_percent",
+          "history_24h_price",
+          "price_change_24h_percent",
+          "unique_wallet_30m",
+          "unique_wallet_history_30m",
+          "unique_wallet_30m_change_percent",
+          "unique_wallet_1h",
+          "unique_wallet_history_1h",
+          "unique_wallet_1h_change_percent",
+          "unique_wallet_2h",
+          "unique_wallet_history_2h",
+          "unique_wallet_2h_change_percent",
+          "unique_wallet_4h",
+          "unique_wallet_history_4h",
+          "unique_wallet_4h_change_percent",
+          "unique_wallet_8h",
+          "unique_wallet_history_8h",
+          "unique_wallet_8h_change_percent",
+          "unique_wallet_24h",
+          "unique_wallet_history_24h",
+          "unique_wallet_24h_change_percent",
+          "trade_30m",
+          "trade_history_30m",
+          "trade_30m_change_percent",
+          "sell_30m",
+          "sell_history_30m",
+          "sell_30m_change_percent",
+          "buy_30m",
+          "buy_history_30m",
+          "buy_30m_change_percent",
+          "volume_30m",
+          "volume_30m_usd",
+          "volume_history_30m",
+          "volume_history_30m_usd",
+          "volume_30m_change_percent",
+          "volume_buy_30m",
+          "volume_buy_30m_usd",
+          "volume_buy_history_30m",
+          "volume_buy_history_30m_usd",
+          "volume_buy_30m_change_percent",
+          "volume_sell_30m",
+          "volume_sell_30m_usd",
+          "volume_sell_history_30m",
+          "volume_sell_history_30m_usd",
+          "volume_sell_30m_change_percent",
+          "trade_1h",
+          "trade_history_1h",
+          "trade_1h_change_percent",
+          "sell_1h",
+          "sell_history_1h",
+          "sell_1h_change_percent",
+          "buy_1h",
+          "buy_history_1h",
+          "buy_1h_change_percent",
+          "volume_1h",
+          "volume_1h_usd",
+          "volume_history_1h",
+          "volume_history_1h_usd",
+          "volume_1h_change_percent",
+          "volume_buy_1h",
+          "volume_buy_1h_usd",
+          "volume_buy_history_1h",
+          "volume_buy_history_1h_usd",
+          "volume_buy_1h_change_percent",
+          "volume_sell_1h",
+          "volume_sell_1h_usd",
+          "volume_sell_history_1h",
+          "volume_sell_history_1h_usd",
+          "volume_sell_1h_change_percent",
+          "trade_2h",
+          "trade_history_2h",
+          "trade_2h_change_percent",
+          "sell_2h",
+          "sell_history_2h",
+          "sell_2h_change_percent",
+          "buy_2h",
+          "buy_history_2h",
+          "buy_2h_change_percent",
+          "volume_2h",
+          "volume_2h_usd",
+          "volume_history_2h",
+          "volume_history_2h_usd",
+          "volume_2h_change_percent",
+          "volume_buy_2h",
+          "volume_buy_2h_usd",
+          "volume_buy_history_2h",
+          "volume_buy_history_2h_usd",
+          "volume_buy_2h_change_percent",
+          "volume_sell_2h",
+          "volume_sell_2h_usd",
+          "volume_sell_history_2h",
+          "volume_sell_history_2h_usd",
+          "volume_sell_2h_change_percent",
+          "trade_4h",
+          "trade_history_4h",
+          "trade_4h_change_percent",
+          "sell_4h",
+          "sell_history_4h",
+          "sell_4h_change_percent",
+          "buy_4h",
+          "buy_history_4h",
+          "buy_4h_change_percent",
+          "volume_4h",
+          "volume_4h_usd",
+          "volume_history_4h",
+          "volume_history_4h_usd",
+          "volume_4h_change_percent",
+          "volume_buy_4h",
+          "volume_buy_4h_usd",
+          "volume_buy_history_4h",
+          "volume_buy_history_4h_usd",
+          "volume_buy_4h_change_percent",
+          "volume_sell_4h",
+          "volume_sell_4h_usd",
+          "volume_sell_history_4h",
+          "volume_sell_history_4h_usd",
+          "volume_sell_4h_change_percent",
+          "trade_8h",
+          "trade_history_8h",
+          "trade_8h_change_percent",
+          "sell_8h",
+          "sell_history_8h",
+          "sell_8h_change_percent",
+          "buy_8h",
+          "buy_history_8h",
+          "buy_8h_change_percent",
+          "volume_8h",
+          "volume_8h_usd",
+          "volume_history_8h",
+          "volume_history_8h_usd",
+          "volume_8h_change_percent",
+          "volume_buy_8h",
+          "volume_buy_8h_usd",
+          "volume_buy_history_8h",
+          "volume_buy_history_8h_usd",
+          "volume_buy_8h_change_percent",
+          "volume_sell_8h",
+          "volume_sell_8h_usd",
+          "volume_sell_history_8h",
+          "volume_sell_history_8h_usd",
+          "volume_sell_8h_change_percent",
+          "trade_24h",
+          "trade_history_24h",
+          "trade_24h_change_percent",
+          "sell_24h",
+          "sell_history_24h",
+          "sell_24h_change_percent",
+          "buy_24h",
+          "buy_history_24h",
+          "buy_24h_change_percent",
+          "volume_24h",
+          "volume_24h_usd",
+          "volume_history_24h",
+          "volume_history_24h_usd",
+          "volume_24h_change_percent",
+          "volume_buy_24h",
+          "volume_buy_24h_usd",
+          "volume_buy_history_24h",
+          "volume_buy_history_24h_usd",
+          "volume_buy_24h_change_percent",
+          "volume_sell_24h",
+          "volume_sell_24h_usd",
+          "volume_sell_history_24h",
+          "volume_sell_history_24h_usd",
+          "volume_sell_24h_change_percent"
+        ],
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "liquidity": {
+            "type": "number"
+          },
+          "last_trade_unix_time": {
+            "type": "number"
+          },
+          "last_trade_human_time": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "history_30m_price": {
+            "type": "number"
+          },
+          "price_change_30m_percent": {
+            "type": "number"
+          },
+          "history_1h_price": {
+            "type": "number"
+          },
+          "price_change_1h_percent": {
+            "type": "number"
+          },
+          "history_2h_price": {
+            "type": "number"
+          },
+          "price_change_2h_percent": {
+            "type": "number"
+          },
+          "history_4h_price": {
+            "type": "number"
+          },
+          "price_change_4h_percent": {
+            "type": "number"
+          },
+          "history_6h_price": {
+            "type": "number"
+          },
+          "price_change_6h_percent": {
+            "type": "number"
+          },
+          "history_8h_price": {
+            "type": "number"
+          },
+          "price_change_8h_percent": {
+            "type": "number"
+          },
+          "history_12h_price": {
+            "type": "number"
+          },
+          "price_change_12h_percent": {
+            "type": "number"
+          },
+          "history_24h_price": {
+            "type": "number"
+          },
+          "price_change_24h_percent": {
+            "type": "number"
+          },
+          "unique_wallet_30m": {
+            "type": "number"
+          },
+          "unique_wallet_history_30m": {
+            "type": "number"
+          },
+          "unique_wallet_30m_change_percent": {
+            "type": "number"
+          },
+          "unique_wallet_1h": {
+            "type": "number"
+          },
+          "unique_wallet_history_1h": {
+            "type": "number"
+          },
+          "unique_wallet_1h_change_percent": {
+            "type": "number"
+          },
+          "unique_wallet_2h": {
+            "type": "number"
+          },
+          "unique_wallet_history_2h": {
+            "type": "number"
+          },
+          "unique_wallet_2h_change_percent": {
+            "type": "number"
+          },
+          "unique_wallet_4h": {
+            "type": "number"
+          },
+          "unique_wallet_history_4h": {
+            "type": "number"
+          },
+          "unique_wallet_4h_change_percent": {
+            "type": "number"
+          },
+          "unique_wallet_8h": {
+            "type": "number"
+          },
+          "unique_wallet_history_8h": {
+            "type": "number"
+          },
+          "unique_wallet_8h_change_percent": {
+            "type": "number"
+          },
+          "unique_wallet_24h": {
+            "type": "number"
+          },
+          "unique_wallet_history_24h": {
+            "type": "number"
+          },
+          "unique_wallet_24h_change_percent": {
+            "type": "number"
+          },
+          "trade_30m": {
+            "type": "number"
+          },
+          "trade_history_30m": {
+            "type": "number"
+          },
+          "trade_30m_change_percent": {
+            "type": "number"
+          },
+          "sell_30m": {
+            "type": "number"
+          },
+          "sell_history_30m": {
+            "type": "number"
+          },
+          "sell_30m_change_percent": {
+            "type": "number"
+          },
+          "buy_30m": {
+            "type": "number"
+          },
+          "buy_history_30m": {
+            "type": "number"
+          },
+          "buy_30m_change_percent": {
+            "type": "number"
+          },
+          "volume_30m": {
+            "type": "number"
+          },
+          "volume_30m_usd": {
+            "type": "number"
+          },
+          "volume_history_30m": {
+            "type": "number"
+          },
+          "volume_history_30m_usd": {
+            "type": "number"
+          },
+          "volume_30m_change_percent": {
+            "type": "number"
+          },
+          "volume_buy_30m": {
+            "type": "number"
+          },
+          "volume_buy_30m_usd": {
+            "type": "number"
+          },
+          "volume_buy_history_30m": {
+            "type": "number"
+          },
+          "volume_buy_history_30m_usd": {
+            "type": "number"
+          },
+          "volume_buy_30m_change_percent": {
+            "type": "number"
+          },
+          "volume_sell_30m": {
+            "type": "number"
+          },
+          "volume_sell_30m_usd": {
+            "type": "number"
+          },
+          "volume_sell_history_30m": {
+            "type": "number"
+          },
+          "volume_sell_history_30m_usd": {
+            "type": "number"
+          },
+          "volume_sell_30m_change_percent": {
+            "type": "number"
+          },
+          "trade_1h": {
+            "type": "number"
+          },
+          "trade_history_1h": {
+            "type": "number"
+          },
+          "trade_1h_change_percent": {
+            "type": "number"
+          },
+          "sell_1h": {
+            "type": "number"
+          },
+          "sell_history_1h": {
+            "type": "number"
+          },
+          "sell_1h_change_percent": {
+            "type": "number"
+          },
+          "buy_1h": {
+            "type": "number"
+          },
+          "buy_history_1h": {
+            "type": "number"
+          },
+          "buy_1h_change_percent": {
+            "type": "number"
+          },
+          "volume_1h": {
+            "type": "number"
+          },
+          "volume_1h_usd": {
+            "type": "number"
+          },
+          "volume_history_1h": {
+            "type": "number"
+          },
+          "volume_history_1h_usd": {
+            "type": "number"
+          },
+          "volume_1h_change_percent": {
+            "type": "number"
+          },
+          "volume_buy_1h": {
+            "type": "number"
+          },
+          "volume_buy_1h_usd": {
+            "type": "number"
+          },
+          "volume_buy_history_1h": {
+            "type": "number"
+          },
+          "volume_buy_history_1h_usd": {
+            "type": "number"
+          },
+          "volume_buy_1h_change_percent": {
+            "type": "number"
+          },
+          "volume_sell_1h": {
+            "type": "number"
+          },
+          "volume_sell_1h_usd": {
+            "type": "number"
+          },
+          "volume_sell_history_1h": {
+            "type": "number"
+          },
+          "volume_sell_history_1h_usd": {
+            "type": "number"
+          },
+          "volume_sell_1h_change_percent": {
+            "type": "number"
+          },
+          "trade_2h": {
+            "type": "number"
+          },
+          "trade_history_2h": {
+            "type": "number"
+          },
+          "trade_2h_change_percent": {
+            "type": "number"
+          },
+          "sell_2h": {
+            "type": "number"
+          },
+          "sell_history_2h": {
+            "type": "number"
+          },
+          "sell_2h_change_percent": {
+            "type": "number"
+          },
+          "buy_2h": {
+            "type": "number"
+          },
+          "buy_history_2h": {
+            "type": "number"
+          },
+          "buy_2h_change_percent": {
+            "type": "number"
+          },
+          "volume_2h": {
+            "type": "number"
+          },
+          "volume_2h_usd": {
+            "type": "number"
+          },
+          "volume_history_2h": {
+            "type": "number"
+          },
+          "volume_history_2h_usd": {
+            "type": "number"
+          },
+          "volume_2h_change_percent": {
+            "type": "number"
+          },
+          "volume_buy_2h": {
+            "type": "number"
+          },
+          "volume_buy_2h_usd": {
+            "type": "number"
+          },
+          "volume_buy_history_2h": {
+            "type": "number"
+          },
+          "volume_buy_history_2h_usd": {
+            "type": "number"
+          },
+          "volume_buy_2h_change_percent": {
+            "type": "number"
+          },
+          "volume_sell_2h": {
+            "type": "number"
+          },
+          "volume_sell_2h_usd": {
+            "type": "number"
+          },
+          "volume_sell_history_2h": {
+            "type": "number"
+          },
+          "volume_sell_history_2h_usd": {
+            "type": "number"
+          },
+          "volume_sell_2h_change_percent": {
+            "type": "number"
+          },
+          "trade_4h": {
+            "type": "number"
+          },
+          "trade_history_4h": {
+            "type": "number"
+          },
+          "trade_4h_change_percent": {
+            "type": "number"
+          },
+          "sell_4h": {
+            "type": "number"
+          },
+          "sell_history_4h": {
+            "type": "number"
+          },
+          "sell_4h_change_percent": {
+            "type": "number"
+          },
+          "buy_4h": {
+            "type": "number"
+          },
+          "buy_history_4h": {
+            "type": "number"
+          },
+          "buy_4h_change_percent": {
+            "type": "number"
+          },
+          "volume_4h": {
+            "type": "number"
+          },
+          "volume_4h_usd": {
+            "type": "number"
+          },
+          "volume_history_4h": {
+            "type": "number"
+          },
+          "volume_history_4h_usd": {
+            "type": "number"
+          },
+          "volume_4h_change_percent": {
+            "type": "number"
+          },
+          "volume_buy_4h": {
+            "type": "number"
+          },
+          "volume_buy_4h_usd": {
+            "type": "number"
+          },
+          "volume_buy_history_4h": {
+            "type": "number"
+          },
+          "volume_buy_history_4h_usd": {
+            "type": "number"
+          },
+          "volume_buy_4h_change_percent": {
+            "type": "number"
+          },
+          "volume_sell_4h": {
+            "type": "number"
+          },
+          "volume_sell_4h_usd": {
+            "type": "number"
+          },
+          "volume_sell_history_4h": {
+            "type": "number"
+          },
+          "volume_sell_history_4h_usd": {
+            "type": "number"
+          },
+          "volume_sell_4h_change_percent": {
+            "type": "number"
+          },
+          "trade_8h": {
+            "type": "number"
+          },
+          "trade_history_8h": {
+            "type": "number"
+          },
+          "trade_8h_change_percent": {
+            "type": "number"
+          },
+          "sell_8h": {
+            "type": "number"
+          },
+          "sell_history_8h": {
+            "type": "number"
+          },
+          "sell_8h_change_percent": {
+            "type": "number"
+          },
+          "buy_8h": {
+            "type": "number"
+          },
+          "buy_history_8h": {
+            "type": "number"
+          },
+          "buy_8h_change_percent": {
+            "type": "number"
+          },
+          "volume_8h": {
+            "type": "number"
+          },
+          "volume_8h_usd": {
+            "type": "number"
+          },
+          "volume_history_8h": {
+            "type": "number"
+          },
+          "volume_history_8h_usd": {
+            "type": "number"
+          },
+          "volume_8h_change_percent": {
+            "type": "number"
+          },
+          "volume_buy_8h": {
+            "type": "number"
+          },
+          "volume_buy_8h_usd": {
+            "type": "number"
+          },
+          "volume_buy_history_8h": {
+            "type": "number"
+          },
+          "volume_buy_history_8h_usd": {
+            "type": "number"
+          },
+          "volume_buy_8h_change_percent": {
+            "type": "number"
+          },
+          "volume_sell_8h": {
+            "type": "number"
+          },
+          "volume_sell_8h_usd": {
+            "type": "number"
+          },
+          "volume_sell_history_8h": {
+            "type": "number"
+          },
+          "volume_sell_history_8h_usd": {
+            "type": "number"
+          },
+          "volume_sell_8h_change_percent": {
+            "type": "number"
+          },
+          "trade_24h": {
+            "type": "number"
+          },
+          "trade_history_24h": {
+            "type": "number"
+          },
+          "trade_24h_change_percent": {
+            "type": "number"
+          },
+          "sell_24h": {
+            "type": "number"
+          },
+          "sell_history_24h": {
+            "type": "number"
+          },
+          "sell_24h_change_percent": {
+            "type": "number"
+          },
+          "buy_24h": {
+            "type": "number"
+          },
+          "buy_history_24h": {
+            "type": "number"
+          },
+          "buy_24h_change_percent": {
+            "type": "number"
+          },
+          "volume_24h": {
+            "type": "number"
+          },
+          "volume_24h_usd": {
+            "type": "number"
+          },
+          "volume_history_24h": {
+            "type": "number"
+          },
+          "volume_history_24h_usd": {
+            "type": "number"
+          },
+          "volume_24h_change_percent": {
+            "type": "number"
+          },
+          "volume_buy_24h": {
+            "type": "number"
+          },
+          "volume_buy_24h_usd": {
+            "type": "number"
+          },
+          "volume_buy_history_24h": {
+            "type": "number"
+          },
+          "volume_buy_history_24h_usd": {
+            "type": "number"
+          },
+          "volume_buy_24h_change_percent": {
+            "type": "number"
+          },
+          "volume_sell_24h": {
+            "type": "number"
+          },
+          "volume_sell_24h_usd": {
+            "type": "number"
+          },
+          "volume_sell_history_24h": {
+            "type": "number"
+          },
+          "volume_sell_history_24h_usd": {
+            "type": "number"
+          },
+          "volume_sell_24h_change_percent": {
+            "type": "number"
+          }
+        }
+      },
+      "DefiTokenTopTradedResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tokenAddress": {
+                      "type": "string"
+                    },
+                    "owner": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "volume": {
+                      "type": "number"
+                    },
+                    "trade": {
+                      "type": "integer"
+                    },
+                    "tradeBuy": {
+                      "type": "integer"
+                    },
+                    "tradeSell": {
+                      "type": "integer"
+                    },
+                    "volumeBuy": {
+                      "type": "number"
+                    },
+                    "volumeSell": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TraderGainerLoserResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "network": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "string"
+                    },
+                    "pnl": {
+                      "type": "number"
+                    },
+                    "volume": {
+                      "type": "number"
+                    },
+                    "trade_count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "message": "Bad request"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized. API key is missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "message": "Unauthorized"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden. Request is blacklisted or not whitelisted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "message": "Access Denied"
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests. Rate limit reached",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "message": "Too many requests"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "message": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "DefiTokenOverview": {
+        "description": "JSON object containing overview information of a token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CommonResponseType"
+            },
+            "examples": {
+              "TokenOverview": {
+                "value": {
+                  "data": {
+                    "address": "So11111111111111111111111111111111111111112",
+                    "decimals": 9,
+                    "symbol": "SOL",
+                    "name": "Wrapped SOL",
+                    "extensions": {
+                      "coingeckoId": "solana",
+                      "serumV3Usdc": "9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT",
+                      "serumV3Usdt": "HWHvQhFmJB3NUcu1aihKmrKegfVxBEHzwVX6yZCKEsi1",
+                      "website": "https://solana.com/",
+                      "telegram": null,
+                      "twitter": "https://twitter.com/solana",
+                      "description": "Wrapped Solana ",
+                      "discord": "https://discordapp.com/invite/pquxPsq",
+                      "medium": "https://medium.com/solana-labs"
+                    },
+                    "logoURI": "https://img.fotofolio.xyz/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolana-labs%2Ftoken-list%2Fmain%2Fassets%2Fmainnet%2FSo11111111111111111111111111111111111111112%2Flogo.png",
+                    "liquidity": 7026510771.328585,
+                    "lastTradeUnixTime": 1726680782,
+                    "lastTradeHumanTime": "2024-09-18T17:33:02",
+                    "price": 128.88257145148586,
+                    "history30mPrice": 128.94328433830523,
+                    "priceChange30mPercent": -0.159524639847503,
+                    "history1hPrice": 128.11810104183903,
+                    "priceChange1hPercent": 0.4835280740819602,
+                    "history2hPrice": 127.37587477735319,
+                    "priceChange2hPercent": 1.0690511475458195,
+                    "history4hPrice": 129.4393197811086,
+                    "priceChange4hPercent": -0.5421318297548722,
+                    "history6hPrice": 129.40459359354182,
+                    "priceChange6hPercent": -0.5154419535367228,
+                    "history8hPrice": 130.34847971332593,
+                    "priceChange8hPercent": -1.2358346553114674,
+                    "history12hPrice": 131.0020403592915,
+                    "priceChange12hPercent": -1.7285626427832042,
+                    "history24hPrice": 133.1311635656234,
+                    "priceChange24hPercent": -3.3001856361757897,
+                    "uniqueWallet30m": 57965,
+                    "uniqueWalletHistory30m": 58256,
+                    "uniqueWallet30mChangePercent": -0.49951936281241416,
+                    "uniqueWallet1h": 82962,
+                    "uniqueWalletHistory1h": 78247,
+                    "uniqueWallet1hChangePercent": 6.025790126139021,
+                    "uniqueWallet2h": 113770,
+                    "uniqueWalletHistory2h": 132278,
+                    "uniqueWallet2hChangePercent": -13.991744658975794,
+                    "uniqueWallet4h": 188772,
+                    "uniqueWalletHistory4h": 147106,
+                    "uniqueWallet4hChangePercent": 28.323793726972387,
+                    "uniqueWallet8h": 274425,
+                    "uniqueWalletHistory8h": 278757,
+                    "uniqueWallet8hChangePercent": -1.554041692226563,
+                    "uniqueWallet24h": 729931,
+                    "uniqueWalletHistory24h": 528345,
+                    "uniqueWallet24hChangePercent": 38.154236341784255,
+                    "totalSupply": 584763577.9554905,
+                    "fdv": 75281052592.82196,
+                    "circulatingSupply": 584763577.9554905,
+                    "marketCap": 75281052592.82196,
+                    "holder": 654340,
+                    "trade30m": 207770,
+                    "tradeHistory30m": 232071,
+                    "trade30mChangePercent": -10.47136436693943,
+                    "sell30m": 158199,
+                    "sellHistory30m": 174553,
+                    "sell30mChangePercent": -9.36907414939875,
+                    "buy30m": 49571,
+                    "buyHistory30m": 57518,
+                    "buy30mChangePercent": -13.81654438610522,
+                    "v30m": 176899.30659268858,
+                    "v30mUSD": 35155352.59832795,
+                    "vHistory30m": 132808.97974841399,
+                    "vHistory30mUSD": 42473437.5743586,
+                    "v30mChangePercent": 33.19830250017497,
+                    "vBuy30m": 99283.02631564619,
+                    "vBuy30mUSD": 20102318.860595156,
+                    "vBuyHistory30m": 67638.4612884733,
+                    "vBuyHistory30mUSD": 26812407.583997864,
+                    "vBuy30mChangePercent": 46.784868289967484,
+                    "vSell30m": 77616.28027704239,
+                    "vSell30mUSD": 15053033.73773279,
+                    "vSellHistory30m": 65170.51845994068,
+                    "vSellHistory30mUSD": 15661029.99036073,
+                    "vSell30mChangePercent": 19.097226953552514,
+                    "trade1h": 439841,
+                    "tradeHistory1h": 605277,
+                    "trade1hChangePercent": -27.332279270482772,
+                    "sell1h": 332752,
+                    "sellHistory1h": 405253,
+                    "sell1hChangePercent": -17.89030556220435,
+                    "buy1h": 107089,
+                    "buyHistory1h": 200024,
+                    "buy1hChangePercent": -46.46192456905172,
+                    "v1h": 309708.2863411133,
+                    "v1hUSD": 43136911.53837976,
+                    "vHistory1h": 524710.5797774522,
+                    "vHistory1hUSD": 21431757.36369426,
+                    "v1hChangePercent": -40.97540658081047,
+                    "vBuy1h": 166921.48760413667,
+                    "vBuy1hUSD": 30832829.31818354,
+                    "vBuyHistory1h": 277551.2080929021,
+                    "vBuyHistory1hUSD": 17584099.863855526,
+                    "vBuy1hChangePercent": -39.85921057556175,
+                    "vSell1h": 142786.79873697663,
+                    "vSell1hUSD": 12304082.220196217,
+                    "vSellHistory1h": 247159.37168455013,
+                    "vSellHistory1hUSD": 3847657.4998387345,
+                    "vSell1hChangePercent": -42.22885510519276,
+                    "trade2h": 1045118,
+                    "tradeHistory2h": 1155797,
+                    "trade2hChangePercent": -9.575989555259271,
+                    "sell2h": 738005,
+                    "sellHistory2h": 891529,
+                    "sell2hChangePercent": -17.220303545930644,
+                    "buy2h": 307113,
+                    "buyHistory2h": 264268,
+                    "buy2hChangePercent": 16.21270831125978,
+                    "v2h": 834418.8661186105,
+                    "v2hUSD": 15691541.686126484,
+                    "vHistory2h": 495189.80343672715,
+                    "vHistory2hUSD": 59150952.11645205,
+                    "v2hChangePercent": 68.50485618394369,
+                    "vBuy2h": 444472.69569706736,
+                    "vBuy2hUSD": 14566544.000268187,
+                    "vBuyHistory2h": 228523.56522462532,
+                    "vBuyHistory2hUSD": 46458917.37809091,
+                    "vBuy2hChangePercent": 94.4975325674517,
+                    "vSell2h": 389946.1704215431,
+                    "vSell2hUSD": 1124997.6858582962,
+                    "vSellHistory2h": 266666.23821210186,
+                    "vSellHistory2hUSD": 12692034.738361144,
+                    "vSell2hChangePercent": 46.23004885657346,
+                    "trade4h": 2200915,
+                    "tradeHistory4h": 1662229,
+                    "trade4hChangePercent": 32.40744807123447,
+                    "sell4h": 1629534,
+                    "sellHistory4h": 1239970,
+                    "sell4hChangePercent": 31.41721170673484,
+                    "buy4h": 571381,
+                    "buyHistory4h": 422259,
+                    "buy4hChangePercent": 35.31529227322567,
+                    "v4h": 1329608.669555223,
+                    "v4hUSD": 25855511.135367878,
+                    "vHistory4h": 660302.0733817923,
+                    "vHistory4hUSD": 59033726.51510045,
+                    "v4hChangePercent": 101.36369748856325,
+                    "vBuy4h": 672996.2609216414,
+                    "vBuy4hUSD": 11092666.897437705,
+                    "vBuyHistory4h": 348279.20300869434,
+                    "vBuyHistory4hUSD": 29084326.5769733,
+                    "vBuy4hChangePercent": 93.23469650435628,
+                    "vSell4h": 656612.4086335817,
+                    "vSell4hUSD": 14762844.237930173,
+                    "vSellHistory4h": 312022.8703730979,
+                    "vSellHistory4hUSD": 29949399.938127145,
+                    "vSell4hChangePercent": 110.43726950157362,
+                    "trade8h": 3863144,
+                    "tradeHistory8h": 3055770,
+                    "trade8hChangePercent": 26.42129479640156,
+                    "sell8h": 2869504,
+                    "sellHistory8h": 2216051,
+                    "sell8hChangePercent": 29.487272630458417,
+                    "buy8h": 993640,
+                    "buyHistory8h": 839719,
+                    "buy8hChangePercent": 18.33006041306675,
+                    "v8h": 1989910.7429370286,
+                    "v8hUSD": 145669294.83606875,
+                    "vHistory8h": 1988767.052141285,
+                    "vHistory8hUSD": 171858867.27861923,
+                    "v8hChangePercent": 0.05750752932638365,
+                    "vBuy8h": 1021275.4639303657,
+                    "vBuy8hUSD": 62216276.29504301,
+                    "vBuyHistory8h": 1013896.7152985546,
+                    "vBuyHistory8hUSD": 72820646.8791919,
+                    "vBuy8hChangePercent": 0.72776137060848,
+                    "vSell8h": 968635.2790066629,
+                    "vSell8hUSD": 83453018.54102576,
+                    "vSellHistory8h": 974870.3368427303,
+                    "vSellHistory8hUSD": 99038220.39942734,
+                    "vSell8hChangePercent": -0.6395781675192421,
+                    "trade24h": 12236742,
+                    "tradeHistory24h": 11564464,
+                    "trade24hChangePercent": 5.813308770730749,
+                    "sell24h": 9333890,
+                    "sellHistory24h": 8560524,
+                    "sell24hChangePercent": 9.03409651091452,
+                    "buy24h": 2902852,
+                    "buyHistory24h": 3003940,
+                    "buy24hChangePercent": -3.365180396412711,
+                    "v24h": 5986855.156929528,
+                    "v24hUSD": 747193016.9269896,
+                    "vHistory24h": 6417510.595781391,
+                    "vHistory24hUSD": 817861158.2096891,
+                    "v24hChangePercent": -6.710630741068936,
+                    "vBuy24h": 3025515.885840522,
+                    "vBuy24hUSD": 360668502.01211613,
+                    "vBuyHistory24h": 3188802.2403669828,
+                    "vBuyHistory24hUSD": 397383438.69322824,
+                    "vBuy24hChangePercent": -5.120617153971544,
+                    "vSell24h": 2961339.271089006,
+                    "vSell24hUSD": 386524514.9148734,
+                    "vSellHistory24h": 3228708.355414408,
+                    "vSellHistory24hUSD": 420477719.51646096,
+                    "vSell24hChangePercent": -8.280992114912914,
+                    "watch": null,
+                    "numberMarkets": 915424
+                  },
+                  "success": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "DefiTokenMarketDataSingle": {
+        "description": "JSON object containing market data of a specific token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefiTokenMarketDataSingleResponse"
+            },
+            "examples": {
+              "TokenMarketData": {
+                "value": {
+                  "data": {
+                    "address": "So11111111111111111111111111111111111111112",
+                    "liquidity": 7889932801.542948,
+                    "price": 128.00523659221298,
+                    "total_supply": 583981435.5103763,
+                    "circulating_supply": 583981433.2307372,
+                    "fdv": 74790067044.55531,
+                    "market_cap": 74790067336.507
+                  },
+                  "success": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "DefiTokenTradeDataSingle": {
+        "description": "JSON object containing trade data of a specific token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefiTokenTradeDataSingleResponse"
+            },
+            "examples": {
+              "TokenTradeDataSingle": {
+                "value": {
+                  "data": {
+                    "address": "So11111111111111111111111111111111111111112",
+                    "holder": 121,
+                    "market": 3,
+                    "last_trade_unix_time": 1727249200,
+                    "last_trade_human_time": "2024-09-25T09:26:40",
+                    "price": 149.44533493115722,
+                    "history_30m_price": 149.9884968852636,
+                    "price_change_30m_percent": -0.36213574066408744,
+                    "history_1h_price": 149.90204912325655,
+                    "price_change_1h_percent": -0.3046750826760177,
+                    "history_2h_price": 150.995313253626,
+                    "price_change_2h_percent": -1.0265075710431388,
+                    "history_4h_price": 151.40675744781961,
+                    "price_change_4h_percent": -1.2954656382086345,
+                    "history_6h_price": 152.4252383016598,
+                    "price_change_6h_percent": -1.9549934142829684,
+                    "history_8h_price": 153.52479421393593,
+                    "price_change_8h_percent": -2.657198990994256,
+                    "history_12h_price": 147.35806076282913,
+                    "price_change_12h_percent": 1.4164641944410046,
+                    "history_24h_price": 146.5931215407925,
+                    "price_change_24h_percent": 1.9456665908918682,
+                    "unique_wallet_30m": 3086,
+                    "unique_wallet_history_30m": 0,
+                    "unique_wallet_30m_change_percent": null,
+                    "unique_wallet_1h": 7660,
+                    "unique_wallet_history_1h": 0,
+                    "unique_wallet_1h_change_percent": null,
+                    "unique_wallet_2h": 10118,
+                    "unique_wallet_history_2h": 0,
+                    "unique_wallet_2h_change_percent": null,
+                    "unique_wallet_4h": 20233,
+                    "unique_wallet_history_4h": 0,
+                    "unique_wallet_4h_change_percent": null,
+                    "unique_wallet_8h": 115179,
+                    "unique_wallet_history_8h": 0,
+                    "unique_wallet_8h_change_percent": null,
+                    "unique_wallet_24h": 334104,
+                    "unique_wallet_history_24h": 0,
+                    "unique_wallet_24h_change_percent": null,
+                    "trade_30m": 97015314,
+                    "trade_history_30m": 24152419,
+                    "trade_30m_change_percent": 301.679492228087,
+                    "sell_30m": 60040653,
+                    "sell_history_30m": 15830032,
+                    "sell_30m_change_percent": 279.2832067553622,
+                    "buy_30m": 36974661,
+                    "buy_history_30m": 8322387,
+                    "buy_30m_change_percent": 344.27951980603643,
+                    "volume_30m": 64975713.36483827,
+                    "volume_30m_usd": 8253175022.86283,
+                    "volume_history_30m": 13997070.971627723,
+                    "volume_history_30m_usd": 1716385665.4366126,
+                    "volume_30m_change_percent": 364.2093584903944,
+                    "volume_buy_30m": 32226723.450585827,
+                    "volume_buy_30m_usd": 4187924440.256996,
+                    "volume_buy_history_30m": 6917145.882413506,
+                    "volume_buy_history_30m_usd": 865489548.3048482,
+                    "volume_buy_30m_change_percent": 365.8962525645244,
+                    "volume_sell_30m": 32748989.91425245,
+                    "volume_sell_30m_usd": 4065250582.605834,
+                    "volume_sell_history_30m": 7079925.089214218,
+                    "volume_sell_history_30m_usd": 850896117.1317643,
+                    "volume_sell_30m_change_percent": 362.56124890563177,
+                    "trade_1h": 121173378,
+                    "trade_history_1h": 37290612,
+                    "trade_1h_change_percent": 224.94338789612786,
+                    "sell_1h": 75874492,
+                    "sell_history_1h": 25015787,
+                    "sell_1h_change_percent": 203.306436051762,
+                    "buy_1h": 45298886,
+                    "buy_history_1h": 12274825,
+                    "buy_1h_change_percent": 269.03895574885996,
+                    "volume_1h": 78974864.45137027,
+                    "volume_1h_usd": 10071507222.057545,
+                    "volume_history_1h": 21535323.191504102,
+                    "volume_history_1h_usd": 2775755724.1831207,
+                    "volume_1h_change_percent": 266.7224482729223,
+                    "volume_buy_1h": 39144752.45802235,
+                    "volume_buy_1h_usd": 5122095538.082648,
+                    "volume_buy_history_1h": 10681136.046283176,
+                    "volume_buy_history_1h_usd": 1406237986.2830422,
+                    "volume_buy_1h_change_percent": 266.4849159153248,
+                    "volume_sell_1h": 39830111.99334792,
+                    "volume_sell_1h_usd": 4949411683.974896,
+                    "volume_sell_history_1h": 10854187.145220926,
+                    "volume_sell_history_1h_usd": 1369517737.9000788,
+                    "volume_sell_1h_change_percent": 266.95619359101454,
+                    "trade_2h": 158464659,
+                    "trade_history_2h": 49919825,
+                    "trade_2h_change_percent": 217.43833036273665,
+                    "sell_2h": 100890854,
+                    "sell_history_2h": 34392198,
+                    "sell_2h_change_percent": 193.35389962572324,
+                    "buy_2h": 57573805,
+                    "buy_history_2h": 15527627,
+                    "buy_2h_change_percent": 270.7830243475065,
+                    "volume_2h": 100510259.585451,
+                    "volume_2h_usd": 12905481672.390522,
+                    "volume_history_2h": 32413437.163979907,
+                    "volume_history_2h_usd": 4095633016.2144647,
+                    "volume_2h_change_percent": 210.08824851548016,
+                    "volume_buy_2h": 49825926.62052496,
+                    "volume_buy_2h_usd": 6550858900.771439,
+                    "volume_buy_history_2h": 15687552.83431236,
+                    "volume_buy_history_2h_usd": 1988967828.861566,
+                    "volume_buy_2h_change_percent": 217.6143987961204,
+                    "volume_sell_2h": 50684332.96492606,
+                    "volume_sell_2h_usd": 6354622771.619082,
+                    "volume_sell_history_2h": 16725884.329667546,
+                    "volume_sell_history_2h_usd": 2106665187.3528986,
+                    "volume_sell_2h_change_percent": 203.02931651287756,
+                    "trade_4h": 208429392,
+                    "trade_history_4h": 21892184,
+                    "trade_4h_change_percent": 852.0721733382105,
+                    "sell_4h": 135313901,
+                    "sell_history_4h": 15409677,
+                    "sell_4h_change_percent": 778.1099110643266,
+                    "buy_4h": 73115491,
+                    "buy_history_4h": 6482507,
+                    "buy_4h_change_percent": 1027.889117589846,
+                    "volume_4h": 132997154.51599729,
+                    "volume_4h_usd": 16922167447.80401,
+                    "volume_history_4h": 12044136.00678658,
+                    "volume_history_4h_usd": 1559244965.8267365,
+                    "volume_4h_change_percent": 1004.2481954791659,
+                    "volume_buy_4h": 65544598.966020264,
+                    "volume_buy_4h_usd": 8459012052.4502535,
+                    "volume_buy_history_4h": 5899017.023666077,
+                    "volume_buy_history_4h_usd": 745556407.6804484,
+                    "volume_buy_4h_change_percent": 1011.1105240595848,
+                    "volume_sell_4h": 67452555.54997703,
+                    "volume_sell_4h_usd": 8463155395.353757,
+                    "volume_sell_history_4h": 6145118.983120502,
+                    "volume_sell_history_4h_usd": 813688558.146288,
+                    "volume_sell_4h_change_percent": 997.6606919289383,
+                    "trade_8h": 230379793,
+                    "trade_history_8h": 15750628,
+                    "trade_8h_change_percent": 1362.6705233594496,
+                    "sell_8h": 150764198,
+                    "sell_history_8h": 11056292,
+                    "sell_8h_change_percent": 1263.605429379036,
+                    "buy_8h": 79615595,
+                    "buy_history_8h": 4694336,
+                    "buy_8h_change_percent": 1595.992681393066,
+                    "volume_8h": 145127208.8335706,
+                    "volume_8h_usd": 18459879246.770485,
+                    "volume_history_8h": 7550729.6609485615,
+                    "volume_history_8h_usd": 923790770.898809,
+                    "volume_8h_change_percent": 1822.028934291616,
+                    "volume_buy_8h": 71491514.48009616,
+                    "volume_buy_8h_usd": 9217985326.357162,
+                    "volume_buy_history_8h": 3730505.4533236013,
+                    "volume_buy_history_8h_usd": 454878582.66987944,
+                    "volume_buy_8h_change_percent": 1816.4028943156368,
+                    "volume_sell_8h": 73635694.35347442,
+                    "volume_sell_8h_usd": 9241893920.41332,
+                    "volume_sell_history_8h": 3820224.2076249607,
+                    "volume_sell_history_8h_usd": 468912188.2289295,
+                    "volume_sell_8h_change_percent": 1827.522845557116,
+                    "trade_24h": 258522892,
+                    "trade_history_24h": 27127166,
+                    "trade_24h_change_percent": 853.0036864153079,
+                    "sell_24h": 170693395,
+                    "sell_history_24h": 17390322,
+                    "sell_24h_change_percent": 881.5424636760607,
+                    "buy_24h": 87829497,
+                    "buy_history_24h": 9736844,
+                    "buy_24h_change_percent": 802.0324963612441,
+                    "volume_24h": 158766463.26959822,
+                    "volume_24h_usd": 20188521260.405678,
+                    "volume_history_24h": 16213807.636875367,
+                    "volume_history_24h_usd": 1843485179.1582026,
+                    "volume_24h_change_percent": 879.2052972709055,
+                    "volume_buy_24h": 78227859.16098201,
+                    "volume_buy_24h_usd": 10090629305.630367,
+                    "volume_buy_history_24h": 7953256.298373873,
+                    "volume_buy_history_24h_usd": 919963863.1631653,
+                    "volume_buy_24h_change_percent": 883.5953504601193,
+                    "volume_sell_24h": 80538604.1086162,
+                    "volume_sell_24h_usd": 10097891954.775312,
+                    "volume_sell_history_24h": 8260551.338501493,
+                    "volume_sell_history_24h_usd": 923521315.9950374,
+                    "volume_sell_24h_change_percent": 874.9785554050719
+                  },
+                  "success": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "DefiTokenTopTraded": {
+        "description": "JSON object containing a list of top traded tokens",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DefiTokenTopTradedResponse"
+            },
+            "examples": {
+              "Tokens": {
+                "value": {
+                  "success": true,
+                  "data": {
+                    "items": [
+                      {
+                        "tokenAddress": "So11111111111111111111111111111111111111112",
+                        "owner": "MfDuWeqSHEqTFVYZ7LoexgAK9dxk7cy4DFJWjWMGVWa",
+                        "tags": [],
+                        "type": "24h",
+                        "volume": 675542.1369220349,
+                        "trade": 74194,
+                        "tradeBuy": 38909,
+                        "tradeSell": 35285,
+                        "volumeBuy": 372626.71744350606,
+                        "volumeSell": 302915.4194785288
+                      },
+                      {
+                        "tokenAddress": "So11111111111111111111111111111111111111112",
+                        "owner": "YubQzu18FDqJRyNfG8JqHmsdbxhnoQqcKUHBdUkN6tP",
+                        "tags": [],
+                        "type": "24h",
+                        "volume": 188500.06136997032,
+                        "trade": 35531,
+                        "tradeBuy": 17249,
+                        "tradeSell": 18282,
+                        "volumeBuy": 94139.68529835819,
+                        "volumeSell": 94360.37607161213
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "WalletTokenBalance": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CommonResponseType"
+            },
+            "examples": {
+              "Solana": {
+                "value": {
+                  "success": true,
+                  "data": {
+                    "address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+                    "decimals": 6,
+                    "balance": 1177780977972721,
+                    "uiAmount": 1177780977.972721,
+                    "chainId": "solana-mainnet",
+                    "logoURI": "https://img.fotofolio.xyz/?w=30&h=30&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolana-labs%2Ftoken-list%2Fmain%2Fassets%2Fmainnet%2FEs9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB%2Flogo.svg",
+                    "name": "USDT",
+                    "symbol": "USDT",
+                    "priceUsd": 0.9999915198446391,
+                    "valueUsd": 1177770990.2070467
+                  }
+                }
+              },
+              "EVM": {
+                "value": {
+                  "success": true,
+                  "data": {
+                    "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+                    "name": "Tether USD",
+                    "symbol": "USDT",
+                    "decimals": 6,
+                    "balance": 94149341656019,
+                    "uiAmount": 94149341.656019,
+                    "chainId": "eth-mainnet",
+                    "priceUsd": 0.9999915198446391,
+                    "valueUsd": 94149341656019.2
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "WalletTxList": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CommonResponseType"
+            },
+            "examples": {
+              "Solana": {
+                "value": {
+                  "success": true,
+                  "data": {
+                    "solana": [
+                      {
+                        "txHash": "svTZ3o5j7GDsk1EfkXZjEQnV1kirqq48YhS29HyfqFkGUiSzosHRNQaQTPNovP3rbDbV3QrkFQh4GzdESEyRw6s",
+                        "blockNumber": 284733408,
+                        "blockTime": "2024-08-20T10:44:26+00:00",
+                        "status": true,
+                        "from": "66YZZejVBupBnMwSEqTaCkAMwPacpPzP41GSEst55Kgz",
+                        "to": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                        "fee": 15000,
+                        "mainAction": "send",
+                        "balanceChange": [
+                          {
+                            "amount": 0,
+                            "symbol": "SOL",
+                            "name": "Wrapped SOL",
+                            "decimals": 9,
+                            "address": "So11111111111111111111111111111111111111112",
+                            "logoURI": "https://img.fotofolio.xyz/?w=30&h=30&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolana-labs%2Ftoken-list%2Fmain%2Fassets%2Fmainnet%2FSo11111111111111111111111111111111111111112%2Flogo.png"
+                          },
+                          {
+                            "tokenAccount": "99pfYkuFEUPvUzVSGsMc2VN47FaFSTrKBMXGnxg13tDt",
+                            "owner": "Q6XprfkF8RQQKoQVG33xT88H7wi8Uk1B1CC7YAs69Gi",
+                            "decimals": 6,
+                            "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                            "amount": -10000000000000,
+                            "address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+                            "name": "USDT",
+                            "symbol": "USDT",
+                            "logoURI": "https://img.fotofolio.xyz/?w=30&h=30&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolana-labs%2Ftoken-list%2Fmain%2Fassets%2Fmainnet%2FEs9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB%2Flogo.svg"
+                          }
+                        ],
+                        "contractLabel": {
+                          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                          "name": "Token Program",
+                          "metadata": {
+                            "icon": ""
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "EVM": {
+                "value": {
+                  "success": true,
+                  "data": {
+                    "ethereum": [
+                      {
+                        "txHash": "0x9e362abb139f2ae9270b66efd9a3bc9477481049c04256b804a5f7093640d24d",
+                        "blockNumber": 20779293,
+                        "blockTime": "2024-09-18T18:32:59Z",
+                        "status": true,
+                        "from": "0xf89d7b9c864f589bbF53a82105107622B35EaA40",
+                        "to": "0xf584F8728B874a6a5c7A8d4d387C9aae9172D621",
+                        "gasUsed": 21000,
+                        "gasPrice": 13739048708,
+                        "fee": "288520022868000",
+                        "feeUsd": 0.6724695987010954,
+                        "value": "12228500000000000000",
+                        "contractLabel": {
+                          "address": "0xf584F8728B874a6a5c7A8d4d387C9aae9172D621",
+                          "name": "Jump Trading",
+                          "metadata": {}
+                        },
+                        "mainAction": "call",
+                        "balanceChange": [
+                          {
+                            "name": "ETH",
+                            "symbol": "ETH",
+                            "logoURI": "https://assets.coingecko.com/coins/images/279/standard/ethereum.png?1696501628",
+                            "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                            "amount": -12228500000000000000,
+                            "decimals": 18
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TraderGainerLoserList": {
+        "description": "JSON object containing a list of top gainer loser traders",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TraderGainerLoserResponse"
+            },
+            "examples": {
+              "GainerList": {
+                "value": {
+                  "success": true,
+                  "data": {
+                    "items": [
+                      {
+                        "network": "solana",
+                        "address": "FciNKwZAvSzepKH1nFEGeejzbP4k87dJiP9BAzGt2Sm3",
+                        "pnl": 675542.1369220349,
+                        "trade_count": 74194,
+                        "volume": 1372626.717443506
+                      },
+                      {
+                        "network": "solana",
+                        "address": "Habp5bncMSsBC3vkChyebepym5dcTNRYeg2LVG464E96",
+                        "pnl": 175542.1369220349,
+                        "trade_count": 20,
+                        "volume": 1372626.717443506
+                      }
+                    ]
+                  }
+                }
+              },
+              "LoserList": {
+                "value": {
+                  "success": true,
+                  "data": {
+                    "items": [
+                      {
+                        "network": "solana",
+                        "address": "FciNKwZAvSzepKH1nFEGeejzbP4k87dJiP9BAzGt2Sm3",
+                        "pnl": -675542.1369220349,
+                        "trade_count": 74194,
+                        "volume": 1372626.717443506
+                      },
+                      {
+                        "network": "solana",
+                        "address": "Habp5bncMSsBC3vkChyebepym5dcTNRYeg2LVG464E96",
+                        "pnl": -175542.1369220349,
+                        "trade_count": 20,
+                        "volume": 1372626.717443506
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "xChainParam": {
+        "name": "x-chain",
+        "description": "A chain name listed in supported networks",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "solana",
+            "ethereum",
+            "arbitrum",
+            "avalanche",
+            "bsc",
+            "optimism",
+            "polygon",
+            "base",
+            "zksync",
+            "sui"
+          ],
+          "default": "solana"
+        }
+      },
+      "tokenAddressParam": {
+        "name": "address",
+        "description": "Address of a token",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "default": "So11111111111111111111111111111111111111112"
+        },
+        "examples": {
+          "solana": {
+            "value": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
+          },
+          "ethereum": {
+            "value": "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce"
+          }
+        }
+      },
+      "sortTypeParam": {
+        "name": "sort_type",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "desc",
+            "asc"
+          ],
+          "default": "desc"
+        }
+      },
+      "sortByTopTradersParam": {
+        "name": "sort_by",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "volume",
+            "trade"
+          ],
+          "default": "volume"
+        }
+      },
+      "offset10kParam": {
+        "name": "offset",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 10000
+        }
+      },
+      "limit10Param": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 10
+        }
+      },
+      "timeFrameParam": {
+        "name": "time_frame",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "30m",
+            "1h",
+            "2h",
+            "4h",
+            "6h",
+            "8h",
+            "12h",
+            "24h"
+          ],
+          "default": "24h"
+        }
+      },
+      "walletApiTokenAddressParam": {
+        "name": "token_address",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "default": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        }
+      },
+      "walletApiWalletParam": {
+        "name": "wallet",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "default": "Gt4RRcMg2mzEN9SDtSUjEjezC9b1nXjEGDQyEVbrc7Sk"
+        }
+      },
+      "walletApiXChainParam": {
+        "name": "x-chain",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "default": "solana",
+          "enum": [
+            "solana",
+            "ethereum",
+            "arbitrum",
+            "avalanche",
+            "bsc",
+            "optimism",
+            "polygon",
+            "base",
+            "zksync",
+            "sui"
+          ]
+        }
+      },
+      "walletApiLimitParam": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "walletApiBeforeParam": {
+        "name": "before",
+        "description": "A transaction hash to traverse starting from. Only works with Solana",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "sortByTopGainerLoserParam": {
+        "name": "sort_by",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PnL"
+          ],
+          "default": "PnL"
+        }
+      },
+      "typeTopGainerLoserParam": {
+        "name": "type",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "yesterday",
+            "today",
+            "1W"
+          ],
+          "default": "1W"
+        }
+      }
+    },
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY",
+        "description": "API key for Birdeye Data Services"
+      }
+    }
+  },
+  "x-samples-languages": [
+    "shell",
+    "python",
+    "javascript",
+    "go"
+  ]
+}
