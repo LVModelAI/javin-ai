@@ -1,4 +1,6 @@
-import { multichainEnsLookup } from "../../utils/multichain-ens-lookup"
+import {
+  multichainEnsLookup,
+} from "../../utils/multichain-ens-lookup";
 import { tool } from "ai";
 import { z } from "zod";
 
@@ -10,6 +12,6 @@ export const ensToAddress = tool({
   execute: async ({ ensName }) => {
     const address = await multichainEnsLookup(ensName);
     console.log("address for ens is --- ", address);
-    return address;
+    return address ?? "not found";
   },
 });
