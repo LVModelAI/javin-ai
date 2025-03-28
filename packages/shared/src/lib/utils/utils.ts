@@ -225,6 +225,13 @@ export const searchGroups = [
   // },
 
   {
+    id: "polygon" as const,
+    name: "Polygon",
+    description: "On chain data for Polygon.",
+    icon: Network,
+    // img: "/images/icon/creditcoin/creditcoin-white.png",
+  },
+  {
     id: "creditcoin" as const,
     name: "Creditcoin",
     description: "Everything Creditcoin. Search, transactions and more.",

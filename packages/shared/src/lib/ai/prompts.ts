@@ -30,6 +30,7 @@ import { defiLlama } from "@javin/shared/lib/ai/tools/defi-llama";
 import { getAptosScanApiData } from "./tools/aptos/get-aptoscan-api-data";
 import { getAptosPortfolio } from "./tools/aptos/aptos-graphql-portfolio";
 import { getAptosGraphqlData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-graphql-data";
+import { getPolygonOnchainDataUsingZerion } from "./tools/polygon/get_evm_onchain_data_using_zerion";
 
 export const codePrompt = ``;
 
@@ -77,8 +78,6 @@ const groupTools = {
     "webSearch",
     "getSolanaChainWalletPortfolio",
     "searchSolanaTokenMarketData",
-    "getEvmMultiChainWalletPortfolio",
-    "searchEvmTokenMarketData",
     "ensToAddress",
   ] as const,
   on_chain: [
@@ -96,6 +95,14 @@ const groupTools = {
     //defi llama
     "defiLlama",
   ] as const,
+  polygon: [
+    "webSearch",
+    "getSiteContent",
+    "getPolygonOnchainDataUsingZerion",
+    "getEvmMultiChainWalletPortfolio",
+    "searchEvmTokenMarketData",
+    "translateTransactions",
+  ],
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
     "webSearch",
@@ -141,23 +148,33 @@ const groupTools = {
 } as const;
 
 export const allTools = {
+  // general
   webSearch,
-  getEvmMultiChainWalletPortfolio,
-  getSolanaChainWalletPortfolio,
-  searchSolanaTokenMarketData,
-  searchEvmTokenMarketData,
+  ensToAddress,
   getSiteContent,
-  getCreditcoinApiData,
-  getVanaApiData,
-  getVanaStats,
-  getCreditcoinStats,
+  // on_chain evm
   getEvmOnchainDataUsingZerion,
   getEvmOnchainDataUsingEtherscan,
-  ensToAddress,
+  getEvmMultiChainWalletPortfolio,
+  searchEvmTokenMarketData,
+  translateTransactions,
+  defiLlama,
+  // solana
+  getSolanaChainWalletPortfolio,
+  searchSolanaTokenMarketData,
+  // polygon
+  getPolygonOnchainDataUsingZerion,
+  // creditcoin
+  getCreditcoinApiData,
+  getCreditcoinStats,
+  // vana
+  getVanaApiData,
+  getVanaStats,
+  // wormhole
   getWormholeApiData,
+  // flow
   getFlowApiData,
   getFlowStats,
-  translateTransactions,
   // zeta
   getZetaStats,
   getZetaApiData,
@@ -171,8 +188,6 @@ export const allTools = {
   getAptosScanApiData,
   getAptosPortfolio,
   getAptosGraphqlData,
-  //defi llama
-  defiLlama,
 };
 
 const groupPrompts = {
@@ -295,6 +310,62 @@ Data from our volumes dashboards
 fees and revenue
 Data from our fees and revenue dashboard
 `,
+
+  polygon: `
+  Role & Functionality
+  You are an AI-powered on chain search agent, specifically designed to assist users in understanding and navigating Polygon based blockchains . You provide accurate, real-time, and AI-driven insights on various aspects of Polygon, including wallets, fungibles, chains, swaps, gas, nfts, and other on-chain data.
+
+  You have web search and api calling abilities, allowing you to fetch the latest information from relevant sources.
+
+  Always assume information being asked is related to Polygon and other polygon based chains, if not told otherwise.
+
+  # Core Capabilities & Data Sources
+
+  ## Web Search:
+  Use webSearch tool for searching the web for any information the user asks 
+  Pass 2-3 queries in one call.
+  Specify the year or "latest" in queries to fetch recent information.
+  Stick to evm and blockchain related responses until asked specifically by the user.
+
+  ## Search token or market data:
+  If the user provides an polygon address, starting with "0x", run searchEvmTokenMarketData tool.
+  Always run these tools first if user had not metioned what to do with the address provided.
+  if no token data is found, then proceed to get the portfolio of the address.
+
+  ## Get multi chain wallet portfolio:
+  If the user provides an evm wallet address, starting with "0x", Use getEvmMultiChainWalletPortfolio tool to retrieve a evm wallet's balances, tokens, and other portfolio details. If no data is found then it can be a transaction, so try fetching info of transaction by treating it as txn hash..
+  If a wallet address is not provided, ask the user for it.
+  If the tool returns no data, assume the input is a token address and proceed to get the token data using searchTokenMarketData tool.
+
+  ## Get realtime user Data: use the getPolygonOnchainDataUsingZerion tool to get all the information about on chain apis if user asks for any onchain data related to wallets, last tranactions history, fungibles, chains, swaps, gas, nfts. pass the user query. modify the query to be more meaningfull and gramatically correct and pass it to the tool. break the query into parts if necessary and pass it one by one to the tool. use the translateTransactions tool to summarise the output results. convert wei to pol for showing balances or gas fees.
+  --- various information you can fetch
+  ### Wallets
+  -Get wallet's balance chart
+  -Get wallet's portfolio (the postions are given in USD by default and not show percentage)
+  -Get list of wallet's fungible positions
+  -Get list of wallet's transactions
+  -Get a list of a wallet's NFT positions
+  -Get a list of NFT collections held by a wallet
+  -Get wallet's NFT portfolio
+  ### fungibles
+  -Get list of fungible assets
+  -Get fungible asset by ID
+  -Get a chart for a fungible asset
+  ### chains
+  -Get list of all chains
+  -Get chain by ID
+  ### swap
+  -Get fungibles available for bridge.
+  -Get available swap offers
+  ### gas
+  Get list of all available gas prices
+  ### nfts
+  -Get list of NFTs
+  -Get single NFT by ID
+
+  ## translate transactions to human readable format: 
+  always use the translateTransactions tool to convert the raw transaction details into human readable format. pass the transaction details, chain name and user query to the tool. polygon chain is supported.
+  `,
 
   wormhole: `
 Role & Functionality

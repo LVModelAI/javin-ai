@@ -11,68 +11,6 @@ import { z } from "zod";
 
 export const maxDuration = 60;
 
-// export async function POST(request: Request) {
-//   const {
-//     model,
-//     prompt,
-//   }: {
-//     model: string;
-//     prompt: string;
-//   } = await request.json();
-
-//   const { tools: activeTools, systemPrompt } = await getGroupConfig("on_chain");
-
-//   return createDataStreamResponse({
-//     execute: (dataStream) => {
-//       const result = streamText({
-//         model: openai(model),
-//         system: systemPrompt,
-//         prompt: prompt,
-//         maxSteps: 10,
-//         experimental_activeTools:
-//           model === "chat-model-reasoning" ? [] : [...activeTools],
-//         experimental_transform: smoothStream({ chunking: "word" }),
-//         experimental_generateMessageId: generateUUID,
-//         onChunk: async ({ chunk }) => {
-//           console.log("onChunk = ", chunk);
-//         },
-//         tools: {
-//           webSearch,
-//           getEvmMultiChainWalletPortfolio,
-//           getSolanaChainWalletPortfolio,
-//           searchSolanaTokenMarketData,
-//           searchEvmTokenMarketData,
-//           getSiteContent,
-//           getCreditcoinApiData,
-//           getVanaApiData,
-//           getVanaStats,
-//           getCreditcoinStats,
-//           getEvmOnchainData,
-//           ensToAddress,
-//           getWormholeApiData,
-//           getFlowApiData,
-//           getFlowStats,
-//         },
-//         onFinish: async ({ response, reasoning }) => {
-//           //   do something if needed
-//         },
-//         experimental_telemetry: {
-//           isEnabled: true,
-//           functionId: "stream-text",
-//         },
-//       });
-
-//       result.mergeIntoDataStream(dataStream, {
-//         sendReasoning: true,
-//       });
-//     },
-//     onError: (error: any) => {
-//       console.log(error);
-//       return "Oops, something went wrong!. Please try again in new chat";
-//     },
-//   });
-// }
-
 export async function POST(request: Request) {
   try {
     const EXTERNALAPIKEY = process.env.SENTIENT_EXTERNAL_APIKEY;
@@ -100,11 +38,6 @@ export async function POST(request: Request) {
     const { tools: activeTools, systemPrompt } = await getGroupConfig(
       "on_chain"
     );
-
-    // const system_fingerprint = crypto
-    //   .createHash("sha256")
-    //   .update(systemPrompt)
-    //   .digest("hex");
 
     const system_fingerprint = process.env.VERCEL_GIT_COMMIT_SHA || "";
 
@@ -231,6 +164,8 @@ export async function POST(request: Request) {
         }
       );
     }
+
+    console.log(error);
 
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
