@@ -191,6 +191,7 @@ export function getMostRecentUserMessage(messages: Array<Message>) {
 export type SearchGroupId =
   | "search"
   | "on_chain"
+  | "polygon"
   | "creditcoin"
   | "vana"
   | "wormhole"
