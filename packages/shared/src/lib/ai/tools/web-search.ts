@@ -71,14 +71,6 @@ export const webSearch = tool({
     const apiKey = process.env.TAVILY_API_KEY;
     const tvly = tavily({ apiKey });
     const includeImageDescriptions = true;
-    console.log("WEB SEARCHGG RESULT ======= ")
-    console.log("Queries:", queries);
-    console.log("Max Results:", maxResults);
-    console.log("Topics:", topics);
-    console.log("Search Depths:", searchDepth);
-    console.log("Exclude Domains:", exclude_domains);
-    console.log("WEB SEARCHGG RESULT ENDED ======= ")
-
     // Execute searches in parallel
     const searchPromises = queries.map(async (query, index) => {
       const data = await tvly.search(query, {

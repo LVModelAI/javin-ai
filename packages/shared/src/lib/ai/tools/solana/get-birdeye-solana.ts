@@ -7,14 +7,12 @@ import {
   loadOpenAPI,
   loadOpenAPIFromJson,
 } from "../../../utils/openapi";
-import { groq } from "@ai-sdk/groq";
 import { translateTransactions } from "../translate-transactions";
-// @ts-ignore
-import birdEyeOpenApiSPec from "./birdeye-openapi.json";
+import birdEyeOpenApiSPec from "./birdeye_openapi.json";
 
 const BIRDEYE_BASE_URL = "https://public-api.birdeye.so";
 
-export const getEvmOnchainDataUsingEtherscan = tool({
+export const getSolanaOnchainDataUsingBirdeye = tool({
   description: "Get real-time data from Solana using Birdeye.",
   parameters: z.object({
     userQuery: z.string().describe("Query of user."),
@@ -24,11 +22,11 @@ export const getEvmOnchainDataUsingEtherscan = tool({
     try {
       console.log("User query:", userQuery);
 
-      const etherscanOpenapidata = await loadOpenAPIFromJson(
+      const solanaBirdeyeOpenapidata = await loadOpenAPIFromJson(
         birdEyeOpenApiSPec
       );
-      const etherscanAllPathsAndDesc = await getAllPathsAndDesc(
-        etherscanOpenapidata
+      const solanaBirdeyeAllPathsAndDesc = await getAllPathsAndDesc(
+        solanaBirdeyeOpenapidata
       );
 
       const aiAgentResponse = await generateText({
@@ -42,7 +40,6 @@ export const getEvmOnchainDataUsingEtherscan = tool({
             
               2. **Retrieve Required Parameters**:  
                  - Use the **getPathParametersAndBaseUrl** tool to fetch all necessary parameters.  
-                 - pass The API path, e.g., '/?module=account&action=balance'
                  - If any required parameters are missing, prompt the user for input.  
             
               3. **Construct and Execute API Call**:  
@@ -55,7 +52,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
               - If no relevant data is found, respond appropriately instead of returning an empty result.  
               `,
         prompt: JSON.stringify(
-          `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${BIRDEYE_BASE_URL}`
+          `User query: "${userQuery}". Available API paths and descriptions: ${solanaBirdeyeAllPathsAndDesc}. Base URL: ${BIRDEYE_BASE_URL}`
         ),
         tools: {
           getPathParametersAndBaseUrl: tool({
@@ -70,26 +67,31 @@ export const getEvmOnchainDataUsingEtherscan = tool({
             }),
             execute: async ({ path }) => {
               console.log("Fetching parameters for path:", path);
-              const etherscanPathsDetails = await getPathDetails(
-                etherscanOpenapidata,
+              const solanaBirdeyePathsDetails = await getPathDetails(
+                solanaBirdeyeOpenapidata,
                 path
               );
-              return etherscanPathsDetails;
+              return solanaBirdeyePathsDetails;
             },
           }),
           makeApiCall: tool({
-            description: "Fetch real-time blockchain data from etherscan API.",
+            description:
+              "Fetch real-time blockchain data from solana Birdeye API.",
             parameters: z.object({
               url: z.string().describe("The full API query URL."),
+              limit: z
+                .number()
+                .describe("The limit for the number of results.")
+                .default(10),
             }),
-            execute: async ({ url }) => {
+            execute: async ({ url, limit }) => {
               try {
                 const options = (chain: string) => ({
                   method: "GET",
                   headers: {
                     accept: "application/json",
                     "X-API-KEY": process.env.BIRDEYE_API_KEY as string,
-                    "x-chain": chain, // Send one chain at a time
+                    "x-chain": chain,
                   },
                 });
                 const fullUrl = `${url}`;
@@ -99,9 +101,16 @@ export const getEvmOnchainDataUsingEtherscan = tool({
                   throw new Error(
                     `API call failed with status ${response.status}`
                   );
-                const json = await response.json();
-                console.log("Fetched API response:", json);
-                return json; // Return parsed JSON data for further processing
+                const respObj = await response.json();
+                // console.log("Fetched API response:", respObj);
+                if (respObj.data.solana.length > limit) {
+                  // used to limit txn_lists
+                  console.log(
+                    `found ${respObj.data.solana.length} results. truncating to ${limit} results`
+                  );
+                  respObj.data.solana = respObj.data.solana.slice(0, limit);
+                }
+                return respObj;
               } catch (error) {
                 console.error("Error fetching API data:", error);
                 return { error: "Failed to fetch data from the API." };
@@ -115,7 +124,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
       console.log(`AI response is `, aiAgentResponse.text);
       return aiAgentResponse.text;
     } catch (error: any) {
-      console.error("Error in getEvmOnchainDataUsingEtherscan:", error);
+      console.error("Error in getSolanaOnchainDataUsingBirdeye:", error);
       return {
         success: false,
         message: "Error retrieving API data.",

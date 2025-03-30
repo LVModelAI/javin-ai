@@ -225,6 +225,14 @@ export const searchGroups = [
   // },
 
   {
+    id: "solana" as const,
+    name: "solana",
+    description: "Access data from Solana",
+    icon: Network,
+    img: "/images/chain-logo/solana_2.png",
+  },
+
+  {
     id: "creditcoin" as const,
     name: "Creditcoin",
     description: "Everything Creditcoin. Search, transactions and more.",
