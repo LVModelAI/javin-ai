@@ -1,11 +1,10 @@
 "use server";
 
 import { z } from "zod";
-
 import { createUser, getUser } from "@/lib/db/queries";
-
 import { signIn } from "./auth";
 import { generateUUID } from "@javin/shared/lib/utils/utils";
+import * as Sentry from "@sentry/nextjs";
 
 // For login: only check required + min length
 const loginSchema = z.object({
@@ -54,7 +53,7 @@ export const login = async (
     if (error instanceof z.ZodError) {
       return { status: "invalid_data" };
     }
-
+    Sentry.captureException(error);
     return { status: "failed" };
   }
 };
@@ -109,7 +108,7 @@ export const register = async (
         },
       };
     }
-
+    Sentry.captureException(error);
     return { status: "failed" };
   }
 };

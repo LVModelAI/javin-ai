@@ -23,6 +23,7 @@ import {
   sanitizeResponseMessages,
 } from "@javin/shared/lib/utils/utils";
 import { generateTitleFromUserMessage } from "../../actions";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
   const {
@@ -116,6 +117,7 @@ export async function POST(request: Request) {
               });
               await decrementRemainingMessageCount(session.user.id);
             } catch (error) {
+              Sentry.captureException(error);
               console.error("Failed to save chat");
             }
           }
@@ -132,6 +134,7 @@ export async function POST(request: Request) {
     },
     onError: (error: any) => {
       console.log(error);
+      Sentry.captureException(error);
       return "Oops, something went wrong!. Please try again in new chat";
     },
   });
@@ -162,6 +165,7 @@ export async function DELETE(request: Request) {
 
     return new Response("Chat deleted", { status: 200 });
   } catch (error) {
+    Sentry.captureException(error);
     return new Response("An error occurred while processing your request", {
       status: 500,
     });
