@@ -5,10 +5,11 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from "ai";
+import { groq } from "@ai-sdk/groq";
 
 export const DEFAULT_CHAT_MODEL: string = "chat-model-small";
 
-export const myProvider:any = customProvider({
+export const myProvider: any = customProvider({
   languageModels: {
     "chat-model-small": openai("gpt-4o-mini"),
     "chat-model-large": openai("gpt-4o"),
@@ -18,6 +19,8 @@ export const myProvider:any = customProvider({
     }),
     "title-model": openai("gpt-4-turbo"),
     "block-model": openai("gpt-4o-mini"),
+    // @ts-ignore due to version type mismatch between @ai-sdk/provider package (v1.0.9 and v1.0.7)
+    "grok-llama-4": groq("meta-llama/llama-4-scout-17b-16e-instruct"),
   },
   imageModels: {
     "small-model": openai.image("dall-e-2"),
@@ -47,4 +50,9 @@ export const chatModels: Array<ChatModel> = [
   //   name: 'Reasoning model',
   //   description: 'Uses advanced reasoning',
   // },
+  {
+    id: "grok-llama-4",
+    name: "Grok Llama 4",
+    description: "Llama 4 scout model for advanced reasoning",
+  },
 ];
