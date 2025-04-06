@@ -13,4 +13,12 @@ Sentry.init({
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
+  beforeSend(event) {
+    if (event.request?.url?.includes("localhost")) {
+      console.log("Not sending event to sentry because it is from localhost");
+      return null; // Drop the event
+    }
+    return event;
+  },
 });
