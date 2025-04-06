@@ -31,6 +31,15 @@ export const user = pgTable("User", {
 
 export type User = InferSelectModel<typeof user>;
 
+export const password_reset_tokens = pgTable("PasswordResetToken", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  email: varchar("email", { length: 64 }).notNull().unique(),
+  token: varchar("token").notNull(),
+  expiry: timestamp("expiry").notNull(),
+});
+
+export type PasswordResetToken = InferSelectModel<typeof password_reset_tokens>;
+
 export const chat = pgTable("Chat", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   createdAt: timestamp("createdAt").notNull(),

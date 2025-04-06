@@ -15,6 +15,7 @@ import {
   type Message,
   message,
   vote,
+  password_reset_tokens,
 } from "./schema";
 
 // Optionally, if not using email/pass login, you can
@@ -80,6 +81,69 @@ export async function saveChat({
     });
   } catch (error) {
     console.error("Failed to save chat in database");
+    throw error;
+  }
+}
+
+export async function updateUserPassword(email: string, newPassword: string) {
+  const salt = genSaltSync(10);
+  const hash = hashSync(newPassword, salt);
+
+  try {
+    return await db
+      .update(user)
+      .set({ password: hash })
+      .where(eq(user.email, email));
+  } catch (error) {
+    console.error("Failed to update user password in database");
+    throw error;
+  }
+}
+
+export async function savePasswordResetToken(email: string, token: string) {
+  await db
+    .insert(password_reset_tokens)
+    .values({ email, token, expiry: new Date(Date.now() + 3600000) })
+    .onConflictDoUpdate({
+      target: password_reset_tokens.email,
+      set: { token, expiry: new Date(Date.now() + 3600000) },
+    });
+}
+
+export async function getPasswordResetToken(token: string) {
+  try {
+    const [resetToken] = await db
+      .select()
+      .from(password_reset_tokens)
+      .where(eq(password_reset_tokens.token, token));
+
+    return resetToken;
+  } catch (error) {
+    console.error("Failed to get password reset token from database");
+    throw error;
+  }
+}
+
+export async function getPasswordResetTokenUsingEmail(email: string) {
+  try {
+    const [token] = await db
+      .select()
+      .from(password_reset_tokens)
+      .where(eq(password_reset_tokens.email, email));
+    return token;
+  } catch (error) {
+    console.error("Failed to get password reset token from database");
+    throw error;
+  }
+}
+
+export async function deletePasswordResetToken(token: string) {
+  try {
+    return await db
+      .delete(password_reset_tokens)
+      .where(eq(password_reset_tokens.token, token));
+  } catch (error) {
+    console.error("Failed to delete password reset token from database");
     throw error;
   }
 }
