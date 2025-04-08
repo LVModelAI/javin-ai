@@ -1,5 +1,4 @@
 "use client";
-
 import type {
   Attachment,
   ChatRequestOptions,
@@ -19,25 +18,17 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
-
 import { sanitizeUIMessages } from "@javin/shared/lib/utils/utils";
-
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from "../icons";
 import { PreviewAttachment } from "../preview-attachment";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { useSession } from "next-auth/react";
 import { User } from "next-auth";
-import { cn, SearchGroup, SearchGroupId, searchGroups } from "@javin/shared/lib/utils/utils";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/hover-card";
-import { AnimatePresence, motion } from "framer-motion";
+import { cn, SearchGroup, SearchGroupId } from "@javin/shared/lib/utils/utils";
+import { motion } from "framer-motion";
 import { ModelSelector } from "./model-selector";
-import Image from "next/image";
 import { GroupSelector } from "./GroupSelector";
+import { ChevronDown } from "lucide-react";
 
 function PureAttachmentsButton({
   fileInputRef,
@@ -134,6 +125,7 @@ function PureMultimodalInput({
   user,
   selectedGroup,
   setSelectedGroup,
+  isAtBottom,
 }: {
   chatId: string;
   input: string;
@@ -160,6 +152,7 @@ function PureMultimodalInput({
   user?: User;
   selectedGroup: SearchGroupId;
   setSelectedGroup: React.Dispatch<React.SetStateAction<SearchGroupId>>;
+  isAtBottom: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -313,7 +306,6 @@ function PureMultimodalInput({
 
   const handleGroupSelect = useCallback(
     async (group: SearchGroup) => {
-      console.log("selectd grup", group);
       setSelectedGroup(group.id);
       setLocalStorageChatMode(group.id);
     },
@@ -328,7 +320,17 @@ function PureMultimodalInput({
     setIsFocused(false);
   };
 
-  // console.log("selectedgroup", selectedGroup);
+  const scrollMessagesToBottom = (e: any) => {
+    e.preventDefault();
+    const el = document.getElementById("chat-scroll");
+    if (el) {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <>
       <motion.div
@@ -420,6 +422,15 @@ function PureMultimodalInput({
               />
             ))}
           </div>
+        )}
+
+        {!isAtBottom && (
+          <button
+            onClick={scrollMessagesToBottom}
+            className="absolute bottom-32 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center p-1 rounded-full bg-neutral-500 text-white dark:bg-neutral-300 dark:text-black cursor-pointer shadow-md"
+          >
+            <ChevronDown size={20} />
+          </button>
         )}
 
         <div className="absolute -bottom-1 flex items-end justify-between w-full">

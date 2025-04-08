@@ -11,13 +11,7 @@ interface PortfolioProps {
 }
 
 const PortfolioTable: React.FC<PortfolioProps> = ({ result }) => {
-  // console.log("portfolio resoult", result);
-  if (!result || !result.attributes)
-    return (
-      <div className="text-black dark:text-white">
-        No portfolio data available.
-      </div>
-    );
+  if (!result || !result.attributes) return null;
   const { attributes, currency } = result;
   const totalPositions = attributes.total?.positions;
   const percentChange = attributes.changes?.percent_1d;
@@ -60,7 +54,9 @@ const PortfolioTable: React.FC<PortfolioProps> = ({ result }) => {
       {/* Portfolio Breakdown by Chain */}
       <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar">
         {chains.length === 0 ? (
-          <div className="text-gray-600 dark:text-gray-400">No holdings available.</div>
+          <div className="text-gray-600 dark:text-gray-400">
+            No holdings available.
+          </div>
         ) : (
           chains.map(([chain, value]) => (
             <div

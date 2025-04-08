@@ -5,7 +5,6 @@ import { smoothStream, streamText, generateText } from "ai";
 import { PromptRequestSchema, ChatCompletionStreaming } from "./type";
 import { z } from "zod";
 
-export const maxDuration = 60;
 export async function POST(request: Request) {
   try {
     const EXTERNALAPIKEY = process.env.SENTIENT_EXTERNAL_APIKEY;
@@ -23,12 +22,13 @@ export async function POST(request: Request) {
     const validatedData = PromptRequestSchema.parse(body);
 
     const {
-      model,
       prompt,
       max_tokens,
       temperature,
       stream: StreamingTrue,
     } = validatedData;
+
+    const model = "gpt-4o-mini";
 
     const { tools: activeTools, systemPrompt } = await getGroupConfig(
       "on_chain"
@@ -43,8 +43,7 @@ export async function POST(request: Request) {
         system: systemPrompt,
         prompt: prompt,
         maxSteps: 10,
-        experimental_activeTools:
-          model === "chat-model-reasoning" ? [] : [...activeTools],
+        experimental_activeTools: [...activeTools],
         tools: allTools,
         maxTokens: max_tokens,
         temperature: temperature,
@@ -71,7 +70,7 @@ export async function POST(request: Request) {
         model,
         system_fingerprint: system_fingerprint,
         usage: { ...result.usage },
-        service_tier: null
+        service_tier: null,
       };
 
       return new Response(JSON.stringify(responseMessage), {
@@ -111,8 +110,7 @@ export async function POST(request: Request) {
             system: systemPrompt,
             prompt: prompt,
             maxSteps: 10,
-            experimental_activeTools:
-              model === "chat-model-reasoning" ? [] : [...activeTools],
+            experimental_activeTools: [...activeTools],
             onChunk: async ({ chunk }) => {
               console.log("onChunk = ", chunk);
             },

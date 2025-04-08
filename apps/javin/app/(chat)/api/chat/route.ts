@@ -1,4 +1,3 @@
-// app/(chat)/api/chat/route.ts
 import {
   type Message,
   createDataStreamResponse,
@@ -9,11 +8,13 @@ import {
 import { auth } from "@/app/(auth)/auth";
 import { myProvider } from "@javin/shared/lib/ai/models";
 import { allTools, getGroupConfig } from "@javin/shared/lib/ai/prompts";
+import { logObjects, logInfo } from "@javin/shared/lib/utils/logging";
 import {
+  decrementRemainingMessageCount,
   deleteChatById,
   getChatById,
   getUser,
-  incrementMessageCount,
+  getUserById,
   saveChat,
   saveMessages,
 } from "@/lib/db/queries";
@@ -23,26 +24,11 @@ import {
   sanitizeResponseMessages,
 } from "@javin/shared/lib/utils/utils";
 import { generateTitleFromUserMessage } from "../../actions";
-
-export const maxDuration = 60;
-
-interface ChatCompletionStreaming {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  system_fingerprint: string;
-  choices: Array<{
-    index: number;
-    delta: {
-      role?: string;
-      content?: string;
-    };
-    finish_reason: string | null;
-  }>;
-}
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
+  logInfo("Received POST request for chat.");
+
   const {
     id,
     messages,
@@ -55,47 +41,67 @@ export async function POST(request: Request) {
     group: any;
   } = await request.json();
 
-  console.log("search groupe", group);
-  const session = await auth();
-  const { tools: activeTools, systemPrompt } = await getGroupConfig(group);
+  logObjects("Request data:", { id, messages, selectedChatModel, group });
+  logObjects("Search group:", group);
 
+  const session = await auth();
   if (!session || !session.user || !session.user.id) {
+    console.error("User not authenticated.");
     return new Response("Please login to start chatting!", { status: 401 });
   }
-  const users = await getUser(session.user.email!);
-  const user_info = users[0];
-  console.log("user infor ", session.user);
-  if (
-    user_info.tier == "free" &&
-    user_info.messageCount >= Number(process.env.FREE_USER_MESSAGE_LIMIT!)
-  ) {
-    // console.log("totmsg ", user_info.messageCount);
-    return new Response(
-      "Message limit reached!  Upgrade to PRO for more usage and other perks!",
-      {
-        status: 403,
-      }
-    );
-  }
-  const userMessage = getMostRecentUserMessage(messages);
+  logObjects("User session:", session.user);
 
+  const { tools: activeTools, systemPrompt } = await getGroupConfig(group);
+  logObjects("Group configuration loaded. Active tools:", activeTools);
+  // logInfo("System prompt:", systemPrompt);
+
+  const users = await getUserById(session.user.id!);
+  const user_info = users[0];
+  logObjects("Retrieved user info:", user_info);
+
+  if (user_info.dailyMessageRemaining <= 0) {
+    if (user_info.tier === "free") {
+      console.warn(`User ${user_info.email} blocked: message limit exceeded`);
+      return new Response(
+        `Free Tier limit of ${process.env.FREE_USER_MESSAGE_LIMIT} messages/day reached! Upgrade to PRO for more usage and other perks!`,
+        { status: 403 }
+      );
+    } else {
+      console.warn(`User ${user_info.email} reached high demand limits.`);
+      return new Response(
+        `We're experiencing exceptionally high demand. Please hang tight as we work on scaling our systems!`,
+        { status: 403 }
+      );
+    }
+  }
+
+  const userMessage = getMostRecentUserMessage(messages);
   if (!userMessage) {
+    console.error("No user message found in the request.");
     return new Response("No user message found", { status: 400 });
   }
+  logObjects("Most recent user message:", userMessage);
 
   const chat = await getChatById({ id });
-
   if (!chat) {
+    logInfo("No existing chat found. Generating a new chat title.");
     const title = await generateTitleFromUserMessage({ message: userMessage });
+    logInfo("Generated chat title: " + title);
     await saveChat({ id, userId: session.user.id, title });
+    logInfo("New chat saved with id: " + id);
+  } else {
+    logInfo("Existing chat found with id: " + id);
   }
 
+  logInfo("Saving user message to the database.");
   await saveMessages({
     messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
   });
 
+  logInfo("Preparing to stream text with model: " + selectedChatModel);
   return createDataStreamResponse({
     execute: async (dataStream) => {
+      logInfo("Starting text stream execution.");
       if (selectedChatModel !== "sentient-dobby-unhinged") {
         // NORMAL FLOW
         const result = streamText({
@@ -110,7 +116,12 @@ export async function POST(request: Request) {
           experimental_transform: smoothStream({ chunking: "word" }),
           experimental_generateMessageId: generateUUID,
           tools: allTools,
+          onStepFinish(event) {
+            logInfo("Step finished.");
+            logObjects("Step Event:", event);
+          },
           onFinish: async ({ response, reasoning }) => {
+            logInfo("Stream finished. Response received from model.");
             if (session.user?.id) {
               try {
                 const sanitizedResponseMessages = sanitizeResponseMessages({
@@ -129,9 +140,12 @@ export async function POST(request: Request) {
                     };
                   }),
                 });
-                await incrementMessageCount(session.user.id);
+                logInfo("Response messages saved to database.");
+                await decrementRemainingMessageCount(session.user.id);
+                logInfo("User's remaining message count decremented.");
               } catch (error) {
-                console.error("Failed to save chat");
+                Sentry.captureException(error);
+                console.error("Failed to save chat", error);
               }
             }
           },
@@ -141,87 +155,83 @@ export async function POST(request: Request) {
           },
         });
 
+        logInfo(
+          "Merging streaming result into dataStream with reasoning enabled."
+        );
         result.mergeIntoDataStream(dataStream, {
           sendReasoning: true,
         });
       } else {
         // GENERATE SUMMARY FROM DOBBY
-        console.log("GENERATING SUMMARY FROM DOBBY");
-        try {
-          const result = await generateText({
-            model: myProvider.languageModel("chat-model-small"),
-            system: systemPrompt,
-            messages,
-            maxSteps: 5,
-            tools: allTools,
-            experimental_activeTools: [...activeTools],
-            experimental_generateMessageId: generateUUID,
-            // TODO SUPPORT STREAMING OF TOOL RESULT
-            // onStepFinish(event) {
-            //   console.log("onStepFinish");
-            //   console.log("toolCalls ", event.toolCalls);
-            //   console.log("toolResults ", event.toolResults);
-            //   const chunkData = {
-            //     id: generateUUID(),
-            //     role: "assistant",
-            //     toolInvocations: event.toolCalls.map((call, idx) => ({
-            //       toolName: call.toolName,
-            //       toolCallId: call.toolCallId,
-            //       state: "result",
-            //       args: call.args,
-            //       result: event.toolResults[idx] || null,
-            //     })),
-            //   };
-            //   dataStream.write(`0:${JSON.stringify(chunkData)}\n`);
-            // },
-          });
+        logInfo("Going into the Dobby flow");
+        const result = await generateText({
+          model: myProvider.languageModel("chat-model-small"),
+          system: systemPrompt,
+          messages,
+          maxSteps: 5,
+          tools: allTools,
+          experimental_activeTools: [...activeTools],
+          experimental_generateMessageId: generateUUID,
+          onStepFinish(event) {
+            logInfo("Step finished.");
+            logObjects("Step Event:", event);
+          },
+          // TODO SUPPORT STREAMING OF TOOL RESULT
+          // onStepFinish(event) {
+          //   console.log("onStepFinish");
+          //   console.log("toolCalls ", event.toolCalls);
+          //   console.log("toolResults ", event.toolResults);
+          //   const chunkData = {
+          //     id: generateUUID(),
+          //     role: "assistant",
+          //     toolInvocations: event.toolCalls.map((call, idx) => ({
+          //       toolName: call.toolName,
+          //       toolCallId: call.toolCallId,
+          //       state: "result",
+          //       args: call.args,
+          //       result: event.toolResults[idx] || null,
+          //     })),
+          //   };
+          //   dataStream.write(`0:${JSON.stringify(chunkData)}\n`);
+          // },
+        });
 
-          // Set up the system prompt and user message for summarization.
-          const summarizationSystemPrompt =
-            `You are a helpful assistant that will convert the text given to you in your own words. Do not reduce the information in the text. Write it correctly formatted and be kinda unhinged.  \n\n The text is:\n\n${result.text}`;
-          const summaryResult = streamText({
-            model: myProvider.languageModel(selectedChatModel),
-            prompt: summarizationSystemPrompt,
-            experimental_transform: smoothStream({ chunking: "word" }),
-            experimental_generateMessageId: generateUUID,
-            onChunk: async ({ chunk }) => {
-              console.log("onChunk = ", chunk);
-            },
-            onFinish: async ({ response, reasoning }) => {
-              const sanitizedResponseMessages = sanitizeResponseMessages({
-                messages: response.messages,
-                reasoning,
-              });
-              console.log(
-                "SAVING MESSAGES FOR DOBBY = ",
-                sanitizedResponseMessages
-              );
+        // Set up the system prompt and user message for summarization.
+        const summarizationSystemPrompt = `You are a helpful assistant that will convert the text given to you in your own words. Do not reduce the information in the text. Write it correctly formatted and be kinda unhinged.  \n\n The text is:\n\n${result.text}`;
+        const summaryResult = streamText({
+          model: myProvider.languageModel(selectedChatModel),
+          prompt: summarizationSystemPrompt,
+          experimental_transform: smoothStream({ chunking: "word" }),
+          experimental_generateMessageId: generateUUID,
+          onFinish: async ({ response, reasoning }) => {
+            const sanitizedResponseMessages = sanitizeResponseMessages({
+              messages: response.messages,
+              reasoning,
+            });
+            await saveMessages({
+              messages: sanitizedResponseMessages.map((message) => {
+                return {
+                  id: message.id,
+                  chatId: id,
+                  role: message.role,
+                  content: message.content,
+                  createdAt: new Date(),
+                };
+              }),
+            });
+            logInfo("Response messages saved to database.");
+            await decrementRemainingMessageCount(session.user.id);
+            logInfo("User's remaining message count decremented.");
+          },
+        });
 
-              await saveMessages({
-                messages: sanitizedResponseMessages.map((message) => {
-                  return {
-                    id: message.id,
-                    chatId: id,
-                    role: message.role,
-                    content: message.content,
-                    createdAt: new Date(),
-                  };
-                }),
-              });
-              await incrementMessageCount(session.user.id);
-            },
-          });
-
-          console.log("merging into datastream");
-          // Merge the summarization stream into the original data stream.
-          summaryResult.mergeIntoDataStream(dataStream);
-        } catch (err) {
-          console.error("Failed to generate summary from dobby", err);
-        }
+        logInfo("merging into datastream");
+        summaryResult.mergeIntoDataStream(dataStream);
       }
     },
     onError: (error: any) => {
-      console.log(error);
+      console.error("Error during text streaming:", error);
+      Sentry.captureException(error);
       return "Oops, something went wrong!. Please try again in new chat";
     },
   });
@@ -252,6 +262,7 @@ export async function DELETE(request: Request) {
 
     return new Response("Chat deleted", { status: 200 });
   } catch (error) {
+    Sentry.captureException(error);
     return new Response("An error occurred while processing your request", {
       status: 500,
     });

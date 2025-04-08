@@ -3,24 +3,19 @@
 import type { ChatRequestOptions, Message } from "ai";
 import cx from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
-import { memo, useMemo, useState } from "react";
+import { memo, useState } from "react";
 
 import type { Vote } from "@/lib/db/schema";
 import {
-  ChevronDownIcon,
-  LoaderIcon,
   PencilEditIcon,
-  SparklesIcon,
   JavinMan,
 } from "./icons";
 import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";
 import { PreviewAttachment } from "./preview-attachment";
-import { Weather } from "./weather";
 import equal from "fast-deep-equal";
-import { cn } from "@javin/shared/lib/utils/utils";
+import { cn, SearchGroupId } from "@javin/shared/lib/utils/utils";
 import { Button } from "./ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
 import MultiSearch from "./multi-search";
@@ -34,6 +29,7 @@ const PurePreviewMessage = ({
   vote,
   isLoading,
   setMessages,
+  selectedGroup,
   reload,
   isReadonly,
   showIcon = true,
@@ -45,6 +41,7 @@ const PurePreviewMessage = ({
   setMessages: (
     messages: Message[] | ((messages: Message[]) => Message[])
   ) => void;
+  selectedGroup: SearchGroupId;
   reload: (
     chatRequestOptions?: ChatRequestOptions
   ) => Promise<string | null | undefined>;
@@ -256,6 +253,7 @@ const PurePreviewMessage = ({
                   message={message}
                   setMode={setMode}
                   setMessages={setMessages}
+                  selectedGroup={selectedGroup}
                   reload={reload}
                 />
               </div>
@@ -292,6 +290,7 @@ export const PreviewMessage = memo(
     )
       return false;
     if (!equal(prevProps.vote, nextProps.vote)) return false;
+    if (!equal(prevProps.selectedGroup, nextProps.selectedGroup)) return false;
 
     return true;
   }

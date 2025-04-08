@@ -1,5 +1,11 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
     "buildCommand": "cd ../.. && npm run build -- --filter=javin",
-    "outputDirectory": ".next"
+    "outputDirectory": ".next",
+    "crons": [
+        {
+            "path": "/api/messagelimitcron",
+            "schedule": "0 0 * * *"
+        }
+    ]
 }

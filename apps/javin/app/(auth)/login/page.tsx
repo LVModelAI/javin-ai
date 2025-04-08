@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
-
 import { AuthForm } from "@/components/auth-form";
 import { SubmitButton } from "@/components/submit-button";
 
 import { login, type LoginActionState } from "../actions";
 import { useTheme } from "next-themes";
+import { LogoGoogle } from "@/components/icons";
+import { signIn } from "next-auth/react";
 
 export default function Page() {
   const router = useRouter();
@@ -64,8 +65,22 @@ export default function Page() {
         </p>
       </div>
       <div className="w-fit overflow-hidden rounded-2xl gap-5 flex flex-col border m-2 p-5">
+        <h3 className="text-xl font-semibold dark:text-zinc-50 text-center">
+          Sign In
+        </h3>
+        <button
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+          className="flex items-center justify-center gap-2 w-fit border px-4 py-2 rounded-md font-medium transition hover:bg-accent dark:hover:bg-zinc-800 mx-auto"
+        >
+          <LogoGoogle />
+          Continue with Google
+        </button>
+        <div className="flex items-center justify-center gap-2 w-full ">
+          <div className="w-1/3 border"></div>
+          <div className="text-zinc-500">OR</div>
+          <div className="w-1/3 border"></div>
+        </div>
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign In</h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
             Use your email and password to sign in
           </p>
