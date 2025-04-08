@@ -48,7 +48,7 @@ export const chatModels: Array<ChatModel> = [
   {
     id: "sentient-dobby-unhinged",
     name: "Dobby Unhinged",
-    description: "Unfiltered, opinionated AI by sentient",
+    description: "Unfiltered, opinionated AI by Sentient",
   },
   // {
   //   id: 'chat-model-reasoning',
