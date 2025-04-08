@@ -9,6 +9,7 @@ import {
 import zerionJson from "./zerion-openapi.json";
 import { zerionBaseURL } from "./constant";
 import { getZerionApiKey } from "../../../utils/utils";
+import { logObjects } from "@javin/shared/lib/utils/logging";
 export const getEvmOnchainDataUsingZerion = tool({
   description: "Get real-time data from Ethereum based blockchains.",
   parameters: z.object({
@@ -46,7 +47,9 @@ export const getEvmOnchainDataUsingZerion = tool({
         ## **Final Response Format:**  
         - Always provide a **clear, structured, human-readable answer** to the user.  
         - Do **not** return raw JSON unless explicitly requested.  
-        - If no relevant data is found, respond appropriately instead of returning an empty result.  
+        - If no relevant data is found, respond appropriately instead of returning an empty result.
+        - Do not modify information in any way.
+        - Do not show the id of the transaction if any, in its place show the transaction hash.
         `,
         prompt: JSON.stringify(
           `User query: "${userQuery}". Available API paths and descriptions: ${zerionAllPathsAndDesc}. Base URL: ${zerionBaseURL}`
@@ -92,7 +95,7 @@ export const getEvmOnchainDataUsingZerion = tool({
                     `API call failed with status ${response.status}`
                   );
                 const json = await response.json();
-                console.log("Fetched API response:", json);
+                logObjects("Fetched API response:", json);
                 return json; // Return parsed JSON data for further processing
               } catch (error) {
                 console.error("Error fetching API data:", error);

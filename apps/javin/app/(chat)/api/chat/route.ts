@@ -41,15 +41,15 @@ export async function POST(request: Request) {
     group: any;
   } = await request.json();
 
-  logObjects("Request data:", { id, messages, selectedChatModel, group });
-  logObjects("Search group:", group);
+  logObjects("Request data:", { id, messages, selectedChatModel, group }, true);
+  logObjects("Search group:", group, true);
 
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
     console.error("User not authenticated.");
     return new Response("Please login to start chatting!", { status: 401 });
   }
-  logObjects("User session:", session.user);
+  logObjects("User session:", session.user, true);
 
   const { tools: activeTools, systemPrompt } = await getGroupConfig(group);
   logObjects("Group configuration loaded. Active tools:", activeTools);
@@ -197,7 +197,13 @@ export async function POST(request: Request) {
         });
 
         // Set up the system prompt and user message for summarization.
-        const summarizationSystemPrompt = `You are a helpful assistant that will convert the text given to you in your own words. Do not reduce the information in the text. Write it correctly formatted and be kinda unhinged.  \n\n The text is:\n\n${result.text}`;
+        const summarizationSystemPrompt = `
+          You are a helpful assistant that will convert the text given in your own words.
+          Do not reduce the information in the text. 
+          Write it correctly formatted and just speak like it's yours.
+          Never mention that you're rewriting anything.
+          \n\n The text is:\n\n${result.text}`;
+
         const summaryResult = streamText({
           model: myProvider.languageModel(selectedChatModel),
           prompt: summarizationSystemPrompt,

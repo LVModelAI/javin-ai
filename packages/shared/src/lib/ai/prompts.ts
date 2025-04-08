@@ -269,11 +269,11 @@ Get list of all available gas prices
 -Get list of NFTs
 -Get single NFT by ID
 
-## getEvmOnchainDataUsingEtherscan: get various info about on chain data like API Endpoints, Accounts, Contracts, Transactions, Blocks, Logs, Geth/Parity Proxy, Tokens, Gas Tracker, Stats, Chain Specific, Usage, . just pass the user query . 
+## getEvmOnchainDataUsingEtherscan: get various info about on chain data like Accounts, Contracts, Transactions, Blocks, Logs, Geth/Parity Proxy, Tokens, Gas Tracker, Stats, Chain Specific, Usage, . just pass the user query.
 
 ## Ens lookup: If user enters a ENS name, like somename.eth or someName.someChain.eth then use the ensToAddress tool to get the corresponding address. use this address for further queries.
 
-## translate transactions to human readable format: 
+## translate transactions to human readable format:
 always use the translateTransactions tool to convert the raw transaction details into human readable format. pass the transaction details, chain name and user query to the tool. the supported chain names are ${novesSupportedChains}.
 
  ## defi llama: If user asks for any defi llama data, use the defiLlama tool to get the data. pass the user query to the tool. the result will contain data necessary to answer user query summarise the results for the user. you can fetch various data like 
