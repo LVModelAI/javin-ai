@@ -7,7 +7,7 @@ import {
 import { auth } from "@/app/(auth)/auth";
 import { myProvider } from "@javin/shared/lib/ai/models";
 import { allTools, getGroupConfig } from "@javin/shared/lib/ai/prompts";
-import { logObjects } from "@javin/shared/lib/utils/logging";
+import { logObjects, logInfo } from "@javin/shared/lib/utils/logging";
 import {
   decrementRemainingMessageCount,
   deleteChatById,
@@ -26,7 +26,7 @@ import { generateTitleFromUserMessage } from "../../actions";
 import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
-  console.log("Received POST request for chat.");
+  logInfo("Received POST request for chat.");
 
   const {
     id,
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
 
   const { tools: activeTools, systemPrompt } = await getGroupConfig(group);
   logObjects("Group configuration loaded. Active tools:", activeTools);
-  // console.log("System prompt:", systemPrompt);
+  // logInfo("System prompt:", systemPrompt);
 
   const users = await getUserById(session.user.id!);
   const user_info = users[0];
@@ -83,27 +83,27 @@ export async function POST(request: Request) {
 
   const chat = await getChatById({ id });
   if (!chat) {
-    console.log("No existing chat found. Generating a new chat title.");
+    logInfo("No existing chat found. Generating a new chat title.");
     const title = await generateTitleFromUserMessage({ message: userMessage });
-    console.log("Generated chat title:", title);
+    logInfo("Generated chat title: " + title);
     await saveChat({ id, userId: session.user.id, title });
-    console.log("New chat saved with id:", id);
+    logInfo("New chat saved with id: " + id);
   } else {
-    console.log("Existing chat found with id:", id);
+    logInfo("Existing chat found with id: " + id);
   }
 
-  console.log("Saving user message to the database.");
+  logInfo("Saving user message to the database.");
   await saveMessages({
     messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
   });
 
-  console.log("Preparing to stream text with model:", selectedChatModel);
+  logInfo("Preparing to stream text with model: " + selectedChatModel);
   return createDataStreamResponse({
     execute: (dataStream) => {
-      console.log("Starting text stream execution.");
+      logInfo("Starting text stream execution.");
 
       if (selectedChatModel === "chat-model-reasoning") {
-        console.log(
+        logInfo(
           "Selected model is 'chat-model-reasoning'; no active tools will be used."
         );
       } else {
@@ -121,11 +121,11 @@ export async function POST(request: Request) {
         experimental_generateMessageId: generateUUID,
         tools: allTools,
         onStepFinish(event) {
-          console.log("Step finished.");
+          logInfo("Step finished.");
           logObjects("Step Event:", event);
         },
         onFinish: async ({ response, reasoning }) => {
-          console.log("Stream finished. Response received from model.");
+          logInfo("Stream finished. Response received from model.");
           // logObjects("Response messages:", response.messages);
           // logObjects("Model reasoning:", reasoning);
 
@@ -148,9 +148,9 @@ export async function POST(request: Request) {
                   createdAt: new Date(),
                 })),
               });
-              console.log("Response messages saved to database.");
+              logInfo("Response messages saved to database.");
               await decrementRemainingMessageCount(session.user.id);
-              console.log("User's remaining message count decremented.");
+              logInfo("User's remaining message count decremented.");
             } catch (error) {
               Sentry.captureException(error);
               console.error("Failed to save chat", error);
@@ -163,7 +163,7 @@ export async function POST(request: Request) {
         },
       });
 
-      console.log(
+      logInfo(
         "Merging streaming result into dataStream with reasoning enabled."
       );
       result.mergeIntoDataStream(dataStream, { sendReasoning: true });
