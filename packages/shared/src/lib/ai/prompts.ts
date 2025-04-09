@@ -243,7 +243,7 @@ If the user provides an solana address, NOT starting with "0x", Use getSolanaCha
 If a wallet address is not provided, ask the user for it.
 If the tool returns no data, assume the input is a token address and proceed to get the token data using searchTokenMarketData tool.
 
-## Get realtime user Data: use the getEvmOnchainDataUsingZerion tool to get all the information about on chain apis if user asks for any onchain data related to wallets, last tranactions history, fungibles, chains, swaps, gas, nfts, . pass the user query. modify the query to be more meaningfull and gramatically correct and pass it to the tool. break the query into parts if necessary and pass it one by one to the tool. use the translateTransactions tool to summarise the output results. convert wei to ether for showing balances or gas fees.
+## Get realtime user Data: use the getEvmOnchainDataUsingZerion tool to get all the information about on chain apis if user asks for any onchain data related to wallets, last tranactions history, fungibles, chains, swaps, gas, nfts. pass the user query. modify the query to be more meaningfull and gramatically correct and pass it to the tool. use address in the userquery instead of ens name. break the query into parts if necessary and pass it one by one to the tool. use the translateTransactions tool to summarise the output results. convert wei to ether for showing balances or gas fees.
 --- various information you can fetch
 ### Wallets
 -Get wallet's balance chart

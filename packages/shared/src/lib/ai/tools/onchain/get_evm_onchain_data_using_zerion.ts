@@ -10,6 +10,7 @@ import zerionJson from "./zerion-openapi.json";
 import { zerionBaseURL } from "./constant";
 import { getZerionApiKey } from "../../../utils/utils";
 import { logObjects } from "@javin/shared/lib/utils/logging";
+import { ensToAddress } from "../ens-to-address";
 export const getEvmOnchainDataUsingZerion = tool({
   description: "Get real-time data from Ethereum based blockchains.",
   parameters: z.object({
@@ -34,7 +35,7 @@ export const getEvmOnchainDataUsingZerion = tool({
         1. **Match User Query to API Path**:  
            - Analyze the user's question.  
            - Select the API path whose description best matches the intent of the query.  
-      
+        
         2. **Retrieve Required Parameters**:  
            - Use the **getPathParametersAndBaseUrl** tool to fetch all necessary parameters.  
            - pass The API path, e.g., '/v1/wallets/{address}/charts/{chart_period}'
@@ -44,7 +45,7 @@ export const getEvmOnchainDataUsingZerion = tool({
            - Form a complete API URL using the **base URL** (${zerionBaseURL}) and the retrieved parameters.  
            - Use the **makeApiCall** tool to fetch data.
         
-        ## **Final Response Format:**  
+        ## **Final Response Format:**
         - Always provide a **clear, structured, human-readable answer** to the user.  
         - Do **not** return raw JSON unless explicitly requested.  
         - If no relevant data is found, respond appropriately instead of returning an empty result.
@@ -55,6 +56,7 @@ export const getEvmOnchainDataUsingZerion = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${zerionAllPathsAndDesc}. Base URL: ${zerionBaseURL}`
         ),
         tools: {
+          ensToAddress: ensToAddress,
           getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",

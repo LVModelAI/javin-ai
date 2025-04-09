@@ -1,4 +1,4 @@
-import { generateObject, generateText, tool } from "ai";
+import { generateText, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../../models";
 import {
@@ -7,8 +7,7 @@ import {
   loadOpenAPI,
 } from "../../../utils/openapi";
 import { etherscanBaseURL } from "./constant";
-import { groq } from "@ai-sdk/groq";
-import { translateTransactions } from "../translate-transactions";
+import { ensToAddress } from "../ens-to-address";
 
 export const getEvmOnchainDataUsingEtherscan = tool({
   description:
@@ -59,6 +58,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}`
         ),
         tools: {
+          ensToAddress: ensToAddress,
           getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",

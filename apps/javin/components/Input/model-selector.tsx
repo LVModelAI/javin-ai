@@ -50,7 +50,7 @@ export function ModelSelector({
           )}
         >
           <Button variant="outline" className="px-2 h-[32px] md:h-[34px]">
-            {selectedChatModel?.name}
+            <span className="truncate max-w-32 sm:max-w-full">{selectedChatModel?.name}</span>
             <ChevronDownIcon />
           </Button>
         </DropdownMenuTrigger>
