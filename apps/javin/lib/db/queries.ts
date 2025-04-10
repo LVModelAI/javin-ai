@@ -166,7 +166,8 @@ export async function getChatsByUserId({ id }: { id: string }) {
       .select()
       .from(chat)
       .where(eq(chat.userId, id))
-      .orderBy(desc(chat.createdAt));
+      .orderBy(desc(chat.createdAt))
+      .limit(20);
   } catch (error) {
     console.error("Failed to get chats by user from database");
     throw error;

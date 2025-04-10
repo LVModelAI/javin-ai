@@ -8,7 +8,7 @@ import {
 
 export const DEFAULT_CHAT_MODEL: string = "chat-model-small";
 
-export const myProvider:any = customProvider({
+export const myProvider: any = customProvider({
   languageModels: {
     "chat-model-small": openai("gpt-4o-mini"),
     "chat-model-large": openai("gpt-4o"),
