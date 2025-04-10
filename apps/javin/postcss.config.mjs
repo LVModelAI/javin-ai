@@ -7,3 +7,4 @@ const config = {
 };
 
 export default config;
+// Note: postcss is used via config, not imported in source – safe to ignore depcheck warning
