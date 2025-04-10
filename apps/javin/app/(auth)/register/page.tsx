@@ -88,6 +88,7 @@ export default function Page() {
           action={handleSubmit}
           defaultEmail={email}
           fieldErrors={state.fieldErrors}
+          forgotPasswordNeeded={false}
         >
           <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
