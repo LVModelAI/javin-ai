@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "lh3.googleusercontent.com", // ✅ Add this line
+        hostname: "**", // Allows all external image sources
       },
     ],
   },
