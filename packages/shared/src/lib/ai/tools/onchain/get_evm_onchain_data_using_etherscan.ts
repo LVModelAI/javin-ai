@@ -7,8 +7,7 @@ import {
   loadOpenAPI,
 } from "../../../utils/openapi";
 import { etherscanBaseURL } from "./constant";
-import { groq } from "@ai-sdk/groq";
-import { translateTransactions } from "../translate-transactions";
+import { ensToAddress } from "../ens-to-address";
 
 export const getEvmOnchainDataUsingEtherscan = tool({
   description:
@@ -19,7 +18,10 @@ export const getEvmOnchainDataUsingEtherscan = tool({
   execute: async ({ userQuery }: { userQuery?: string }) => {
     console.log("using etherscan ...");
     try {
-      console.log("User query:", userQuery);
+      console.log(
+        "User query for getEvmOnchainDataUsingEtherscan :",
+        userQuery
+      );
       const apiKey = process.env.ETHERSCAN_API_KEY;
       if (!apiKey) {
         throw new Error("Etherscan API key not found");
@@ -59,6 +61,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}`
         ),
         tools: {
+          ensToAddress: ensToAddress,
           getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",

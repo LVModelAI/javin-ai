@@ -6,6 +6,7 @@ import {
 } from "../../../../types/wallet-actions-response";
 import { filterAndLimitPortfolio, getZerionApiKey } from "../../../utils/utils";
 import { SUPPORTED_CURRENCY } from "../../../constants";
+import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
 
 export const getEvmMultiChainWalletPortfolio = tool({
   description:
@@ -35,21 +36,25 @@ export const getEvmMultiChainWalletPortfolio = tool({
         authorization: `Basic ${apiKey}`,
       },
     };
-    console.log("fetching portfoio of -", wallet_address);
+    logInfo(
+      "fetching portfoio of using tool getEvmMultiChainWalletPortfolio - " +
+        wallet_address
+    );
     try {
-      const response = await fetch(
-        `https://api.zerion.io/v1/wallets/${wallet_address}/portfolio?currency=${currency}`,
-        options
-      );
-
+      const url = `https://api.zerion.io/v1/wallets/${wallet_address}/portfolio?currency=${currency}`;
+      logInfo("url is " + url);
+      const response = await fetch(url, options);
       const portfolioData: PortfolioResponse = await response.json();
+      logObjects(
+        "portfolioData from getEvmMultiChainWalletPortfolio of wallet " +
+          wallet_address,
+        portfolioData
+      );
       if (!portfolioData || !portfolioData?.data?.attributes) {
-        //@ts-ignore
         return "No results found. Check address and try again.";
       }
 
       if (portfolioData?.data?.attributes?.total?.positions == 0) {
-        //@ts-ignore
         return "Wallet has no balances.";
       }
 

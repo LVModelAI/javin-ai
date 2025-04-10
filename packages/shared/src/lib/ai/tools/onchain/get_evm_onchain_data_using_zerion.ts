@@ -9,6 +9,7 @@ import {
 import zerionJson from "./zerion-openapi.json";
 import { zerionBaseURL } from "./constant";
 import { getZerionApiKey } from "../../../utils/utils";
+import { ensToAddress } from "../ens-to-address";
 export const getEvmOnchainDataUsingZerion = tool({
   description: "Get real-time data from Ethereum based blockchains.",
   parameters: z.object({
@@ -52,6 +53,7 @@ export const getEvmOnchainDataUsingZerion = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${zerionAllPathsAndDesc}. Base URL: ${zerionBaseURL}`
         ),
         tools: {
+          ensToAddress: ensToAddress,
           getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",
