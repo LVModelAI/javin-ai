@@ -1,4 +1,3 @@
-// app/(chat)/api/chat/route.ts
 import {
   type Message,
   createDataStreamResponse,
@@ -8,6 +7,7 @@ import {
 import { auth } from "@/app/(auth)/auth";
 import { myProvider } from "@javin/shared/lib/ai/models";
 import { allTools, getGroupConfig } from "@javin/shared/lib/ai/prompts";
+import { logObjects, logInfo } from "@javin/shared/lib/utils/logging";
 import {
   decrementRemainingMessageCount,
   deleteChatById,
@@ -26,6 +26,8 @@ import { generateTitleFromUserMessage } from "../../actions";
 import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
+  logInfo("Received POST request for chat.");
+
   const {
     id,
     messages,
@@ -38,55 +40,76 @@ export async function POST(request: Request) {
     group: any;
   } = await request.json();
 
-  console.log("search groupe", group);
-  const session = await auth();
-  const { tools: activeTools, systemPrompt } = await getGroupConfig(group);
+  logObjects("Request data:", { id, messages, selectedChatModel, group });
+  logObjects("Search group:", group);
 
+  const session = await auth();
   if (!session || !session.user || !session.user.id) {
+    console.error("User not authenticated.");
     return new Response("Please login to start chatting!", { status: 401 });
   }
-  console.log("user session ", session.user);
+  logObjects("User session:", session.user);
+
+  const { tools: activeTools, systemPrompt } = await getGroupConfig(group);
+  logObjects("Group configuration loaded. Active tools:", activeTools);
+  // logInfo("System prompt:", systemPrompt);
+
   const users = await getUserById(session.user.id!);
   const user_info = users[0];
+  logObjects("Retrieved user info:", user_info);
 
   if (user_info.dailyMessageRemaining <= 0) {
     if (user_info.tier === "free") {
       console.warn(`User ${user_info.email} blocked: message limit exceeded`);
-
       return new Response(
         `Free Tier limit of ${process.env.FREE_USER_MESSAGE_LIMIT} messages/day reached! Upgrade to PRO for more usage and other perks!`,
-        {
-          status: 403,
-        }
+        { status: 403 }
       );
     } else {
+      console.warn(`User ${user_info.email} reached high demand limits.`);
       return new Response(
         `We're experiencing exceptionally high demand. Please hang tight as we work on scaling our systems!`,
-        {
-          status: 403,
-        }
+        { status: 403 }
       );
     }
   }
 
   const userMessage = getMostRecentUserMessage(messages);
   if (!userMessage) {
+    console.error("No user message found in the request.");
     return new Response("No user message found", { status: 400 });
   }
+  logObjects("Most recent user message:", userMessage);
 
   const chat = await getChatById({ id });
-
   if (!chat) {
+    logInfo("No existing chat found. Generating a new chat title.");
     const title = await generateTitleFromUserMessage({ message: userMessage });
+    logInfo("Generated chat title: " + title);
     await saveChat({ id, userId: session.user.id, title });
+    logInfo("New chat saved with id: " + id);
+  } else {
+    logInfo("Existing chat found with id: " + id);
   }
 
+  logInfo("Saving user message to the database.");
   await saveMessages({
     messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
   });
 
+  logInfo("Preparing to stream text with model: " + selectedChatModel);
   return createDataStreamResponse({
     execute: (dataStream) => {
+      logInfo("Starting text stream execution.");
+
+      if (selectedChatModel === "chat-model-reasoning") {
+        logInfo(
+          "Selected model is 'chat-model-reasoning'; no active tools will be used."
+        );
+      } else {
+        logObjects("Active tools being used:", activeTools);
+      }
+
       const result = streamText({
         model: myProvider.languageModel(selectedChatModel),
         system: systemPrompt,
@@ -97,28 +120,40 @@ export async function POST(request: Request) {
         experimental_transform: smoothStream({ chunking: "word" }),
         experimental_generateMessageId: generateUUID,
         tools: allTools,
+        onStepFinish(event) {
+          logInfo("Step finished.");
+          logObjects("Step Event:", event);
+        },
         onFinish: async ({ response, reasoning }) => {
+          logInfo("Stream finished. Response received from model.");
+          // logObjects("Response messages:", response.messages);
+          // logObjects("Model reasoning:", reasoning);
+
           if (session.user?.id) {
             try {
               const sanitizedResponseMessages = sanitizeResponseMessages({
                 messages: response.messages,
                 reasoning,
               });
+              // logObjects(
+              //   "Sanitized response messages:",
+              //   sanitizedResponseMessages
+              // );
               await saveMessages({
-                messages: sanitizedResponseMessages.map((message) => {
-                  return {
-                    id: message.id,
-                    chatId: id,
-                    role: message.role,
-                    content: message.content,
-                    createdAt: new Date(),
-                  };
-                }),
+                messages: sanitizedResponseMessages.map((message) => ({
+                  id: message.id,
+                  chatId: id,
+                  role: message.role,
+                  content: message.content,
+                  createdAt: new Date(),
+                })),
               });
+              logInfo("Response messages saved to database.");
               await decrementRemainingMessageCount(session.user.id);
+              logInfo("User's remaining message count decremented.");
             } catch (error) {
               Sentry.captureException(error);
-              console.error("Failed to save chat");
+              console.error("Failed to save chat", error);
             }
           }
         },
@@ -128,12 +163,13 @@ export async function POST(request: Request) {
         },
       });
 
-      result.mergeIntoDataStream(dataStream, {
-        sendReasoning: true,
-      });
+      logInfo(
+        "Merging streaming result into dataStream with reasoning enabled."
+      );
+      result.mergeIntoDataStream(dataStream, { sendReasoning: true });
     },
     onError: (error: any) => {
-      console.log(error);
+      console.error("Error during text streaming:", error);
       Sentry.captureException(error);
       return "Oops, something went wrong!. Please try again in new chat";
     },
