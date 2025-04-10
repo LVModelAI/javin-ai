@@ -200,8 +200,9 @@ export async function POST(request: Request) {
         const summarizationSystemPrompt = `
           You are a helpful assistant that will convert the text given in your own words.
           Do not reduce the information in the text. 
-          Write it correctly formatted and just speak like it's yours.
+          Just speak like it's yours.
           Never mention that you're rewriting anything.
+          Format the output correctly so that it is easy to read.
           \n\n The text is:\n\n${result.text}`;
 
         const summaryResult = streamText({
