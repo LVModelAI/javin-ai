@@ -78,6 +78,17 @@ import {
 } from "@/lib/pinecone";
 import { getIntrospectionQuery } from "graphql";
 
+function encodeInternalSpacesOnly(query: string) {
+  // Extract leading/trailing spaces
+  const leading = query.match(/^ */)?.[0] ?? "";
+  const trailing = query.match(/ *$/)?.[0] ?? "";
+
+  // Trim internal part and encode only internal spaces
+  const middle = query.trim().replace(/ /g, "%20");
+
+  return `${leading}${middle}${trailing}`;
+}
+
 export async function POST(request: Request) {
   logInfo("Received POST request for chat.");
 
@@ -196,11 +207,10 @@ export async function POST(request: Request) {
                         .length(3)
                         .describe("search query variations"),
                     }),
-                    system: `You are a subgraph name generator.
-
-Given a user question, return 3 short search queries (1-3 words each) that match likely subgraph names or protocol names.
-
-The results will be used to search on The Graph's explorer for the most relevant subgraphs. Keep names crisp and specific to the protocol, project, or tool mentioned in the user query.
+                    system: `You are a protocol name finder. 
+                    find the  protocol or chain name from the user query , and make 3 variations of it , based on version, chains, etc. 
+                    do not add any metrics or other details.
+                    only include the protocol name and chain name and version in the search query.
 .
 
                   For example if user query is "What are the top 10 Uniswap v3 pools on Base by volume?"
@@ -226,7 +236,12 @@ The results will be used to search on The Graph's explorer for the most relevant
                 ) {
                   const searchQuery = search_query_array[i];
                   console.log("search query : ", searchQuery);
-                  const searchQueryUrl = `https://thegraph.com/explorer/api/subgraphs/search?orderBy=Query+Count&orderDirection=desc&search=${searchQuery}&page=1;`;
+                  //remove spaces from the start and end of the query
+                  const trimmedQuery = searchQuery.trim();
+                  // Encode spaces in the middle of the query
+                  const encodedQuery = encodeInternalSpacesOnly(trimmedQuery);
+                  const searchQueryUrl = `https://thegraph.com/explorer/api/subgraphs/search?orderBy=Query+Count&orderDirection=desc&search=${encodedQuery}&page=1`;
+
                   console.log("search query names : ", searchQueryUrl);
 
                   const queryResponse = await fetch(searchQueryUrl);
@@ -261,14 +276,13 @@ The results will be used to search on The Graph's explorer for the most relevant
                 if (subGraphsData.length == 0) {
                   return "No subgraph found for the given query, please try again";
                 }
-                // console.log("sub graph data : ", subGraphsData[0]);
+                console.log("sub graph data : ", subGraphsData);
 
                 //chose the best subgraph
                 const { object: bestSubgraphIdObj } = await generateObject({
                   model: myProvider.languageModel("chat-model-small"),
                   schema: z.object({
                     bestSubgraphId: z.string().describe("best subgraph id"),
-                    displayName: z.string().describe("display name"),
                   }),
                   system: `You are a subgraph evaluator.
 
@@ -277,19 +291,24 @@ Select the best subgraph from the list below based on:
 - Its query volume (higher is better)
 - Network relevance
 
-Return the best subgraph ID and its displayName.
+Return the best subgraph ID 
 .`,
                   prompt: `User query: ${userQuery}
                   Subgraph data: ${JSON.stringify(subGraphsData)}
                   `,
                 });
-                // const bestSubgraphId = bestSubgraphIdObj.bestSubgraphId;
-                const bestSubgraphId =
-                  "GENunSHWLBXm59mBSgPzQ8metBEp9YDfdqwFr91Av1UM";
-                console.log(
-                  "best subgraph id : ",
-                  bestSubgraphIdObj.displayName
+                const bestSubgraphId = bestSubgraphIdObj.bestSubgraphId;
+                console.log("best subgraph id : ", bestSubgraphId);
+                const bestSubgraph = subGraphsData.find(
+                  (subgraph) => subgraph.id === bestSubgraphId
                 );
+                if (!bestSubgraph) {
+                  return "No subgraph found for the given query, please try again";
+                }
+                console.log("best subgraph : ", bestSubgraph.displayName);
+                // const bestSubgraphId =
+                //   "GENunSHWLBXm59mBSgPzQ8metBEp9YDfdqwFr91Av1UM";
+
                 console.log("getting schema of  : ", bestSubgraphId);
 
                 // Chunk and embed schema if not already in Pinecone
