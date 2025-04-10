@@ -10,7 +10,7 @@ export const ensToAddress = tool({
   }),
   execute: async ({ ensName }) => {
     const address = await multichainEnsLookup(ensName);
-    logInfo(`Address reolved for ens:${ensName} is ${address}`);
+    logInfo(`Address resolved for ens:${ensName} is ${address}`);
     return { ensName: ensName, address: address };
   },
 });
