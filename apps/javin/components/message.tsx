@@ -100,6 +100,12 @@ const PurePreviewMessage = ({
               <div className="flex flex-col gap-4">
                 {message.toolInvocations.map((toolInvocation) => {
                   const { toolName, toolCallId, state, args } = toolInvocation;
+                  const updates =
+                    message?.annotations
+                      ?.filter((a: any) => a.type === "search_update")
+                      ?.map((a: any) => a.data) || [];
+
+                  // console.log("updates", updates);
 
                   if (state === "result") {
                     const { result } = toolInvocation;
@@ -201,6 +207,8 @@ const PurePreviewMessage = ({
                             Looking for you in the blockchain...
                           </p>
                         </div>
+                      ) : toolName === "onChainGraph" ? (
+                        <>searching graphs...</>
                       ) : toolName === "translateTransactions" ? (
                         <div className="text-sm">
                           <p className="flex flex-row gap-1 items-center">

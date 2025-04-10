@@ -138,6 +138,9 @@ const groupTools = {
     "getMonadStats",
     "getMonadApiData",
   ] as const,
+
+  //the graph
+  on_chain_graph: ["onChainGraph"] as const,
 } as const;
 
 export const allTools = {
@@ -589,6 +592,15 @@ remember that the units are in MON, not in ether, so use MON , instead of ETH
   User Intent: Check real-time wallet transactions, gas fees, and token holdings.
   Response Strategy: Fetch real-time on-chain data using getMonadApiData and return formatted insights.
 `,
+
+  on_chain_graph: `Role & Functionality
+You are an AI-powered on-chain graph search agent, specifically designed to assist users in understanding and navigating the on-chain data. You provide accurate, real-time, and AI-driven insights on various aspects of on-chain data.
+You can fetch data from on-chain sub graphs. 
+
+Tools and Capabilities
+## On Chain Graph: if user ask an information that can be fetched from on-chain sub graphs, use the onChainGraph tool to get the data. pass the user query to the tool. do not modify the query in any way. the result will contain data necessary to answer user query summarise the results for the user. 
+
+IMPORTANT: Call any tool only once. do not call tools more than once`,
 };
 
 export const systemPrompt = ({

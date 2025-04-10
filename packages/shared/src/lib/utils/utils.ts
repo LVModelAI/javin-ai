@@ -8,7 +8,7 @@ import type {
 } from "ai";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Globe, Network } from "lucide-react";
+import { GitGraph, Globe, Network } from "lucide-react";
 import { PortfolioData, TokenItem } from "../../types/wallet-actions-response";
 import {
   BirdeyeTokenSearchResponse,
@@ -197,7 +197,8 @@ export type SearchGroupId =
   | "flow"
   | "zeta"
   | "monad"
-  | "aptos";
+  | "aptos"
+  | "on_chain_graph";
 
 export const searchGroups = [
   {
@@ -223,6 +224,13 @@ export const searchGroups = [
   //   icon: Network,
   //   img: "/images/icon/wormhole-logo.png",
   // },
+  {
+    id: "on_chain_graph" as const,
+    name: "On Chain Graph",
+    description: "Indepth onchain analysis",
+    icon: GitGraph,
+    img: "",
+  },
 
   {
     id: "creditcoin" as const,
