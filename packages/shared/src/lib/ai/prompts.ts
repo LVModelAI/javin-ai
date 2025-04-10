@@ -28,7 +28,7 @@ import { getZetaStats } from "./tools/zeta/get-stats";
 import { getZetaApiData } from "./tools/zeta/get-zeta-api-data";
 import { defiLlama } from "@javin/shared/lib/ai/tools/defi-llama";
 import { getAptosScanApiData } from "./tools/aptos/get-aptoscan-api-data";
-import { getAptosPortfolio } from "./tools/aptos/aptos-graphql-portfolio";
+import { getAptosPortfolio } from "./tools/aptos/get-aptos-portfolio";
 import { getAptosGraphqlData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-graphql-data";
 
 export const codePrompt = ``;
@@ -120,11 +120,11 @@ const groupTools = {
     "webSearch",
     "getSiteContent",
     "getAptosStats",
-    // "getAptosApiData",
     "getAptosScanApiData",
     "aptosNames",
     "defiLlama",
-    // "getAptosPortfolio",
+    "getAptosPortfolio",
+    // "getAptosApiData",
     // "getAptosGraphqlData",
   ] as const,
   zeta: [
@@ -506,8 +506,11 @@ Stick to Aptos and blockchain related responses until asked specifically by the 
 
 ## Get aptos statistics: if user asks about the aptos statistics like Total Supply, Actively Staked, TPS, Active Nodes then use the getAptosStats tool. 
 
+# get aptos portfolio: use the getAptosPortfolio tool to get the portfolio of the address. pass the owner address to the tool. do not give additional summary of the data. just call the tool. the ui will take care of the rest.
+
 ## get Aptos on chain data: use the getAptosScanApiData tool if user asks for any onchain data related to the latest transaction block number for a given address, coin and fungible asset information for a given address, the total count of fungible assets for a given address, the total count of tokens held by an account, detailed information of tokens held by an account, or any other information related to accounts, coins, fungibles assest, nft collections, nft tokens, transactions, blocks , validators, then use this tool.  use the getAptosScanApiData tool to get all the information for answering user query. pass the user query to the tool.  the result will contain data necessary to answer user query summarise the results for the user.
 if you couldnt find any data using this tool, then use the web search tool to get the data.
+
 
 ## Aptos name service lookup: If user enters a Aptos name name, like somename.apt or  then use the aptosNames tool to get the corresponding address. use this address for further queries.
 

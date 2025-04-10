@@ -6,10 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { memo, useState } from "react";
 
 import type { Vote } from "@/lib/db/schema";
-import {
-  PencilEditIcon,
-  JavinMan,
-} from "./icons";
+import { PencilEditIcon, JavinMan } from "./icons";
 import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";
 import { PreviewAttachment } from "./preview-attachment";
@@ -22,6 +19,7 @@ import MultiSearch from "./multi-search";
 import PortfolioTable from "./birdeye/PortfolioTable";
 import TokenInfoTable from "./birdeye/TokenInfoTable";
 import { Check } from "lucide-react";
+import AptosPortfolioTable from "@/components/aptos/AptosPortfolioTable";
 
 const PurePreviewMessage = ({
   chatId,
@@ -100,14 +98,15 @@ const PurePreviewMessage = ({
               <div className="flex flex-col gap-4">
                 {message.toolInvocations.map((toolInvocation) => {
                   const { toolName, toolCallId, state, args } = toolInvocation;
+                  console.log("toolName is --", toolName);
 
                   if (state === "result") {
                     const { result } = toolInvocation;
-                    // console.log(
-                    //   toolName,
-                    //   " -- tool result ------------ ",
-                    //   result
-                    // );
+                    console.log(
+                      toolName,
+                      " -- tool result ------------ ",
+                      result
+                    );
                     return (
                       <div key={toolCallId}>
                         {toolName === "webSearch" ? (
@@ -119,6 +118,8 @@ const PurePreviewMessage = ({
                           toolName === "getEvmMultiChainWalletPortfolio" ||
                           toolName === "getTokenBalances" ? (
                           <PortfolioTable result={result} />
+                        ) : toolName === "getAptosPortfolio" ? (
+                          <AptosPortfolioTable result={result} />
                         ) : toolName === "getCreditcoinApiData" ||
                           toolName === "getVanaApiData" ||
                           toolName === "getEvmOnchainDataUsingZerion" ? (
@@ -174,7 +175,8 @@ const PurePreviewMessage = ({
                           <MultiSearch result={null} args={args} />
                         </div>
                       ) : toolName === "getSolanaChainWalletPortfolio" ||
-                        toolName === "getEvmMultiChainWalletPortfolio" ? (
+                        toolName === "getEvmMultiChainWalletPortfolio" ||
+                        toolName === "getAptosPortfolio" ? (
                         <div className="text-sm">
                           <p className="py-1">Fetching portfolio...</p>
                         </div>
