@@ -70,6 +70,13 @@ type SubgraphInfo = {
   queryVolume: number;
 };
 import * as Sentry from "@sentry/nextjs";
+import {
+  chunkSchemaFromIntrospection,
+  embedAndStoreChunks,
+  queryRelevantSchemaChunksWithBoosting,
+  schemaExists,
+} from "@/lib/pinecone";
+import { getIntrospectionQuery } from "graphql";
 
 export async function POST(request: Request) {
   logInfo("Received POST request for chat.");
@@ -179,110 +186,260 @@ export async function POST(request: Request) {
                 // Send initial status update (without steps count and extra details)
                 console.log("onChainGraph: initialised");
 
-                const aiResponse = await generateText({
+                // create 3 variations of the search query
+                const { object: search_query_array_obj } = await generateObject(
+                  {
+                    model: myProvider.languageModel("chat-model-small"),
+                    schema: z.object({
+                      search_query_array: z
+                        .array(z.string())
+                        .length(3)
+                        .describe("search query variations"),
+                    }),
+                    system: `You are a subgraph name generator.
+
+Given a user question, return 3 short search queries (1-3 words each) that match likely subgraph names or protocol names.
+
+The results will be used to search on The Graph's explorer for the most relevant subgraphs. Keep names crisp and specific to the protocol, project, or tool mentioned in the user query.
+.
+
+                  For example if user query is "What are the top 10 Uniswap v3 pools on Base by volume?"
+                  The search queries could be:
+                  1. "Uniswap v3 Base "
+                  2. "Uniswap v3  "
+                  3. "Uniswap "`,
+                    prompt: `Create 3 variations of the search query for the following user query.
+                  User query: ${userQuery}`,
+                  }
+                );
+                const search_query_array =
+                  search_query_array_obj.search_query_array;
+                console.log("search query : ", search_query_array);
+
+                let subGraphsData: any[] = [];
+
+                // search for subgraphs using the search query untill we find data
+                let i = 0;
+                while (
+                  subGraphsData.length == 0 &&
+                  i < search_query_array.length
+                ) {
+                  const searchQuery = search_query_array[i];
+                  console.log("search query : ", searchQuery);
+                  const searchQueryUrl = `https://thegraph.com/explorer/api/subgraphs/search?orderBy=Query+Count&orderDirection=desc&search=${searchQuery}&page=1;`;
+                  console.log("search query names : ", searchQueryUrl);
+
+                  const queryResponse = await fetch(searchQueryUrl);
+                  const data: SubgraphResponseInfo = await queryResponse.json();
+                  // console.log("sub graph data : ", data);
+
+                  if (data.subgraphs.length == 0) {
+                    console.log("no sub graph found");
+                    i++;
+                    continue;
+                  }
+
+                  // only take top 10 subgraphs
+                  subGraphsData = data.subgraphs
+                    .slice(0, 10)
+                    .map((subgraph) => {
+                      return {
+                        id: subgraph.id,
+                        displayName: subgraph.metadata.displayName,
+                        description: subgraph.metadata.description,
+                        catagories: subgraph.metadata.categories,
+                        network:
+                          subgraph.currentVersion.subgraphDeployment.manifest
+                            .network,
+                        queryVolume: subgraph.queryVolume,
+                        createdAt: subgraph.createdAt,
+                        updatedAt: subgraph.updatedAt,
+                      };
+                    });
+                }
+
+                if (subGraphsData.length == 0) {
+                  return "No subgraph found for the given query, please try again";
+                }
+                // console.log("sub graph data : ", subGraphsData[0]);
+
+                //chose the best subgraph
+                const { object: bestSubgraphIdObj } = await generateObject({
                   model: myProvider.languageModel("chat-model-small"),
-                  maxRetries: 3,
-                  prompt: `user query : ${userQuery}`,
-                  system: `You are a helpful assistant that helps to find data to answer user query using sub graphs.
+                  schema: z.object({
+                    bestSubgraphId: z.string().describe("best subgraph id"),
+                    displayName: z.string().describe("display name"),
+                  }),
+                  system: `You are a subgraph evaluator.
 
-                  The flow to find data and answer user query is as follows:
-                  1. first try to find the top 10 most relevant sub graphs by using the getRelevantSubgraphsInfo tool. based on the user query, form a search query, and pass it to the getRelevantSubgraphsInfo tool. for example if the user query is : What are the top 10 Uniswap v3 pools on Base by volume?, then the searh query should be : uniswap v3 base. it returns the info of the top 10 most relevant subgraphs by name. if the tool did not return and subgraph info, try a different search query. you can try for 3 times. if the tool did not return any sub graph info after 3 tries then return no graphs found and ask user to give more details about the query. 
-                  
-                  2. using the info of the subgraphs, choose only one sub graph that is most relevant to the user query. if there are multiple sub graphs that are relevant, then choose the one that has the most query volume. if there are multiple sub graphs that have the same query volume, then choose the one that was created most recently. if there are multiple sub graphs that were created most recently, then choose the one that has the most recent updatedAt date. if there are multiple sub graphs that have the same updatedAt date, then choose the one that has the most recent createdAt date.
+Select the best subgraph from the list below based on:
+- How well it matches the user question
+- Its query volume (higher is better)
+- Network relevance
 
-                
+Return the best subgraph ID and its displayName.
+.`,
+                  prompt: `User query: ${userQuery}
+                  Subgraph data: ${JSON.stringify(subGraphsData)}
                   `,
-                  tools: {
-                    getRelevantSubgraphsInfo: tool({
-                      description:
-                        "get relevant sub graph information by search query.",
-                      parameters: z.object({
-                        search_query: z.string().describe("search query."),
-                      }),
-                      execute: async ({ search_query }) => {
-                        console.log("search query : ", search_query);
-                        const queryUrl = `https://thegraph.com/explorer/api/subgraphs/search?orderBy=Query+Count&orderDirection=desc&search=${search_query}&page=1`;
-                        console.log("query url : ", queryUrl);
-
-                        const response = await fetch(queryUrl);
-                        const data: SubgraphResponseInfo =
-                          await response.json();
-                        // console.log("sub graph data : ", data);
-
-                        if (data.subgraphs.length === 0) {
-                          return "no graphs found";
-                        }
-                        // only take top 10 subgraphs
-                        const subGraphsData = data.subgraphs
-                          .slice(0, 10)
-                          .map((subgraph) => {
-                            return {
-                              id: subgraph.id,
-                              displayName: subgraph.metadata.displayName,
-                              description: subgraph.metadata.description,
-                              catagories: subgraph.metadata.categories,
-                              network:
-                                subgraph.currentVersion.subgraphDeployment
-                                  .manifest.network,
-                              queryVolume: subgraph.queryVolume,
-                              createdAt: subgraph.createdAt,
-                              updatedAt: subgraph.updatedAt,
-                            };
-                          });
-                        console.log("sub graph data : ", subGraphsData[0]);
-
-                        return subGraphsData;
-                      },
-                    }),
-
-                    getSubgraphSchema: tool({
-                      description: "get sub graph schema by sub graph id.",
-                      parameters: z.object({
-                        subgraphId: z.string().describe("sub graph id."),
-                      }),
-                      execute: async ({ subgraphId }) => {
-                        console.log("getting schema of  : ", subgraphId);
-                        const apiKey = process.env.THE_GRAPH_API_KEY;
-                        if (!apiKey) {
-                          return "API key is not defined";
-                        }
-
-                        const queryUrl = `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${subgraphId}`;
-
-                        const body = {
-                          query:
-                            "{ __schema { types { name fields { name type { name kind } } } } }",
-                        };
-                        const headers = {
-                          "Content-Type": "application/json",
-                        };
-                        const response = await fetch(queryUrl, {
-                          method: "POST",
-                          headers,
-                          body: JSON.stringify(body),
-                        });
-                        if (!response.ok) {
-                          console.error(
-                            "Error fetching subgraph schema:",
-                            response.statusText
-                          );
-                          return "Error fetching subgraph schema";
-                        }
-                        const data = await response.json();
-
-                        //only log first 100 chracters of the response
-                        console.log(
-                          "sub graph schema data : ",
-                          JSON.stringify(data).slice(0, 100)
-                        );
-                        return "scmema data fetched, but query funtion wil coming soon";
-                      },
-                    }),
-                  },
-                  maxSteps: 5,
                 });
-                console.log("ai response : ", aiResponse.text);
-                return aiResponse.text;
+                // const bestSubgraphId = bestSubgraphIdObj.bestSubgraphId;
+                const bestSubgraphId =
+                  "GENunSHWLBXm59mBSgPzQ8metBEp9YDfdqwFr91Av1UM";
+                console.log(
+                  "best subgraph id : ",
+                  bestSubgraphIdObj.displayName
+                );
+                console.log("getting schema of  : ", bestSubgraphId);
+
+                // Chunk and embed schema if not already in Pinecone
+                const alreadyExists = await schemaExists(bestSubgraphId);
+                if (!alreadyExists) {
+                  //get schema from sub graph
+                  const apiKey = process.env.THE_GRAPH_API_KEY;
+                  if (!apiKey) {
+                    return "API key is not defined";
+                  }
+
+                  const queryUrl = `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${bestSubgraphId}`;
+                  console.log("schema query url : ", queryUrl);
+
+                  const body = {
+                    query: getIntrospectionQuery(),
+                  };
+                  const headers = {
+                    "Content-Type": "application/json",
+                  };
+                  const response = await fetch(queryUrl, {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify(body),
+                  });
+                  if (!response.ok) {
+                    console.error(
+                      "Error fetching subgraph schema:",
+                      response.statusText
+                    );
+                    return "Error fetching subgraph schema";
+                  }
+                  const schemaJson = await response.json();
+                  if (!schemaJson || schemaJson.errors) {
+                    console.error("Introspection error:", schemaJson.errors);
+                    throw new Error(
+                      "Invalid introspection result. GraphQL returned errors."
+                    );
+                    throw new Error(
+                      "Invalid introspection result. GraphQL returned errors."
+                    );
+                  }
+
+                  if (!schemaJson.data) {
+                    throw new Error(
+                      "Invalid introspection result: missing data property."
+                    );
+                  }
+
+                  // Chunk and embed the schema
+                  const chunks = await chunkSchemaFromIntrospection(
+                    schemaJson.data
+                  );
+                  await embedAndStoreChunks(bestSubgraphId, chunks);
+                  console.log("Stored schema chunks in Pinecone.");
+                } else {
+                  console.log("Schema chunks already exist in Pinecone.");
+                }
+
+                // Step 4: Query Pinecone for relevant schema chunks
+                const relevantSchema =
+                  await queryRelevantSchemaChunksWithBoosting(
+                    bestSubgraphId,
+                    userQuery
+                  );
+                // console.log(
+                //   "Relevant schema chunks from Pinecone:",
+                //   relevantSchema
+                // );
+
+                // Step 5: Generate GraphQL query using the relevant schema
+                const { object: queryObj } = await generateObject({
+                  model: myProvider.languageModel("chat-model-small"),
+                  schema: z.object({
+                    query: z.string().describe("graphql query"),
+                  }),
+                  system: `You are a GraphQL expert agent.
+
+Using the schema and examples provided, generate a **valid GraphQL query** that answers the user query. Use the schema types, field names, and arguments. Make sure the query includes filters, ordering, and pagination if relevant.
+
+DO NOT hallucinate fields that don't exist in the schema.
+
+Format the output as a valid GraphQL query string.
+.`,
+                  prompt: ` Relevant schema chunks:
+${relevantSchema}
+
+Examples:
+
+User: What are the top 10 pools by volume?
+Query:
+{
+  pools(first: 10, orderBy: volumeUSD, orderDirection: desc) {
+    id
+    token0 { symbol }
+    token1 { symbol }
+    volumeUSD
+  }
+}
+
+User: What is the highest TVL on Aerodrome?
+Query:
+{
+  pools(first: 5, orderBy: totalValueLockedUSD, orderDirection: desc) {
+    id
+    token0 { symbol }
+    token1 { symbol }
+    totalValueLockedUSD
+  }
+}
+
+Now generate a GraphQL query for:
+User: ${userQuery}
+`,
+                });
+                const query = queryObj.query;
+                console.log("graphql query make by agent: ", query);
+                // Step 6: Fetch data from the subgraph using the generated GraphQL query
+
+                console.log("getting data of  : ", bestSubgraphId);
+                const apiKey = process.env.THE_GRAPH_API_KEY;
+                if (!apiKey) {
+                  return "API key is not defined";
+                }
+
+                const queryUrl = `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${bestSubgraphId}`;
+                console.log("data query url : ", queryUrl);
+                // console.log("graphql query : ", query);
+                const body = {
+                  query: query,
+                };
+                const headers = {
+                  "Content-Type": "application/json",
+                };
+                const response = await fetch(queryUrl, {
+                  method: "POST",
+                  headers,
+                  body: JSON.stringify(body),
+                });
+                if (!response.ok) {
+                  console.error(
+                    "Error fetching subgraph data:",
+                    response.statusText
+                  );
+                  return "Error fetching subgraph data";
+                }
+                const dataJson = await response.json();
+                // console.log("data json : ", dataJson);
+
+                return dataJson;
               } catch (error) {
                 console.error("Error in onChainGraph:", error);
                 return error; // Re-throw to allow handling by the caller

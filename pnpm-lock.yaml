@@ -53,6 +53,9 @@ importers:
       '@mendable/firecrawl-js':
         specifier: ^1.17.0
         version: 1.17.0(ws@8.18.1)
+      '@pinecone-database/pinecone':
+        specifier: ^5.1.1
+        version: 5.1.1
       '@radix-ui/react-accordion':
         specifier: ^1.2.0
         version: 1.2.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@19.0.0-rc-45804af1-20241021)(react@19.0.0-rc-45804af1-20241021)
@@ -146,6 +149,9 @@ importers:
       googleapis:
         specifier: ^148.0.0
         version: 148.0.0
+      graphql:
+        specifier: ^16.10.0
+        version: 16.10.0
       lucide-react:
         specifier: ^0.446.0
         version: 0.446.0(react@19.0.0-rc-45804af1-20241021)
@@ -3478,6 +3484,11 @@ packages:
 
   /@paulmillr/qr@0.2.1:
     resolution: {integrity: sha512-IHnV6A+zxU7XwmKFinmYjUcwlyK9+xkG3/s9KcQhI9BjQKycrJ1JRO+FbNYPwZiPKW3je/DR0k7w8/gLa5eaxQ==}
+    dev: false
+
+  /@pinecone-database/pinecone@5.1.1:
+    resolution: {integrity: sha512-2JwnY28qb2AQi3fLlBfiXhV6e4ZEF0/0HNLdoFWoSPcty6Eu7+354M8mo/Hj0Hi7y3TCDkSCXq2dgmbcDSmCFQ==}
+    engines: {node: '>=18.0.0'}
     dev: false
 
   /@pkgjs/parseargs@0.11.0:
