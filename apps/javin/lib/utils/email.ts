@@ -1,10 +1,10 @@
 import nodemailer from "nodemailer";
-import { google } from "googleapis";
+import { OAuth2Client } from "google-auth-library";
 
-const oAuth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.EMAIL_REDIRECT_URI
+const oAuth2Client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID!,
+  process.env.GOOGLE_CLIENT_SECRET!,
+  process.env.EMAIL_REDIRECT_URI!
 );
 
 oAuth2Client.setCredentials({
