@@ -1,6 +1,7 @@
-import { multichainEnsLookup } from "../../utils/multichain-ens-lookup"
+import { multichainEnsLookup } from "../../utils/multichain-ens-lookup";
 import { tool } from "ai";
 import { z } from "zod";
+import { logInfo } from "../../utils/logging";
 
 export const ensToAddress = tool({
   description: "Get the address corresponding to ENS",
@@ -9,7 +10,7 @@ export const ensToAddress = tool({
   }),
   execute: async ({ ensName }) => {
     const address = await multichainEnsLookup(ensName);
-    console.log("address for ens is --- ", address);
-    return address;
+    logInfo(`Address reolved for ens:${ensName} is ${address}`);
+    return { ensName: ensName, address: address };
   },
 });
