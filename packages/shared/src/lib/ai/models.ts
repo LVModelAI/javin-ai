@@ -20,7 +20,8 @@ export const myProvider: any = customProvider({
     "title-model": openai("gpt-4-turbo"),
     "block-model": openai("gpt-4o-mini"),
     // @ts-ignore due to version type mismatch between @ai-sdk/provider package (v1.0.9 and v1.0.7)
-    "grok-llama-4": groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+    // "groq-llama-4": groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+    "groq-llama-4": groq("meta-llama/llama-4-maverick-17b-128e-instruct"),
   },
   imageModels: {
     "small-model": openai.image("dall-e-2"),
@@ -51,8 +52,8 @@ export const chatModels: Array<ChatModel> = [
   //   description: 'Uses advanced reasoning',
   // },
   {
-    id: "grok-llama-4",
-    name: "Grok Llama 4",
+    id: "groq-llama-4",
+    name: "Groq Llama 4",
     description: "Llama 4 scout model for advanced reasoning",
   },
 ];
