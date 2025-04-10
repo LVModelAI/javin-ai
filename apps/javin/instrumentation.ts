@@ -1,13 +1,7 @@
-import * as Sentry from '@sentry/nextjs';
-
+// instrumentation.ts
+// Empty or super minimal for edge runtime
 export async function register() {
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
-    await import('./sentry.server.config');
-  }
-
-  if (process.env.NEXT_RUNTIME === 'edge') {
-    await import('./sentry.edge.config');
-  }
+  // Edge-safe register, or just no-op
 }
 
-export const onRequestError = Sentry.captureRequestError;
+export const onRequestError = () => {};
