@@ -14,6 +14,9 @@ importers:
 
   apps/javin:
     dependencies:
+      '@ai-sdk/openai':
+        specifier: 1.1.9
+        version: 1.1.9(zod@3.24.2)
       '@codemirror/lang-python':
         specifier: ^6.1.7
         version: 6.1.7
@@ -29,6 +32,9 @@ importers:
       '@javin/shared':
         specifier: workspace:^
         version: link:../../packages/shared
+      '@pinecone-database/pinecone':
+        specifier: ^5.1.1
+        version: 5.1.1
       '@radix-ui/react-accordion':
         specifier: ^1.2.4
         version: 1.2.4(@types/react-dom@18.3.6)(@types/react@18.3.20)(react-dom@18.3.1)(react@18.3.1)
@@ -104,6 +110,9 @@ importers:
       google-auth-library:
         specifier: ^9.15.1
         version: 9.15.1
+      graphql:
+        specifier: ^16.10.0
+        version: 16.10.0
       lucide-react:
         specifier: ^0.446.0
         version: 0.446.0(react@18.3.1)
@@ -404,7 +413,7 @@ packages:
         optional: true
     dependencies:
       '@ai-sdk/provider': 1.0.9
-      eventsource-parser: 3.0.0
+      eventsource-parser: 3.0.1
       nanoid: 3.3.11
       secure-json-parse: 2.7.0
       zod: 3.24.2
@@ -2556,6 +2565,11 @@ packages:
 
   /@panva/hkdf@1.2.1:
     resolution: {integrity: sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw==}
+    dev: false
+
+  /@pinecone-database/pinecone@5.1.1:
+    resolution: {integrity: sha512-2JwnY28qb2AQi3fLlBfiXhV6e4ZEF0/0HNLdoFWoSPcty6Eu7+354M8mo/Hj0Hi7y3TCDkSCXq2dgmbcDSmCFQ==}
+    engines: {node: '>=18.0.0'}
     dev: false
 
   /@pkgjs/parseargs@0.11.0:
@@ -6081,11 +6095,6 @@ packages:
   /events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
-    dev: false
-
-  /eventsource-parser@3.0.0:
-    resolution: {integrity: sha512-T1C0XCUimhxVQzW4zFipdx0SficT651NnkR0ZSH3yQwh+mFMdLfgjABVi4YtMTtaL4s168593DaoaRLMqryavA==}
-    engines: {node: '>=18.0.0'}
     dev: false
 
   /eventsource-parser@3.0.1:
