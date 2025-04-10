@@ -18,14 +18,14 @@ async function fetchGraphQL(query: string, variables: Record<string, any>) {
 
     return json.data;
   } catch (error) {
-    console.error(`Error fetching data: ${error}`);
+    console.error(`Error fetching using graph data: ${error}`);
     throw error;
   }
 }
 
 // 1️⃣ Get Transaction Block Number
 export async function getPortfolio(address: string, limit = 25, offset = 0) {
-  console.log("Fetching portfolio for address:", address);
+  console.log("Fetching using graph portfolio for address:", address);
   const ownedTokens = await getOwnedTokens(address, limit, offset);
   const ownedCoins = await getOwnedCoinsData(address, limit, offset);
   return {
@@ -40,7 +40,7 @@ export async function getAccountTransactionsData(
   limit = 25,
   offset = 0
 ) {
-  console.log("Fetching transactions for address:", address);
+  console.log("Fetching using graph transactions for address:", address);
   const query = `
     query AccountTransactionsData($address: String, $limit: Int, $offset: Int) {
       account_transactions(
@@ -63,7 +63,7 @@ export async function getOwnedCoinsData(
   limit = 100,
   offset = 0
 ) {
-  console.log("Fetching coins data for address:", ownerAddress);
+  console.log("Fetching using graph coins data for address:", ownerAddress);
   const query = `
     query CoinsData($owner_address: String, $limit: Int, $offset: Int) {
       current_fungible_asset_balances(
@@ -87,7 +87,7 @@ export async function getOwnedCoinsData(
     limit,
     offset,
   });
-  console.log("Coins data:", data);
+  // console.log("Coins data:", data);
   /* "data": {
     "current_fungible_asset_balances": [
       {
@@ -110,13 +110,16 @@ export async function getOwnedCoinsData(
       amount: amount / Math.pow(10, decimals),
     };
   });
-  console.log("Coins data:", coinsData);
+  // console.log("Coins data:", coinsData);
   return coinsData;
 }
 
 // 3️⃣ Get Count of Fungible Assets
 export async function getFungibleAssetCount(address: string) {
-  console.log("Fetching fungible asset count for address:", address);
+  console.log(
+    "Fetching using graph fungible asset count for address:",
+    address
+  );
   const query = `
     query GetFungibleAssetCount($address: String) {
       current_fungible_asset_balances_aggregate(
@@ -133,7 +136,7 @@ export async function getFungibleAssetCount(address: string) {
 
 // 4️⃣ Get Count of Tokens Held
 export async function getAccountTokensCount(address: string) {
-  console.log("Fetching token count for address:", address);
+  console.log("Fetching using graph token count for address:", address);
   const query = `
     query getAccountTokensCount($where_condition: current_token_ownerships_v2_bool_exp) {
       current_token_ownerships_v2_aggregate(
@@ -154,7 +157,7 @@ export async function getAccountTokensCount(address: string) {
 
 // 5️⃣ Get Detailed Information of Tokens Held
 export async function getOwnedTokens(address: string, limit = 20, offset = 0) {
-  console.log("Fetching owned tokens for address:", address);
+  console.log("Fetching using graph owned tokens for address:", address);
   const query = `
     query getOwnedTokens($where_condition: current_token_ownerships_v2_bool_exp!, $offset: Int, $limit: Int) {
       current_token_ownerships_v2(
@@ -187,7 +190,10 @@ export async function getOwnedTokens(address: string, limit = 20, offset = 0) {
 
 // 6️⃣ Get Token Data
 export async function getTokenData(tokenDataId: string) {
-  console.log("Fetching token data for token address:", tokenDataId);
+  console.log(
+    "Fetching using graph token data for token address:",
+    tokenDataId
+  );
   const query = `
     query getTokenData($where_condition: current_token_datas_v2_bool_exp) {
       current_token_datas_v2(
@@ -211,7 +217,7 @@ export async function getTokenActivity(
   limit = 20,
   offset = 0
 ) {
-  console.log("Fetching token activity for token ID:", tokenDataId);
+  console.log("Fetching using graph token activity for token ID:", tokenDataId);
   const query = `
     query getTokenActivity($where_condition: token_activities_v2_bool_exp!) {
       token_activities_v2(
@@ -238,7 +244,7 @@ export async function getTokenActivity(
 // 8️⃣ Get Transaction Balance Change
 export async function getTransactionBalanceChange(txnVersion: string) {
   console.log(
-    "Fetching transaction balance change for txn version:",
+    "Fetching using graph transaction balance change for txn version:",
     txnVersion
   );
   const query = `
