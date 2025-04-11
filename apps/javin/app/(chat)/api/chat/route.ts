@@ -184,24 +184,6 @@ export async function POST(request: Request) {
             logInfo("Step finished.");
             logObjects("Step Event:", event);
           },
-          // TODO SUPPORT STREAMING OF TOOL RESULT
-          // onStepFinish(event) {
-          //   console.log("onStepFinish");
-          //   console.log("toolCalls ", event.toolCalls);
-          //   console.log("toolResults ", event.toolResults);
-          //   const chunkData = {
-          //     id: generateUUID(),
-          //     role: "assistant",
-          //     toolInvocations: event.toolCalls.map((call, idx) => ({
-          //       toolName: call.toolName,
-          //       toolCallId: call.toolCallId,
-          //       state: "result",
-          //       args: call.args,
-          //       result: event.toolResults[idx] || null,
-          //     })),
-          //   };
-          //   dataStream.write(`0:${JSON.stringify(chunkData)}\n`);
-          // },
         });
 
         // Set up the system prompt and user message for summarization.
