@@ -10,7 +10,7 @@ import {
   getTokenData,
   getTokenActivity,
   getTransactionBalanceChange,
-} from "./aptosGraphqlFunctions"; // Import the functions you built earlier
+} from "../../../utils/aptosGraphqlFunctions"; // Import the functions you built earlier
 
 // Utility to call respective functions
 export const getAptosGraphqlData = tool({

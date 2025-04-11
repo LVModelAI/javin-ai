@@ -41,8 +41,8 @@ export async function POST(request: Request) {
     group: any;
   } = await request.json();
 
-  logObjects("Request data:", { id, messages, selectedChatModel, group }, true);
-  logObjects("Search group:", group, true);
+  // logObjects("Request data:", { id, messages, selectedChatModel, group });
+  logObjects("Search group:", group);
 
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
@@ -102,6 +102,14 @@ export async function POST(request: Request) {
   return createDataStreamResponse({
     execute: async (dataStream) => {
       logInfo("Starting text stream execution.");
+      if (selectedChatModel === "chat-model-reasoning") {
+        logInfo(
+          "Selected model is 'chat-model-reasoning'; no active tools will be used."
+        );
+      } else {
+        logObjects("Active tools being used:", activeTools);
+      }
+      
       if (selectedChatModel !== "sentient-dobby-unhinged") {
         // NORMAL FLOW
         const result = streamText({

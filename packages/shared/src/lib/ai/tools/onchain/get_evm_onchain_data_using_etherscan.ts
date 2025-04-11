@@ -18,7 +18,10 @@ export const getEvmOnchainDataUsingEtherscan = tool({
   execute: async ({ userQuery }: { userQuery?: string }) => {
     console.log("using etherscan ...");
     try {
-      console.log("User query:", userQuery);
+      console.log(
+        "User query for getEvmOnchainDataUsingEtherscan :",
+        userQuery
+      );
       const apiKey = process.env.ETHERSCAN_API_KEY;
       if (!apiKey) {
         throw new Error("Etherscan API key not found");
