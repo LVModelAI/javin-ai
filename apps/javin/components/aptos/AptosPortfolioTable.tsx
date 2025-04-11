@@ -56,8 +56,64 @@ const AptosPortfolioTable: React.FC<AptosPortfolioTableProps> = ({
 
   return (
     <>
+      {/* Coins Outer Table */}
+      <div className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-white  rounded-lg w-full max-w-lg  ">
+        {/* Header for Coins */}
+        <div className="flex flex-col p-4 border-b border-neutral-200 dark:border-neutral-700">
+          <div className="flex flex-row gap-1 justify-between items-center">
+            <h2 className="text-lg font-semibold">Owned Coins</h2>
+            {coins.length > 0 && (
+              <div>
+                <span className="text-xl font-bold">{coins.length}</span>
+                <span className="text-sm ml-1">coins</span>
+              </div>
+            )}
+          </div>
+        </div>
+        {/* Coins Table Content */}
+        <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar mt-2">
+          {coins.length === 0 ? (
+            <div className="text-gray-600 dark:text-gray-400">
+              No coins available.
+            </div>
+          ) : (
+            <table className="w-full table-auto border-collapse">
+              <thead>
+                <tr className="bg-neutral-200 dark:bg-neutral-700">
+                  <th className="border px-2 py-2 text-sm">Name</th>
+                  <th className="border px-2 py-2 text-sm">Symbol</th>
+                  <th className="border px-2 py-2 text-sm">Amt</th>
+                  <th className="border px-2 py-2 text-sm">Std.</th>
+                </tr>
+              </thead>
+              <tbody>
+                {coins.map((coin, idx) => (
+                  <tr key={idx} className="border-b">
+                    <td className="border px-2 py-2 text-sm">
+                      {coin.metadata.name}
+                    </td>
+                    <td className="border px-2 py-2 text-sm">
+                      {coin.metadata.symbol}
+                    </td>
+                    <td className="border px-2 py-2 text-sm">
+                      {coin.amount.toLocaleString(undefined, {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: coin.metadata.decimals,
+                      })}
+                    </td>
+                    <td className="border px-2 py-2 text-sm">
+                      {coin.metadata.token_standard}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+
       {/* Tokens Outer Table */}
-      <div className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-white  rounded-lg w-full max-w-lg mt-2 ">
+      <div className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-white  rounded-lg w-full max-w-lg mt-5">
         {/* Header for Tokens */}
         <div className="flex flex-col p-4 border-b border-neutral-200 dark:border-neutral-700">
           <div className="flex flex-row gap-1 justify-between items-center">
@@ -109,62 +165,6 @@ const AptosPortfolioTable: React.FC<AptosPortfolioTableProps> = ({
                       >
                         View
                       </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
-
-      {/* Coins Outer Table */}
-      <div className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-white  rounded-lg w-full max-w-lg mt-4 ">
-        {/* Header for Coins */}
-        <div className="flex flex-col p-4 border-b border-neutral-200 dark:border-neutral-700">
-          <div className="flex flex-row gap-1 justify-between items-center">
-            <h2 className="text-lg font-semibold">Owned Coins</h2>
-            {coins.length > 0 && (
-              <div>
-                <span className="text-xl font-bold">{coins.length}</span>
-                <span className="text-sm ml-1">coins</span>
-              </div>
-            )}
-          </div>
-        </div>
-        {/* Coins Table Content */}
-        <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar mt-2">
-          {coins.length === 0 ? (
-            <div className="text-gray-600 dark:text-gray-400">
-              No coins available.
-            </div>
-          ) : (
-            <table className="w-full table-auto border-collapse">
-              <thead>
-                <tr className="bg-neutral-200 dark:bg-neutral-700">
-                  <th className="border px-2 py-2 text-sm">Name</th>
-                  <th className="border px-2 py-2 text-sm">Symbol</th>
-                  <th className="border px-2 py-2 text-sm">Amt</th>
-                  <th className="border px-2 py-2 text-sm">Std.</th>
-                </tr>
-              </thead>
-              <tbody>
-                {coins.map((coin, idx) => (
-                  <tr key={idx} className="border-b">
-                    <td className="border px-2 py-2 text-sm">
-                      {coin.metadata.name}
-                    </td>
-                    <td className="border px-2 py-2 text-sm">
-                      {coin.metadata.symbol}
-                    </td>
-                    <td className="border px-2 py-2 text-sm">
-                      {coin.amount.toLocaleString(undefined, {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: coin.metadata.decimals,
-                      })}
-                    </td>
-                    <td className="border px-2 py-2 text-sm">
-                      {coin.metadata.token_standard}
                     </td>
                   </tr>
                 ))}
