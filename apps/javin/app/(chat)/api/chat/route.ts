@@ -121,8 +121,8 @@ export async function POST(request: Request) {
         experimental_generateMessageId: generateUUID,
         tools: allTools,
         onStepFinish(event) {
-          // logInfo("Step finished.");
-          // logObjects("Step Event:", event);
+          logInfo("Step finished.");
+          logObjects("Step Event:", event);
         },
         onFinish: async ({ response, reasoning }) => {
           // logInfo("Stream finished. Response received from model.");
