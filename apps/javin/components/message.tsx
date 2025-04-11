@@ -20,6 +20,7 @@ import PortfolioTable from "./birdeye/PortfolioTable";
 import TokenInfoTable from "./birdeye/TokenInfoTable";
 import { Check } from "lucide-react";
 import AptosPortfolioTable from "@/components/aptos/AptosPortfolioTable";
+import ToolCallLoader from "@/components/ui/tool-call-loader";
 
 const PurePreviewMessage = ({
   chatId,
@@ -94,19 +95,13 @@ const PurePreviewMessage = ({
               />
             )}
 
-            {message.toolInvocations && message.toolInvocations.length > 0 && (
+            {message.toolInvocations && message.toolInvocations?.length > 0 && (
               <div className="flex flex-col gap-4">
                 {message.toolInvocations.map((toolInvocation) => {
                   const { toolName, toolCallId, state, args } = toolInvocation;
-                  console.log("toolName is --", toolName);
 
                   if (state === "result") {
-                    const { result } = toolInvocation;
-                    console.log(
-                      toolName,
-                      " -- tool result ------------ ",
-                      result
-                    );
+                    const result = toolInvocation.result;
                     return (
                       <div key={toolCallId}>
                         {toolName === "webSearch" ? (
@@ -123,53 +118,44 @@ const PurePreviewMessage = ({
                         ) : toolName === "getCreditcoinApiData" ||
                           toolName === "getVanaApiData" ||
                           toolName === "getEvmOnchainDataUsingZerion" ? (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Exploring the blockchain
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Exploring the blockchain"
+                            isFinished
+                          />
                         ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Exploring ethereum
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Exploring ethereum"
+                            isFinished
+                          />
                         ) : toolName === "ensToAddress" ||
                           toolName === "aptosNames" ? (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Looking for you in the blockchain
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Looking for you in the blockchain"
+                            isFinished
+                          />
                         ) : toolName === "translateTransactions" ? (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Summarizing transactions
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Summarizing transactions"
+                            isFinished
+                          />
+                        ) : toolName === "getSiteContent" ? (
+                          <ToolCallLoader
+                            loadingMessage="Exploring the protocol"
+                            isFinished
+                          />
                         ) : (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Finding info
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Finding info"
+                            isFinished
+                          />
                         )}
                       </div>
                     );
                   }
-                  // else when tool is loading
+
+                  // tool is still loading
                   return (
-                    <div
-                      key={toolCallId}
-                      className={cx({
-                        skeleton: ["getWeather"].includes(toolName),
-                      })}
-                    >
+                    <div key={toolCallId}>
                       {toolName === "webSearch" ? (
                         <div className="mt-4">
                           <MultiSearch result={null} args={args} />
@@ -177,40 +163,26 @@ const PurePreviewMessage = ({
                       ) : toolName === "getSolanaChainWalletPortfolio" ||
                         toolName === "getEvmMultiChainWalletPortfolio" ||
                         toolName === "getAptosPortfolio" ? (
-                        <div className="text-sm">
-                          <p className="py-1">Fetching portfolio...</p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Fetching portfolio..." />
                       ) : toolName === "getCreditcoinApiData" ||
                         toolName === "getVanaApiData" ||
                         toolName === "getEvmOnchainDataUsingZerion" ? (
-                        <div className="text-sm">
-                          <p className="py-1">Exploring the blockchain...</p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Exploring the blockchain..." />
                       ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
-                        <div className="text-sm">
-                          <p className="py-1">Exploring ethereum...</p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Exploring ethereum..." />
                       ) : toolName === "creditCoinApiFetch" ||
                         toolName === "vanaApiFetch" ||
                         toolName === "onChainQuery" ? (
-                        <div className="text-sm">
-                          <p className="py-1">Fetching data...</p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Fetching data..." />
                       ) : toolName === "ensToAddress" ||
                         toolName === "aptosNames" ? (
-                        <div className="text-sm">
-                          <p className="py-1">
-                            Looking for you in the blockchain...
-                          </p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Looking for you in the blockchain..." />
                       ) : toolName === "translateTransactions" ? (
-                        <div className="text-sm">
-                          <p className="flex flex-row gap-1 items-center">
-                            Summarizing transactions...
-                          </p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Summarizing transactions..." />
+                      ) : toolName === "getSiteContent" ? (
+                        <ToolCallLoader loadingMessage="Exploring the protocol..." />
                       ) : (
-                        <div className="text-sm">Finding info...</div>
+                        <ToolCallLoader loadingMessage="Finding info..." />
                       )}
                     </div>
                   );
