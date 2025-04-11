@@ -1,6 +1,6 @@
 import { generateObject, generateText, tool } from "ai";
 import { z } from "zod";
-import { myProvider } from "../../models";
+import { myProvider } from "@javin/shared/lib/ai/models";
 import {
   getAllPaths,
   getAllPathsAndDesc,
@@ -8,8 +8,8 @@ import {
   getPathInfo,
   loadOpenAPI,
   loadOpenAPIFromJson,
-} from "../../../utils/openapi";
-import aptosOpenapiJson from "./aptosscan-openapi.json";
+} from "@javin/shared/lib/utils/openapi";
+import aptosOpenapiJson from "@javin/shared/lib/utils/aptosscan-openapi.json";
 import {
   getAccountTransactionsData,
   getOwnedCoinsData,
@@ -20,7 +20,7 @@ import {
   getTokenActivity,
   getTransactionBalanceChange,
   getPortfolio,
-} from "./aptosGraphqlFunctions"; // Import the functions you built earlier
+} from "@javin/shared/lib/utils/aptosGraphqlFunctions"; // Import the functions you built earlier
 
 function scaleLargeNumbers(data: any): any {
   const SCALE_FACTOR = 10n ** 8n; // 10^8 as a BigInt
@@ -114,19 +114,19 @@ export const getAptosScanApiData = tool({
               await getAccountTransactionsData(address, limit, offset),
           }),
 
-          getPortfolio: tool({
-            description: "Fetches portfolio information for a given address.",
-            parameters: z.object({
-              ownerAddress: z.string().describe("address of the account"),
-              limit: z
-                .number()
-                .optional()
-                .describe("Number of records to fetch"),
-              offset: z.number().optional().describe("Offset for pagination"),
-            }),
-            execute: async ({ ownerAddress, limit, offset }) =>
-              await getPortfolio(ownerAddress, limit, offset),
-          }),
+          // getPortfolio: tool({
+          //   description: "Fetches portfolio information for a given address.",
+          //   parameters: z.object({
+          //     ownerAddress: z.string().describe("address of the account"),
+          //     limit: z
+          //       .number()
+          //       .optional()
+          //       .describe("Number of records to fetch"),
+          //     offset: z.number().optional().describe("Offset for pagination"),
+          //   }),
+          //   execute: async ({ ownerAddress, limit, offset }) =>
+          //     await getPortfolio(ownerAddress, limit, offset),
+          // }),
 
           getOwnedCoinsData: tool({
             description:

@@ -28,7 +28,7 @@ import { getZetaStats } from "./tools/zeta/get-stats";
 import { getZetaApiData } from "./tools/zeta/get-zeta-api-data";
 import { defiLlama } from "@javin/shared/lib/ai/tools/defi-llama";
 import { getAptosScanApiData } from "./tools/aptos/get-aptoscan-api-data";
-import { getAptosPortfolio } from "./tools/aptos/aptos-graphql-portfolio";
+import { getAptosPortfolio } from "./tools/aptos/get-aptos-portfolio";
 import { getAptosGraphqlData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-graphql-data";
 
 export const codePrompt = ``;
@@ -120,11 +120,11 @@ const groupTools = {
     "webSearch",
     "getSiteContent",
     "getAptosStats",
-    // "getAptosApiData",
     "getAptosScanApiData",
     "aptosNames",
     "defiLlama",
-    // "getAptosPortfolio",
+    "getAptosPortfolio",
+    // "getAptosApiData",
     // "getAptosGraphqlData",
   ] as const,
   zeta: [
@@ -496,19 +496,24 @@ You have web search and web crawling capabilities, allowing you to fetch the lat
 Always assume information being asked is related to Aptos, if not told otherwise.
 
 # Core Capabilities & Data Sources
+
+
+## get the site content: use  getSiteContent to scrap any website. pass the url to scrape. official aptos website: https://aptosfoundation.org/
+site to get the site map of aptos: https://aptosfoundation.org/sitemap.xml
+ to get all the links in the aptos website, and then select the relevant links, that can answer user query and use this tool again to scrape those links. Can be used to for various info like aptos protocol information, collectibles, current updates, events, various ecosystem events, grants, use-cases, whitepapers, etc.
+
 ## Web Search:
 Use webSearch tool for searching the web for any information the user asks
 Pass 2-3 queries in one call.
 Specify the year or "latest" in queries to fetch recent information.
 Stick to Aptos and blockchain related responses until asked specifically by the user. you can use the scrape url tool if user asks a specific quesiton and relevant data is not found on internet.
 
-## Scrape url to get the site content: 
-Use getSiteContent to scrap any website. pass the url to scrape. Can be used to scrape the Aptos site: https://aptosfoundation.org/ for various info like upcoming events, resouces, stats, etc
-
 ## Get aptos statistics:
 If user asks about the aptos statistics like Total Supply, Actively Staked, TPS, Active Nodes then use the getAptosStats tool.
 
-## get Aptos on chain data:
+# Get aptos portfolio: use the getAptosPortfolio tool to get the portfolio of the address. pass the owner address to the tool. do not give additional summary of the data. just call the tool. the ui will take care of the rest.
+
+## Get Aptos on chain data:
 Use the getAptosScanApiData tool if user asks for any onchain data related to the latest transaction, block number for a given address, coin and fungible asset information for a given address, the total count of fungible assets for a given address, the total count of tokens held by an account, detailed information of tokens held by an account, or any other information related to accounts, coins, fungibles assets, nft collections, nft tokens, transactions, blocks , validators, then use this tool. Use the getAptosScanApiData tool to get all the information for answering user query. pass the user query to the tool. The result will contain data necessary to answer user query summarize the results for the user.
 If you couldn't find any data using this tool, then use the web search tool to get the data.
 
