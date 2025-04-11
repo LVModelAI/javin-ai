@@ -21,6 +21,7 @@ import TokenInfoTable from "./birdeye/TokenInfoTable";
 import { Check } from "lucide-react";
 import AptosPortfolioTable from "@/components/aptos/AptosPortfolioTable";
 import ToolCallLoader from "@/components/ui/tool-call-loader";
+import ReasonSearch from "@/components/reason-search";
 
 const PurePreviewMessage = ({
   chatId,
@@ -100,6 +101,10 @@ const PurePreviewMessage = ({
                 {message.toolInvocations.map((toolInvocation) => {
                   const { toolName, toolCallId, state, args } = toolInvocation;
 
+                  const updates = message?.annotations
+                    ?.filter((a: any) => a.type === "research_update")
+                    .map((a: any) => a.data);
+
                   if (state === "result") {
                     const result = toolInvocation.result;
                     return (
@@ -143,6 +148,8 @@ const PurePreviewMessage = ({
                             loadingMessage="Exploring the protocol"
                             isFinished
                           />
+                        ) : toolName === "reason_search" ? (
+                          <ReasonSearch updates={updates} />
                         ) : (
                           <ToolCallLoader
                             loadingMessage="Finding info"
@@ -181,6 +188,8 @@ const PurePreviewMessage = ({
                         <ToolCallLoader loadingMessage="Summarizing transactions..." />
                       ) : toolName === "getSiteContent" ? (
                         <ToolCallLoader loadingMessage="Exploring the protocol..." />
+                      ) : toolName === "reason_search" ? (
+                        <ReasonSearch updates={updates} />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}
@@ -249,26 +258,7 @@ const PurePreviewMessage = ({
   );
 };
 
-export const PreviewMessage = memo(
-  PurePreviewMessage,
-  (prevProps, nextProps) => {
-    if (prevProps.isLoading !== nextProps.isLoading) return false;
-    if (prevProps.message.reasoning !== nextProps.message.reasoning)
-      return false;
-    if (prevProps.message.content !== nextProps.message.content) return false;
-    if (
-      !equal(
-        prevProps.message.toolInvocations,
-        nextProps.message.toolInvocations
-      )
-    )
-      return false;
-    if (!equal(prevProps.vote, nextProps.vote)) return false;
-    if (!equal(prevProps.selectedGroup, nextProps.selectedGroup)) return false;
-
-    return true;
-  }
-);
+export const PreviewMessage = PurePreviewMessage;
 
 export const ThinkingMessage = () => {
   const role = "assistant";
