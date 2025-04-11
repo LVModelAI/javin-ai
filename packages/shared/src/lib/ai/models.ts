@@ -53,7 +53,7 @@ export const chatModels: Array<ChatModel> = [
   // },
   {
     id: "groq-llama-4",
-    name: "Groq Llama 4",
-    description: "Llama 4 scout model for advanced reasoning",
+    name: "Llama 4 Maverick",
+    description: "Llama 4 maverick model for advanced reasoning",
   },
 ];
