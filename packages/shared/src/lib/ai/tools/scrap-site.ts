@@ -21,8 +21,6 @@ export const getSiteContent = tool({
   }),
   execute: async ({ linkToScrape }) => {
     try {
-      console.log("scraping link : ", linkToScrape);
-
       const response = await scrapeSite(linkToScrape);
 
       return response;
