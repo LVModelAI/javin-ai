@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     group: any;
   } = await request.json();
 
-  logObjects("Request data:", { id, messages, selectedChatModel, group });
+  // logObjects("Request data:", { id, messages, selectedChatModel, group });
   logObjects("Search group:", group);
 
   const session = await auth();
@@ -121,11 +121,11 @@ export async function POST(request: Request) {
         experimental_generateMessageId: generateUUID,
         tools: allTools,
         onStepFinish(event) {
-          logInfo("Step finished.");
-          logObjects("Step Event:", event);
+          // logInfo("Step finished.");
+          // logObjects("Step Event:", event);
         },
         onFinish: async ({ response, reasoning }) => {
-          logInfo("Stream finished. Response received from model.");
+          // logInfo("Stream finished. Response received from model.");
           // logObjects("Response messages:", response.messages);
           // logObjects("Model reasoning:", reasoning);
 
