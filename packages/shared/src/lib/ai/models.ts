@@ -22,6 +22,12 @@ export const myProvider: any = customProvider({
     // @ts-ignore due to version type mismatch between @ai-sdk/provider package (v1.0.9 and v1.0.7)
     // "groq-llama-4": groq("meta-llama/llama-4-scout-17b-16e-instruct"),
     "groq-llama-4": groq("meta-llama/llama-4-maverick-17b-128e-instruct"),
+    "firework-llama-4": wrapLanguageModel({
+      model: fireworks(
+        "accounts/fireworks/models/llama4-maverick-instruct-basic"
+      ),
+      middleware: extractReasoningMiddleware({ tagName: "think" }),
+    }),
   },
   imageModels: {
     "small-model": openai.image("dall-e-2"),
@@ -55,5 +61,10 @@ export const chatModels: Array<ChatModel> = [
     id: "groq-llama-4",
     name: "Llama 4 Maverick",
     description: "Llama 4 maverick model for advanced reasoning",
+  },
+  {
+    id: "firework-llama-4",
+    name: "Firework Llama 4",
+    description: "Firework Llama 4 model for advanced reasoning",
   },
 ];
