@@ -19,7 +19,9 @@ export const myProvider: any = customProvider({
     }),
     "title-model": openai("gpt-4-turbo"),
     "block-model": openai("gpt-4o-mini"),
+    //@ts-ignore
     "gemini-2.0-flash": google("gemini-2.0-flash"),
+    //@ts-ignore
     "gemini-2.0-flash-lite": google("gemini-2.0-flash-lite"),
   },
   imageModels: {

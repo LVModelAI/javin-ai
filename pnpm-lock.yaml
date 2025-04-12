@@ -14,6 +14,12 @@ importers:
 
   apps/javin:
     dependencies:
+      '@ai-sdk/google':
+        specifier: ^1.2.10
+        version: 1.2.10(zod@3.24.2)
+      '@ai-sdk/openai':
+        specifier: ^1.3.10
+        version: 1.3.10(zod@3.24.2)
       '@codemirror/lang-python':
         specifier: ^6.1.7
         version: 6.1.7
@@ -405,6 +411,17 @@ packages:
     dependencies:
       '@ai-sdk/provider': 1.0.7
       '@ai-sdk/provider-utils': 2.1.6(zod@3.24.2)
+      zod: 3.24.2
+    dev: false
+
+  /@ai-sdk/openai@1.3.10(zod@3.24.2):
+    resolution: {integrity: sha512-XO0wF2lmAMWCYjkM5bLpWTKoXet61fBiIimTi+blqEGiLUjAvivt/1zZL1Lzhrv9+p19IC1rn9EWZI1dCelV8w==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.0.0
+    dependencies:
+      '@ai-sdk/provider': 1.1.2
+      '@ai-sdk/provider-utils': 2.2.6(zod@3.24.2)
       zod: 3.24.2
     dev: false
 
