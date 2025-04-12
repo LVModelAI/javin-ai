@@ -3,7 +3,7 @@ import {
   getAllPathsAndDesc,
   loadOpenAPI,
   loadOpenAPIFromJson,
-} from  "../../utils/openapi";
+} from "../../utils/openapi";
 import { generateObject, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../models";
@@ -107,7 +107,7 @@ export const translateTransactions = tool({
       // console.log("transaction data is  ----------- ", transactionDetails);
 
       const { object: apiEndpointsArray } = await generateObject({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         output: "array",
         schema: z.string().describe("the api endpoint"),
         system: `\n
