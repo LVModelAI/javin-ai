@@ -22,6 +22,11 @@ export const myProvider: any = customProvider({
     // @ts-ignore due to version type mismatch between @ai-sdk/provider package (v1.0.9 and v1.0.7)
     // "groq-llama-4": groq("meta-llama/llama-4-scout-17b-16e-instruct"),
     "groq-llama-4": groq("meta-llama/llama-4-maverick-17b-128e-instruct"),
+    "groq-llama-4-scout": wrapLanguageModel({
+      // @ts-ignore due to version type mismatch between @ai-sdk/provider package (v1.0.9 and v1.0.7)
+      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      middleware: extractReasoningMiddleware({ tagName: "think" }),
+    }),
     "firework-llama-4": wrapLanguageModel({
       model: fireworks(
         "accounts/fireworks/models/llama4-maverick-instruct-basic"
@@ -58,13 +63,18 @@ export const chatModels: Array<ChatModel> = [
   //   description: 'Uses advanced reasoning',
   // },
   {
+    id: "groq-llama-4-scout",
+    name: "Llama 4 Scout",
+    description: "Llama 4 scout model using groq",
+  },
+  {
     id: "groq-llama-4",
     name: "Llama 4 Maverick",
-    description: "Llama 4 maverick model for advanced reasoning",
+    description: "Llama 4 maverick model using groq",
   },
   {
     id: "firework-llama-4",
     name: "Firework Llama 4",
-    description: "Firework Llama 4 model for advanced reasoning",
+    description: "Llama 4 maverick model using fireworks.ai",
   },
 ];
