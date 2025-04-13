@@ -4,6 +4,7 @@ import { X, Share, Plus, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getWithExpiry, setWithExpiry } from "@javin/shared/lib/utils/utils";
+import * as Sentry from "@sentry/nextjs";
 
 export function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -64,6 +65,7 @@ export function InstallPrompt() {
         setDeferredPrompt(null);
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error("Install prompt error:", error);
     }
   };
