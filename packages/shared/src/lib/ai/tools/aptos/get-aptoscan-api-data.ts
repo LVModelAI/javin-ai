@@ -77,7 +77,7 @@ export const getAptosScanApiData = tool({
 
       logObjects(" all paths and desc", allPathsAndDesc);
 
-      const aptosBaseUrl = "https://api.aptoscan.com/public/v1.0";
+      const aptosBaseUrl = "https://api.mainnet.aptoslabs.com/v1";
 
       const aiAgentResponse = await generateText({
         model: myProvider.languageModel("chat-model-small"),
@@ -196,13 +196,11 @@ export const getAptosScanApiData = tool({
               );
 
               const response = await fetch(
-                `${aptosBaseUrl}/transactions/${txnId}`,
+                `${aptosBaseUrl}/transactions/by_hash/${txnId}`,
                 {
                   method: "GET",
                   headers: {
                     accept: "application/json",
-                    "User-Agent":
-                      "Mozilla/5.0 (compatible; JavinBot/1.0; +https://javin.ai)",
                   },
                 }
               );
