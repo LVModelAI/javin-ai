@@ -4,12 +4,11 @@ import {
 } from "../../../utils/utils";
 import {
   PortfolioData,
-  PortfolioResponse,
   BirdeyePortfolioResponse,
-  TokenItem,
 } from "../../../../types/wallet-actions-response";
 import { tool } from "ai";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 export const getSolanaChainWalletPortfolio = tool({
   description:
@@ -49,7 +48,8 @@ export const getSolanaChainWalletPortfolio = tool({
 
       return filteredPortfolio;
     } catch (error) {
-      console.error("Error fetching wallet portfolio:", error);
+      console.error("Error getSolanaChainWalletPortfolio:", error);
+      Sentry.captureException(error);
       return "Failed to fetch wallet portfolio";
     }
   },

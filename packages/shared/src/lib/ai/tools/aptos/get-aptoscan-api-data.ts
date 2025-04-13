@@ -1,12 +1,9 @@
-import { generateObject, generateText, tool } from "ai";
+import { generateText, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "@javin/shared/lib/ai/models";
 import {
-  getAllPaths,
   getAllPathsAndDesc,
   getPathDetails,
-  getPathInfo,
-  loadOpenAPI,
   loadOpenAPIFromJson,
 } from "@javin/shared/lib/utils/openapi";
 import aptosOpenapiJson from "@javin/shared/lib/utils/aptosscan-openapi.json";
@@ -16,11 +13,8 @@ import {
   getFungibleAssetCount,
   getAccountTokensCount,
   getOwnedTokens,
-  getTokenData,
-  getTokenActivity,
-  getTransactionBalanceChange,
-  getPortfolio,
 } from "@javin/shared/lib/utils/aptosGraphqlFunctions"; // Import the functions you built earlier
+import * as Sentry from "@sentry/nextjs";
 
 function scaleLargeNumbers(data: any): any {
   const SCALE_FACTOR = 10n ** 8n; // 10^8 as a BigInt
@@ -290,6 +284,7 @@ export const getAptosScanApiData = tool({
                 return processedData;
               } catch (error) {
                 console.error("Error fetching aptos API data:", error);
+                Sentry.captureException(error);
                 return { error: "Failed to fetch data from the API." };
               }
             },
@@ -303,7 +298,7 @@ export const getAptosScanApiData = tool({
       return aiAgentResponse.text;
     } catch (error: any) {
       console.error("Error in getAptosApiData:", error);
-
+      Sentry.captureException(error);
       // Returning error details so AI can adapt its next action
       return {
         success: false,

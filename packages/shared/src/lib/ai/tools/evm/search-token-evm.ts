@@ -6,6 +6,7 @@ import {
 } from "../../../../types/token-search-response";
 import { tool } from "ai";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const sortOptions = [
   "-market_data.market_cap",
@@ -91,6 +92,7 @@ export const searchEvmTokenMarketData = tool({
       return data.data;
     } catch (error) {
       // console.error("Error searchTokenMarketData:", error);
+      Sentry.captureException(error);
       return "Something went wrong. Please try again";
     }
   },

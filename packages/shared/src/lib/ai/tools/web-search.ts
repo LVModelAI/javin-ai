@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { tavily } from "@tavily/core";
+import * as Sentry from "@sentry/nextjs";
 
 function sanitizeUrl(url: string): string {
   return url.replace(/\s+/g, "%20");
@@ -21,7 +22,8 @@ async function isValidImageUrl(url: string): Promise<boolean> {
       response.ok &&
       (response.headers.get("content-type")?.startsWith("image/") ?? false)
     );
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     return false;
   }
 }
@@ -71,13 +73,13 @@ export const webSearch = tool({
     const apiKey = process.env.TAVILY_API_KEY;
     const tvly = tavily({ apiKey });
     const includeImageDescriptions = true;
-    console.log("WEB SEARCHGG RESULT ======= ")
+    console.log("WEB SEARCHGG RESULT ======= ");
     console.log("Queries:", queries);
     console.log("Max Results:", maxResults);
     console.log("Topics:", topics);
     console.log("Search Depths:", searchDepth);
     console.log("Exclude Domains:", exclude_domains);
-    console.log("WEB SEARCHGG RESULT ENDED ======= ")
+    console.log("WEB SEARCHGG RESULT ENDED ======= ");
 
     // Execute searches in parallel
     const searchPromises = queries.map(async (query, index) => {
