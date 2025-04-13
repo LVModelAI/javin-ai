@@ -206,6 +206,7 @@ export const getAptosScanApiData = tool({
                   },
                 }
               );
+              console.log("response is ", response);
               if (!response.ok) {
                 throw new Error(
                   `API call failed with status ${response.status}`
