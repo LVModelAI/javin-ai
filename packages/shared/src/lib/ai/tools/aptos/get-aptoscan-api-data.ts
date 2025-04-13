@@ -154,6 +154,8 @@ export const getAptosScanApiData = tool({
                       method: "GET",
                       headers: {
                         accept: "application/json",
+                        "User-Agent":
+                          "Mozilla/5.0 (compatible; JavinBot/1.0; +https://javin.ai)",
                       },
                     }
                   );
@@ -199,6 +201,8 @@ export const getAptosScanApiData = tool({
                   method: "GET",
                   headers: {
                     accept: "application/json",
+                    "User-Agent":
+                      "Mozilla/5.0 (compatible; JavinBot/1.0; +https://javin.ai)",
                   },
                 }
               );
