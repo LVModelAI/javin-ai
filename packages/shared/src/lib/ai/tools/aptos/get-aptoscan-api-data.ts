@@ -11,7 +11,7 @@ import {
 } from "@javin/shared/lib/utils/openapi";
 import aptosOpenapiJson from "@javin/shared/lib/utils/aptosscan-openapi.json";
 import {
-  getAccountTransactionsData,
+  getAccountTransactionsIds,
   getOwnedCoinsData,
   getFungibleAssetCount,
   getAccountTokensCount,
@@ -21,6 +21,7 @@ import {
   getTransactionBalanceChange,
   getPortfolio,
 } from "@javin/shared/lib/utils/aptosGraphqlFunctions"; // Import the functions you built earlier
+import { logObjects } from "@javin/shared/lib/utils/logging";
 
 function scaleLargeNumbers(data: any): any {
   const SCALE_FACTOR = 10n ** 8n; // 10^8 as a BigInt
@@ -69,6 +70,8 @@ export const getAptosScanApiData = tool({
       const aptosOpenapidata = await loadOpenAPIFromJson(aptosOpenapiJson);
       const allPathsAndDesc = await getAllPathsAndDesc(aptosOpenapidata);
 
+      logObjects(" all paths and desc", allPathsAndDesc);
+
       const aptosBaseUrl = "https://api.aptoscan.com/public/v1.0";
 
       const aiAgentResponse = await generateText({
@@ -99,9 +102,9 @@ export const getAptosScanApiData = tool({
           `User query: "${userQuery}".  Base URL: ${aptosBaseUrl}`
         ),
         tools: {
-          getAccountTransactionsData: tool({
+          getAccountTransactionsIds: tool({
             description:
-              "Fetches the latest transaction block number for a given address.",
+              "Fetches the latest transaction id for a given address.",
             parameters: z.object({
               address: z.string().describe("address of the account"),
               limit: z
@@ -110,23 +113,52 @@ export const getAptosScanApiData = tool({
                 .describe("Number of records to fetch"),
               offset: z.number().optional().describe("Offset for pagination"),
             }),
-            execute: async ({ address, limit, offset }) =>
-              await getAccountTransactionsData(address, limit, offset),
-          }),
+            execute: async ({ address, limit, offset }) => {
+              type TransactionId = {
+                transaction_version: number;
+                __typename: string;
+              };
 
-          // getPortfolio: tool({
-          //   description: "Fetches portfolio information for a given address.",
-          //   parameters: z.object({
-          //     ownerAddress: z.string().describe("address of the account"),
-          //     limit: z
-          //       .number()
-          //       .optional()
-          //       .describe("Number of records to fetch"),
-          //     offset: z.number().optional().describe("Offset for pagination"),
-          //   }),
-          //   execute: async ({ ownerAddress, limit, offset }) =>
-          //     await getPortfolio(ownerAddress, limit, offset),
-          // }),
+              const txnIds = await getAccountTransactionsIds(
+                address,
+                limit,
+                offset
+              );
+              console.log("Transaction IDs:", txnIds);
+
+              /*  Transaction IDs: {
+                    account_transactions: [
+                      {
+                        transaction_version: 2541745748,
+                        __typename: 'account_transactions'
+                      },
+
+              */
+              // Fetch transaction details in parallel
+              const results = await Promise.all(
+                txnIds.account_transactions.map(async (txn: TransactionId) => {
+                  console.log("Transaction ID:", txn.transaction_version);
+                  const response = await fetch(
+                    `${aptosBaseUrl}/transactions/${txn.transaction_version}`,
+                    {
+                      method: "GET",
+                      headers: {
+                        accept: "application/json",
+                      },
+                    }
+                  );
+                  if (!response.ok) {
+                    throw new Error(
+                      `API call failed with status ${response.status}`
+                    );
+                  }
+                  return await response.json();
+                })
+              );
+
+              return results; // or format as needed
+            },
+          }),
 
           getOwnedCoinsData: tool({
             description:
@@ -177,40 +209,6 @@ export const getAptosScanApiData = tool({
             execute: async ({ address, limit, offset }) =>
               await getOwnedTokens(address, limit, offset),
           }),
-
-          // getTokenData: tool({
-          //   description:
-          //     "Fetches data about a specified token using its token address.",
-          //   parameters: z.object({
-          //     tokenDataId: z.string().describe("The token address."),
-          //   }),
-          //   execute: async ({ tokenDataId }) => await getTokenData(tokenDataId),
-          // }),
-
-          // getTokenActivity: tool({
-          //   description:
-          //     "Fetches token activity data for a given token address.",
-          //   parameters: z.object({
-          //     tokenDataId: z.string().describe("The token address."),
-          //     limit: z
-          //       .number()
-          //       .optional()
-          //       .describe("Number of records to fetch"),
-          //     offset: z.number().optional().describe("Offset for pagination"),
-          //   }),
-          //   execute: async ({ tokenDataId, limit, offset }) =>
-          //     await getTokenActivity(tokenDataId, limit, offset),
-          // }),
-
-          // getTransactionBalanceChange: tool({
-          //   description:
-          //     "Fetches transaction balance change information for a given transaction version.",
-          //   parameters: z.object({
-          //     txnVersion: z.string().describe("The transaction version."),
-          //   }),
-          //   execute: async ({ txnVersion }) =>
-          //     await getTransactionBalanceChange(txnVersion),
-          // }),
 
           getPathParametersAndBaseUrl: tool({
             description:

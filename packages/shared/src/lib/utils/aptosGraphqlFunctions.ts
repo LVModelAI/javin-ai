@@ -35,7 +35,7 @@ export async function getPortfolio(address: string, limit = 25, offset = 0) {
 }
 
 // 1️⃣ Get Transaction Block Number
-export async function getAccountTransactionsData(
+export async function getAccountTransactionsIds(
   address: string,
   limit = 25,
   offset = 0
