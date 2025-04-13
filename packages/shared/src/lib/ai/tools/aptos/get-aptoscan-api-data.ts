@@ -58,6 +58,73 @@ const processNumbers = (data: any): any => {
   return data;
 };
 
+const extractImportantTransactionInfo = (txData: any) => {
+  const tx = txData.data;
+  const metadata = txData.metadata;
+
+  // Extract sender and receiver
+  const sender = tx.sender;
+  const receiver = tx.receiver?.receiver;
+
+  // Extract vote details
+  const voteEvent = tx.events?.find((e) =>
+    e.type.includes("vote_manager::VoteEvent")
+  );
+
+  const voteDetails = voteEvent?.data
+    ? {
+        voter: voteEvent.data.owner,
+        veToken: voteEvent.data.ve_token?.inner,
+        votedPools: voteEvent.data.pools.map((p) => p.inner),
+        weights: voteEvent.data.weights,
+      }
+    : null;
+
+  // Assets involved
+  const fungibleAssets = tx.interacted_fungible_assets.map((addr) => {
+    const asset = metadata.fungible_assets[addr]?.data;
+    return asset
+      ? { name: asset.name, symbol: asset.symbol, address: asset.address }
+      : { address: addr };
+  });
+
+  const tokenV2 = tx.interacted_digital_assets.map((addr) => {
+    const token = metadata.tokenv2s[addr]?.data;
+    return token
+      ? {
+          name: token.token_name,
+          description: token.description,
+          metadata_uri: token.metadata_uri,
+          address: token.token_data_id,
+        }
+      : { address: addr };
+  });
+
+  // Fee info
+  const feeChange = tx.transaction_fee_changes?.[0];
+
+  return {
+    version: tx.version,
+    txHash: tx.hash,
+    status: tx.vm_status,
+    sender,
+    receiver,
+    voteDetails,
+    assetsInvolved: {
+      fungibleAssets,
+      digitalAssets: tokenV2,
+    },
+    transactionFee: feeChange
+      ? {
+          amount: feeChange.amount,
+          asset:
+            metadata.coins[feeChange.asset_address]?.data.symbol || "UNKNOWN",
+          payer: feeChange.account,
+        }
+      : null,
+  };
+};
+
 export const getAptosScanApiData = tool({
   description:
     "Get real-time Aptos blockchain data about portofolio, tokens, transactions, etc.",
@@ -152,8 +219,14 @@ export const getAptosScanApiData = tool({
                       `API call failed with status ${response.status}`
                     );
                   }
-                  return await response.json();
+                  const t = await response.json();
+                  return extractImportantTransactionInfo(t);
                 })
+              );
+
+              logObjects(
+                "Result from getAccountTransactionsIds in get-aposcan-api-data.ts -> ",
+                results
               );
 
               return results; // or format as needed
