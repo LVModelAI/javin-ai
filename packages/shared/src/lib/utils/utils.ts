@@ -223,7 +223,13 @@ export const searchGroups = [
   //   icon: Network,
   //   img: "/images/icon/wormhole-logo.png",
   // },
-
+  {
+    id: "aptos",
+    name: "Aptos",
+    description: "Everything Aptos. Search, transactions and more.",
+    icon: Network,
+    img: "/images/icon/aptos/aptos-logo.png",
+  },
   {
     id: "creditcoin" as const,
     name: "Creditcoin",
@@ -252,13 +258,7 @@ export const searchGroups = [
     icon: Network,
     img: "/images/icon/zeta/zetachain-logo.png",
   },
-  {
-    id: "aptos",
-    name: "Aptos",
-    description: "Everything Aptos. Search, transactions and more.",
-    icon: Network,
-    img: "/images/icon/aptos/aptos-logo.png",
-  },
+
   {
     id: "monad",
     name: "Monad",
