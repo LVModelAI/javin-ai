@@ -14,6 +14,7 @@
     "@ai-sdk/google": "^1.2.10",
     "@ai-sdk/groq": "^1.1.11",
     "@ai-sdk/openai": "1.1.9",
+    "@ai-sdk/perplexity": "^1.1.6",
     "@apidevtools/json-schema-ref-parser": "^11.9.1",
     "@aptos-labs/ts-sdk": "^1.35.0",
     "@ensdomains/ensjs": "^4.0.2",

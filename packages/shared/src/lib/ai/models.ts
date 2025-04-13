@@ -6,6 +6,7 @@ import {
   wrapLanguageModel,
 } from "ai";
 import { google } from "@ai-sdk/google";
+import { perplexity } from "@ai-sdk/perplexity";
 
 export const DEFAULT_CHAT_MODEL: string = "gpt-4o-mini";
 
@@ -23,6 +24,10 @@ export const myProvider: any = customProvider({
     "gemini-2.0-flash": google("gemini-2.0-flash"),
     //@ts-ignore
     "gemini-2.0-flash-lite": google("gemini-2.0-flash-lite"),
+    //@ts-ignore
+    sonar: perplexity("sonar"),
+    //@ts-ignore
+    "sonar-pro": perplexity("sonar-pro"),
   },
   imageModels: {
     "small-model": openai.image("dall-e-2"),
@@ -56,6 +61,16 @@ export const chatModels: Array<ChatModel> = [
     id: "gemini-2.0-flash-lite",
     name: "Gemini 2.0 Flash Lite",
     description: "Lite version of Gemini 2.0 Flash model",
+  },
+  {
+    id: "sonar",
+    name: "Sonar",
+    description: "Perplexity's Sonar model",
+  },
+  {
+    id: "sonar-pro",
+    name: "Sonar Pro",
+    description: "Pro version of Perplexity's Sonar model",
   },
   // {
   //   id: 'chat-model-reasoning',
