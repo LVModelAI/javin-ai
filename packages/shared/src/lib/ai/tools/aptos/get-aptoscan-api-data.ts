@@ -9,7 +9,7 @@ import {
   loadOpenAPI,
   loadOpenAPIFromJson,
 } from "@javin/shared/lib/utils/openapi";
-import aptosOpenapiJson from "@javin/shared/lib/utils/aptosscan-openapi.json";
+import aptosOpenapiJson from "@javin/shared/lib/utils/aptoslabs-openapi.json";
 import {
   getAccountTransactionsData,
   getOwnedCoinsData,
@@ -147,15 +147,13 @@ export const getAptosScanApiData = tool({
                 txnIds.account_transactions.map(async (txn: TransactionId) => {
                   console.log("Transaction ID:", txn.transaction_version);
                   logInfo(`Fetching transaction data : 
-                ${aptosBaseUrl}/transactions/${txn.transaction_version}`);
+                ${aptosBaseUrl}/transactions/by_version/${txn.transaction_version}`);
                   const response = await fetch(
-                    `${aptosBaseUrl}/transactions/${txn.transaction_version}`,
+                    `${aptosBaseUrl}/transactions/by_version/${txn.transaction_version}`,
                     {
                       method: "GET",
                       headers: {
                         accept: "application/json",
-                        "User-Agent":
-                          "Mozilla/5.0 (compatible; JavinBot/1.0; +https://javin.ai)",
                       },
                     }
                   );
