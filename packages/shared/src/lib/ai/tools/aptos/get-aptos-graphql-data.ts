@@ -2,7 +2,7 @@ import { generateText, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "@javin/shared/lib/ai/models";
 import {
-  getAccountTransactionsIds,
+  getAccountTransactionsData,
   getOwnedCoinsData,
   getFungibleAssetCount,
   getAccountTokensCount,
@@ -30,7 +30,7 @@ export const getAptosGraphqlData = tool({
         Choose the appropriate tool from the list and provide the required parameters.`,
         prompt: `User query: "${userQuery}".`,
         tools: {
-          getAccountTransactionsIds: tool({
+          getAccountTransactionsData: tool({
             description:
               "Fetches the latest transaction block number for a given address.",
             parameters: z.object({
@@ -39,7 +39,7 @@ export const getAptosGraphqlData = tool({
               offset: z.number().optional(),
             }),
             execute: async ({ address, limit, offset }) =>
-              await getAccountTransactionsIds(address, limit, offset),
+              await getAccountTransactionsData(address, limit, offset),
           }),
 
           getOwnedCoinsData: tool({

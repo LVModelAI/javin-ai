@@ -11,7 +11,7 @@ import {
 } from "@javin/shared/lib/utils/openapi";
 import aptosOpenapiJson from "@javin/shared/lib/utils/aptosscan-openapi.json";
 import {
-  getAccountTransactionsIds,
+  getAccountTransactionsData,
   getOwnedCoinsData,
   getFungibleAssetCount,
   getAccountTokensCount,
@@ -21,109 +21,47 @@ import {
   getTransactionBalanceChange,
   getPortfolio,
 } from "@javin/shared/lib/utils/aptosGraphqlFunctions"; // Import the functions you built earlier
-import { logObjects } from "@javin/shared/lib/utils/logging";
+import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
 
 function scaleLargeNumbers(data: any): any {
-  const SCALE_FACTOR = 10n ** 8n; // 10^8 as a BigInt
+  const SCALE_FACTOR = 10n ** 8n;
+
+  // Try to convert strings to numbers or BigInts
+  const parseAndScale = (val: string) => {
+    if (/^\d+$/.test(val)) {
+      const bigVal = BigInt(val);
+      if (bigVal >= SCALE_FACTOR) {
+        return Number(bigVal / SCALE_FACTOR);
+      }
+    }
+    return val; // return original if not a valid number string
+  };
 
   if (typeof data === "bigint" && data >= SCALE_FACTOR) {
     return data / SCALE_FACTOR;
-  } else if (typeof data === "number" && data >= Number(SCALE_FACTOR)) {
-    return data / Number(SCALE_FACTOR);
-  } else if (Array.isArray(data)) {
-    return data.map(scaleLargeNumbers);
-  } else if (typeof data === "object" && data !== null) {
-    return Object.fromEntries(
-      //@ts-ignore
-      Object.entries(data).map(([key, value]) => [
-        key,
-        scaleLargeNumbers(value),
-      ])
-    );
   }
+
+  if (typeof data === "number" && data >= Number(SCALE_FACTOR)) {
+    return data / Number(SCALE_FACTOR);
+  }
+
+  if (typeof data === "string") {
+    return parseAndScale(data);
+  }
+
+  if (Array.isArray(data)) {
+    return data.map(scaleLargeNumbers);
+  }
+
+  if (typeof data === "object" && data !== null) {
+    return Object.entries(data).reduce((acc, [key, value]) => {
+      acc[key] = scaleLargeNumbers(value);
+      return acc;
+    }, {} as Record<string, any>);
+  }
+
   return data;
 }
-
-// Recursive function to process numbers in the response
-const processNumbers = (data: any): any => {
-  if (typeof data === "number" && data >= 10_000_000) {
-    return data / 10 ** 8;
-  } else if (Array.isArray(data)) {
-    return data.map(processNumbers);
-  } else if (typeof data === "object" && data !== null) {
-    return Object.fromEntries(
-      Object.entries(data).map(([key, value]) => [key, processNumbers(value)])
-    );
-  }
-  return data;
-};
-
-const extractImportantTransactionInfo = (txData: any) => {
-  const tx = txData.data;
-  const metadata = txData.metadata;
-
-  // Extract sender and receiver
-  const sender = tx.sender;
-  const receiver = tx.receiver?.receiver;
-
-  // Extract vote details
-  const voteEvent = tx.events?.find((e) =>
-    e.type.includes("vote_manager::VoteEvent")
-  );
-
-  const voteDetails = voteEvent?.data
-    ? {
-        voter: voteEvent.data.owner,
-        veToken: voteEvent.data.ve_token?.inner,
-        votedPools: voteEvent.data.pools.map((p) => p.inner),
-        weights: voteEvent.data.weights,
-      }
-    : null;
-
-  // Assets involved
-  const fungibleAssets = tx.interacted_fungible_assets.map((addr) => {
-    const asset = metadata.fungible_assets[addr]?.data;
-    return asset
-      ? { name: asset.name, symbol: asset.symbol, address: asset.address }
-      : { address: addr };
-  });
-
-  const tokenV2 = tx.interacted_digital_assets.map((addr) => {
-    const token = metadata.tokenv2s[addr]?.data;
-    return token
-      ? {
-          name: token.token_name,
-          description: token.description,
-          metadata_uri: token.metadata_uri,
-          address: token.token_data_id,
-        }
-      : { address: addr };
-  });
-
-  // Fee info
-  const feeChange = tx.transaction_fee_changes?.[0];
-
-  return {
-    version: tx.version,
-    txHash: tx.hash,
-    status: tx.vm_status,
-    sender,
-    receiver,
-    voteDetails,
-    assetsInvolved: {
-      fungibleAssets,
-      digitalAssets: tokenV2,
-    },
-    transactionFee: feeChange
-      ? {
-          amount: feeChange.amount,
-          asset:
-            metadata.coins[feeChange.asset_address]?.data.symbol || "UNKNOWN",
-          payer: feeChange.account,
-        }
-      : null,
-  };
-};
 
 export const getAptosScanApiData = tool({
   description:
@@ -145,8 +83,11 @@ export const getAptosScanApiData = tool({
         model: myProvider.languageModel("chat-model-small"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant aptos blockchain data in a user-friendly format.
       
-        you have a variety of tools available, using them you can get : the latest transaction block number for a given address, coin and fungible asset information for a given address, the total count of fungible assets for a given address, the total count of tokens held by an account, detailed information of tokens held by an account, , transaction balance change information for a given transaction version,
+        you have a variety of tools available, using them you can get : the  transactions made by a given address, transaction data by id or block version,  coin and fungible asset information for a given address, the total count of fungible assets for a given address, the total count of tokens held by an account, detailed information of tokens held by an account, , transaction balance change information for a given transaction version,
         based on the user query, see if those tools are helpfull and call the appropriate tool with params.
+
+        Important:
+        If you are showing transactions data, only tell what exactly happened in the transaction, do not show the entire transaction data.
 
         if the above tools are not helpful, you can use the below tools to get the required data:
         you have access to public apis  which can be called to get the required data. Available API paths and descriptions: ${allPathsAndDesc}. you need to follow below steps to get the required data:
@@ -169,7 +110,7 @@ export const getAptosScanApiData = tool({
           `User query: "${userQuery}".  Base URL: ${aptosBaseUrl}`
         ),
         tools: {
-          getAccountTransactionsIds: tool({
+          getAccountTransactionsData: tool({
             description:
               "Fetches the latest transaction id for a given address.",
             parameters: z.object({
@@ -186,7 +127,7 @@ export const getAptosScanApiData = tool({
                 __typename: string;
               };
 
-              const txnIds = await getAccountTransactionsIds(
+              const txnIds = await getAccountTransactionsData(
                 address,
                 limit,
                 offset
@@ -220,16 +161,51 @@ export const getAptosScanApiData = tool({
                     );
                   }
                   const t = await response.json();
-                  return extractImportantTransactionInfo(t);
+                  return scaleLargeNumbers(t);
                 })
               );
 
               logObjects(
-                "Result from getAccountTransactionsIds in get-aposcan-api-data.ts -> ",
+                "Result from getAccountTransactionsData in get-aposcan-api-data.ts -> ",
                 results
               );
 
               return results; // or format as needed
+            },
+          }),
+
+          getTransactionDataByVersionOrId: tool({
+            description:
+              "Fetches transaction data for a given transaction Id or verison.",
+            parameters: z.object({
+              txnId: z
+                .string()
+                .optional()
+                .describe(
+                  "transaction transaction id or block version to fetch data for"
+                ),
+            }),
+            execute: async ({ txnId }) => {
+              logInfo(`Fetching transaction data for ID: ${txnId}`);
+              const response = await fetch(
+                `${aptosBaseUrl}/transactions/${txnId}`,
+                {
+                  method: "GET",
+                  headers: {
+                    accept: "application/json",
+                  },
+                }
+              );
+              if (!response.ok) {
+                throw new Error(
+                  `API call failed with status ${response.status}`
+                );
+              }
+              const txData = await response.json();
+              const t = scaleLargeNumbers(txData);
+              txData;
+              logObjects("txn data - ", t);
+              return t;
             },
           }),
 
@@ -302,6 +278,7 @@ export const getAptosScanApiData = tool({
               return aptosPathDetails;
             },
           }),
+
           makeApiCall: tool({
             description: "Fetch real-time blockchain data from Aptos API.",
             parameters: z.object({
