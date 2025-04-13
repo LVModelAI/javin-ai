@@ -63,6 +63,30 @@ function scaleLargeNumbers(data: any): any {
   return data;
 }
 
+function convertToDecimalFields(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(convertToDecimalFields);
+  }
+
+  if (typeof obj === "object" && obj !== null) {
+    const newObj: any = {};
+    for (const key in obj) {
+      if (
+        ["value", "amount", "renewal_fee_octas"].includes(key) &&
+        typeof obj[key] === "string" &&
+        /^\d+$/.test(obj[key])
+      ) {
+        newObj[key] = parseFloat(obj[key]) / 1e8;
+      } else {
+        newObj[key] = convertToDecimalFields(obj[key]);
+      }
+    }
+    return newObj;
+  }
+
+  return obj;
+}
+
 export const getAptosScanApiData = tool({
   description:
     "Get real-time Aptos blockchain data about portofolio, tokens, transactions, etc.",
@@ -163,7 +187,7 @@ export const getAptosScanApiData = tool({
                     );
                   }
                   const t = await response.json();
-                  return scaleLargeNumbers(t);
+                  return convertToDecimalFields(t);
                 })
               );
 
@@ -202,14 +226,14 @@ export const getAptosScanApiData = tool({
                   },
                 }
               );
-              console.log("response is ", response);
+              // console.log("response is ", response);
               if (!response.ok) {
                 throw new Error(
                   `API call failed with status ${response.status}`
                 );
               }
               const txData = await response.json();
-              const t = scaleLargeNumbers(txData);
+              const t = convertToDecimalFields(txData);
               txData;
               logObjects("txn data - ", t);
               return t;
