@@ -1,4 +1,5 @@
 import FirecrawlApp, { ScrapeResponse } from "@mendable/firecrawl-js";
+import * as Sentry from "@sentry/nextjs";
 
 const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY;
 const FIRECRAWL_API_ENDPOINT = process.env.FIRECRAWL_API_ENDPOINT;
@@ -27,6 +28,7 @@ export async function getStatPageScreenshot(statsPageUrl: string) {
     return scrapeResult.markdown;
   } catch (error) {
     console.error("Error in getStatPageScreenshot:", error);
+    Sentry.captureException(error);
     throw error; // Re-throw to allow handling by the caller
   }
 }

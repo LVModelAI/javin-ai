@@ -11,6 +11,7 @@ import {
   getTokenActivity,
   getTransactionBalanceChange,
 } from "../../../utils/aptosGraphqlFunctions"; // Import the functions you built earlier
+import * as Sentry from "@sentry/nextjs";
 
 // Utility to call respective functions
 export const getAptosGraphqlData = tool({
@@ -121,6 +122,7 @@ export const getAptosGraphqlData = tool({
       return aiAgentResponse.text;
     } catch (error: any) {
       console.error("Error in fetching data:", error);
+      Sentry.captureException(error);
       return {
         success: false,
         message: "Error fetching data.",

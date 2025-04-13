@@ -1,12 +1,12 @@
 import {
-  getAllPaths,
   getAllPathsAndDesc,
   loadOpenAPI,
   loadOpenAPIFromJson,
-} from  "../../utils/openapi";
+} from "../../utils/openapi";
 import { generateObject, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../models";
+import * as Sentry from "@sentry/nextjs";
 
 export const novesSupportedChains = [
   "arbitrum",
@@ -145,6 +145,7 @@ export const translateTransactions = tool({
             return json;
           } catch (error) {
             console.error("Error parsing API response:", error);
+            Sentry.captureException(error);
             return null;
           }
         })
@@ -154,6 +155,7 @@ export const translateTransactions = tool({
       return results;
     } catch (error) {
       console.error("Error in summarizing transactions:", error);
+      Sentry.captureException(error);
       return error; // Re-throw to allow handling by the caller
     }
   },

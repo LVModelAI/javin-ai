@@ -1,6 +1,7 @@
 import { getStatPageScreenshot } from "../../../utils/get-stat-page-sceenshot";
 import { tool } from "ai";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 export const getVanaStats = tool({
   description: "Get Vana blockchain statistics",
@@ -17,7 +18,7 @@ export const getVanaStats = tool({
       return response;
     } catch (error: any) {
       console.error("Error in getVanaStats:", error);
-
+      Sentry.captureException(error);
       return {
         success: false,
         message: "Error in getting vana stats.",

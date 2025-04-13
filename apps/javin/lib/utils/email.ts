@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { OAuth2Client } from "google-auth-library";
+import * as Sentry from "@sentry/nextjs";
 
 const oAuth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID!,
@@ -48,6 +49,7 @@ export async function sendResetEmail(email: string, resetUrl: string) {
     console.log(`✅ Reset email sent to ${email}`);
   } catch (error) {
     console.error("❌ Error sending reset email:", error);
+    Sentry.captureException(error);
     throw new Error("Email sending failed");
   }
 }

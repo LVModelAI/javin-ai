@@ -1,4 +1,4 @@
-import { generateObject, generateText, tool } from "ai";
+import { generateText, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../../models";
 import {
@@ -8,6 +8,7 @@ import {
 } from "../../../utils/openapi";
 import { etherscanBaseURL } from "./constant";
 import { ensToAddress } from "../ens-to-address";
+import * as Sentry from "@sentry/nextjs";
 
 export const getEvmOnchainDataUsingEtherscan = tool({
   description:
@@ -106,6 +107,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
                 return json; // Return parsed JSON data for further processing
               } catch (error) {
                 console.error("Error fetching API data:", error);
+                Sentry.captureException(error);
                 return { error: "Failed to fetch data from the API." };
               }
             },
@@ -118,6 +120,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
       return aiAgentResponse.text;
     } catch (error: any) {
       console.error("Error in getEvmOnchainDataUsingEtherscan:", error);
+      Sentry.captureException(error);
       return {
         success: false,
         message: "Error retrieving API data.",
