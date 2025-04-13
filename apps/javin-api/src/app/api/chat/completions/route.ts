@@ -4,6 +4,7 @@ import { openai } from "@ai-sdk/openai";
 import { smoothStream, streamText, generateText } from "ai";
 import { PromptRequestSchema, ChatCompletionStreaming } from "./type";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: Request) {
   try {
@@ -170,6 +171,7 @@ export async function POST(request: Request) {
           controller.close();
         } catch (error) {
           console.error("Streaming error:", error);
+          Sentry.captureException(error);
           controller.enqueue(
             encoder.encode(
               `data: ${JSON.stringify({ error: "Internal Server Error" })}\n\n`
@@ -198,7 +200,7 @@ export async function POST(request: Request) {
         }
       );
     }
-
+    Sentry.captureException(error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
