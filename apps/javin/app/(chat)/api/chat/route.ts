@@ -41,22 +41,22 @@ export async function POST(request: Request) {
   } = await request.json();
 
   // logObjects("Request data:", { id, messages, selectedChatModel, group });
-  logObjects("Search group:", group);
+  // logObjects("Search group:", group);
 
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
     console.error("User not authenticated.");
     return new Response("Please login to start chatting!", { status: 401 });
   }
-  logObjects("User session:", session.user);
+  // logObjects("User session:", session.user);
 
   const { tools: activeTools, systemPrompt } = await getGroupConfig(group);
-  logObjects("Group configuration loaded. Active tools:", activeTools);
+  // logObjects("Group configuration loaded. Active tools:", activeTools);
   // logInfo("System prompt:", systemPrompt);
 
   const users = await getUserById(session.user.id!);
   const user_info = users[0];
-  logObjects("Retrieved user info:", user_info);
+  // logObjects("Retrieved user info:", user_info);
 
   if (user_info.dailyMessageRemaining <= 0) {
     if (user_info.tier === "free") {
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     console.error("No user message found in the request.");
     return new Response("No user message found", { status: 400 });
   }
-  logObjects("Most recent user message:", userMessage);
+  // logObjects("Most recent user message:", userMessage);
 
   const chat = await getChatById({ id });
   if (!chat) {
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
         tools: allTools,
         onStepFinish(event) {
           logInfo("Step finished.");
-          logObjects("Step Event:", event);
+          // logObjects("Step Event:", event);
         },
         onFinish: async ({ response, reasoning }) => {
           // logInfo("Stream finished. Response received from model.");
