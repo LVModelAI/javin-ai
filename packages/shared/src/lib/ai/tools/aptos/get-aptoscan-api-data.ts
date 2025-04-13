@@ -146,6 +146,8 @@ export const getAptosScanApiData = tool({
               const results = await Promise.all(
                 txnIds.account_transactions.map(async (txn: TransactionId) => {
                   console.log("Transaction ID:", txn.transaction_version);
+                  logInfo(`Fetching transaction data : 
+                ${aptosBaseUrl}/transactions/${txn.transaction_version}`);
                   const response = await fetch(
                     `${aptosBaseUrl}/transactions/${txn.transaction_version}`,
                     {
@@ -186,7 +188,11 @@ export const getAptosScanApiData = tool({
                 ),
             }),
             execute: async ({ txnId }) => {
-              logInfo(`Fetching transaction data for ID: ${txnId}`);
+              logInfo(
+                `Fetching transaction data : 
+                ${aptosBaseUrl}/transactions/${txnId}`
+              );
+
               const response = await fetch(
                 `${aptosBaseUrl}/transactions/${txnId}`,
                 {
