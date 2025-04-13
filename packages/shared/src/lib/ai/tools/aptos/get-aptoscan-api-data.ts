@@ -9,7 +9,7 @@ import {
   loadOpenAPI,
   loadOpenAPIFromJson,
 } from "@javin/shared/lib/utils/openapi";
-import aptosOpenapiJson from "@javin/shared/lib/utils/aptosscan-openapi.json";
+import aptosOpenapiJson from "@javin/shared/lib/utils/aptoslabs-openapi.json";
 import {
   getAccountTransactionsData,
   getOwnedCoinsData,
@@ -63,6 +63,30 @@ function scaleLargeNumbers(data: any): any {
   return data;
 }
 
+function convertToDecimalFields(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(convertToDecimalFields);
+  }
+
+  if (typeof obj === "object" && obj !== null) {
+    const newObj: any = {};
+    for (const key in obj) {
+      if (
+        ["value", "amount", "renewal_fee_octas"].includes(key) &&
+        typeof obj[key] === "string" &&
+        /^\d+$/.test(obj[key])
+      ) {
+        newObj[key] = parseFloat(obj[key]) / 1e8;
+      } else {
+        newObj[key] = convertToDecimalFields(obj[key]);
+      }
+    }
+    return newObj;
+  }
+
+  return obj;
+}
+
 export const getAptosScanApiData = tool({
   description:
     "Get real-time Aptos blockchain data about portofolio, tokens, transactions, etc.",
@@ -77,7 +101,7 @@ export const getAptosScanApiData = tool({
 
       logObjects(" all paths and desc", allPathsAndDesc);
 
-      const aptosBaseUrl = "https://api.aptoscan.com/public/v1.0";
+      const aptosBaseUrl = "https://api.mainnet.aptoslabs.com/v1";
 
       const aiAgentResponse = await generateText({
         model: myProvider.languageModel("gpt-4o-mini"),
@@ -146,8 +170,10 @@ export const getAptosScanApiData = tool({
               const results = await Promise.all(
                 txnIds.account_transactions.map(async (txn: TransactionId) => {
                   console.log("Transaction ID:", txn.transaction_version);
+                  logInfo(`Fetching transaction data : 
+                ${aptosBaseUrl}/transactions/by_version/${txn.transaction_version}`);
                   const response = await fetch(
-                    `${aptosBaseUrl}/transactions/${txn.transaction_version}`,
+                    `${aptosBaseUrl}/transactions/by_version/${txn.transaction_version}`,
                     {
                       method: "GET",
                       headers: {
@@ -161,7 +187,7 @@ export const getAptosScanApiData = tool({
                     );
                   }
                   const t = await response.json();
-                  return scaleLargeNumbers(t);
+                  return convertToDecimalFields(t);
                 })
               );
 
@@ -186,9 +212,13 @@ export const getAptosScanApiData = tool({
                 ),
             }),
             execute: async ({ txnId }) => {
-              logInfo(`Fetching transaction data for ID: ${txnId}`);
+              logInfo(
+                `Fetching transaction data : 
+                ${aptosBaseUrl}/transactions/${txnId}`
+              );
+
               const response = await fetch(
-                `${aptosBaseUrl}/transactions/${txnId}`,
+                `${aptosBaseUrl}/transactions/by_hash/${txnId}`,
                 {
                   method: "GET",
                   headers: {
@@ -196,13 +226,14 @@ export const getAptosScanApiData = tool({
                   },
                 }
               );
+              // console.log("response is ", response);
               if (!response.ok) {
                 throw new Error(
                   `API call failed with status ${response.status}`
                 );
               }
               const txData = await response.json();
-              const t = scaleLargeNumbers(txData);
+              const t = convertToDecimalFields(txData);
               txData;
               logObjects("txn data - ", t);
               return t;
