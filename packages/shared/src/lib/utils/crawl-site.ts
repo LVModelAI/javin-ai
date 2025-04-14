@@ -1,4 +1,5 @@
 import { app } from "./firecrawlapp";
+import * as Sentry from "@sentry/nextjs";
 
 export async function crawlSite(linkToCrawl: string) {
   try {
@@ -19,6 +20,7 @@ export async function crawlSite(linkToCrawl: string) {
     return crawlResponse.data;
   } catch (error) {
     console.error("Error in crawlSite:", error);
+    Sentry.captureException(error);
     throw error; // Re-throw to allow handling by the caller
   }
 }

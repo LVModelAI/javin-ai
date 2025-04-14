@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 const APTOS_GRAPHQL_ENDPOINT =
   "https://indexer.mainnet.aptoslabs.com/v1/graphql";
 
@@ -19,6 +20,7 @@ async function fetchGraphQL(query: string, variables: Record<string, any>) {
     return json.data;
   } catch (error) {
     console.error(`Error fetching using graph data: ${error}`);
+    Sentry.captureException(error);
     throw error;
   }
 }

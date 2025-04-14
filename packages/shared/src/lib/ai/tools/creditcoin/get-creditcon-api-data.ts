@@ -3,6 +3,7 @@ import { z } from "zod";
 import { myProvider } from "../../models";
 import { getAllPaths, getPathInfo, loadOpenAPI } from "../../../utils/openapi";
 import { makeBlockscoutApiRequest } from "../../../utils/make-blockscout-api-request";
+import * as Sentry from "@sentry/nextjs";
 
 function scaleLargeNumbersInJson(jsonString: string): string {
   return jsonString.replace(/"(\d{10,})"/g, (_match, num) => {
@@ -57,7 +58,7 @@ export const getCreditcoinApiData = tool({
       return results;
     } catch (error: any) {
       console.error("Error in getCreditcoinApiData:", error);
-
+      Sentry.captureException(error);
       // Returning error details so AI can adapt its next action
       return {
         success: false,

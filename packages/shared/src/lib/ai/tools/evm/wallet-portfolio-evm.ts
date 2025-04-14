@@ -7,6 +7,7 @@ import {
 import { filterAndLimitPortfolio, getZerionApiKey } from "../../../utils/utils";
 import { SUPPORTED_CURRENCY } from "../../../constants";
 import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
+import * as Sentry from "@sentry/nextjs";
 
 export const getEvmMultiChainWalletPortfolio = tool({
   description:
@@ -64,6 +65,7 @@ export const getEvmMultiChainWalletPortfolio = tool({
       return { ...filteredPortfolio, currency };
     } catch (error) {
       console.error("Error fetching wallet portfolio:", error);
+      Sentry.captureException(error);
       return "Failed to fetch wallet portfolio";
     }
   },

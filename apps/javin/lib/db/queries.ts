@@ -4,7 +4,7 @@ import { genSaltSync, hashSync } from "bcrypt-ts";
 import { and, asc, desc, eq, gt, gte, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-
+import * as Sentry from "@sentry/nextjs";
 import {
   user,
   chat,
@@ -31,6 +31,7 @@ export async function getUser(email: string): Promise<Array<User>> {
     return await db.select().from(user).where(eq(user.email, email));
   } catch (error) {
     console.error("Failed to get user from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -39,6 +40,7 @@ export async function getUserById(id: string): Promise<Array<User>> {
     return await db.select().from(user).where(eq(user.id, id));
   } catch (error) {
     console.error("Failed to get user from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -59,6 +61,7 @@ export async function createUser(
     }
   } catch (error) {
     console.error("Failed to create user in database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -81,6 +84,7 @@ export async function saveChat({
     });
   } catch (error) {
     console.error("Failed to save chat in database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -96,6 +100,7 @@ export async function updateUserPassword(email: string, newPassword: string) {
       .where(eq(user.email, email));
   } catch (error) {
     console.error("Failed to update user password in database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -120,6 +125,7 @@ export async function getPasswordResetToken(token: string) {
     return resetToken;
   } catch (error) {
     console.error("Failed to get password reset token from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -133,6 +139,7 @@ export async function getPasswordResetTokenUsingEmail(email: string) {
     return token;
   } catch (error) {
     console.error("Failed to get password reset token from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -144,6 +151,7 @@ export async function deletePasswordResetToken(token: string) {
       .where(eq(password_reset_tokens.token, token));
   } catch (error) {
     console.error("Failed to delete password reset token from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -156,6 +164,7 @@ export async function deleteChatById({ id }: { id: string }) {
     return await db.delete(chat).where(eq(chat.id, id));
   } catch (error) {
     console.error("Failed to delete chat by id from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -170,6 +179,7 @@ export async function getChatsByUserId({ id }: { id: string }) {
       .limit(20);
   } catch (error) {
     console.error("Failed to get chats by user from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -180,6 +190,7 @@ export async function getChatById({ id }: { id: string }) {
     return selectedChat;
   } catch (error) {
     console.error("Failed to get chat by id from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -189,6 +200,7 @@ export async function saveMessages({ messages }: { messages: Array<Message> }) {
     return await db.insert(message).values(messages);
   } catch (error) {
     console.error("Failed to save messages in database", error);
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -202,6 +214,7 @@ export async function getMessagesByChatId({ id }: { id: string }) {
       .orderBy(asc(message.createdAt));
   } catch (error) {
     console.error("Failed to get messages by chat id from database", error);
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -234,6 +247,7 @@ export async function voteMessage({
     });
   } catch (error) {
     console.error("Failed to upvote message in database", error);
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -243,6 +257,7 @@ export async function getVotesByChatId({ id }: { id: string }) {
     return await db.select().from(vote).where(eq(vote.chatId, id));
   } catch (error) {
     console.error("Failed to get votes by chat id from database", error);
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -286,6 +301,7 @@ export async function getDocumentsById({ id }: { id: string }) {
     return documents;
   } catch (error) {
     console.error("Failed to get document by id from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -301,6 +317,7 @@ export async function getDocumentById({ id }: { id: string }) {
     return selectedDocument;
   } catch (error) {
     console.error("Failed to get document by id from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -329,6 +346,7 @@ export async function deleteDocumentsByIdAfterTimestamp({
     console.error(
       "Failed to delete documents by id after timestamp from database"
     );
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -342,6 +360,7 @@ export async function saveSuggestions({
     return await db.insert(suggestion).values(suggestions);
   } catch (error) {
     console.error("Failed to save suggestions in database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -360,6 +379,7 @@ export async function getSuggestionsByDocumentId({
     console.error(
       "Failed to get suggestions by document version from database"
     );
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -369,6 +389,7 @@ export async function getMessageById({ id }: { id: string }) {
     return await db.select().from(message).where(eq(message.id, id));
   } catch (error) {
     console.error("Failed to get message by id from database");
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -407,6 +428,7 @@ export async function deleteMessagesByChatIdAfterTimestamp({
     console.error(
       "Failed to delete messages by id after timestamp from database"
     );
+    Sentry.captureException(error);
     throw error;
   }
 }
@@ -422,6 +444,7 @@ export async function updateChatVisiblityById({
     return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
   } catch (error) {
     console.error("Failed to update chat visibility in database");
+    Sentry.captureException(error);
     throw error;
   }
 }

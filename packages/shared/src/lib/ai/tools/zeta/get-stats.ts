@@ -1,6 +1,7 @@
 import { getStatPageScreenshot } from "../../../utils/get-stat-page-sceenshot";
 import { tool } from "ai";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 export const getZetaStats = tool({
   description: "Get ZetaChain blockchain statistics",
@@ -19,7 +20,7 @@ export const getZetaStats = tool({
       return response;
     } catch (error: any) {
       console.error("Error in  getZetaStats:", error);
-
+      Sentry.captureException(error);
       return {
         success: false,
         message: "Error in getting  getZetaStats stats.",

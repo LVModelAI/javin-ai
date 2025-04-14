@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import * as Sentry from "@sentry/nextjs";
 
 // You can use AptosConfig to choose which network to connect to
 const config = new AptosConfig({ network: Network.MAINNET });
@@ -39,6 +40,7 @@ export const aptosNames = tool({
       return addressHex;
     } catch (error: any) {
       console.error("Error in aptosNames:", error);
+      Sentry.captureException(error);
       return {
         success: false,
         message: "Error in getting aptosnames.",
