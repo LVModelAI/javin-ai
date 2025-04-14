@@ -4,8 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Javin.ai",
     short_name: "Javin.ai",
-    description:
-      "A focused, no-nonsense AI search engine for crypto.",
+    description: "A focused, no-nonsense AI search engine for crypto.",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
@@ -24,7 +23,7 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "maskable",
       },
       {
-        src: "/images/javin/javin_logo_512px.jpg",
+        src: "/images/javin/javin_logo_512px.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

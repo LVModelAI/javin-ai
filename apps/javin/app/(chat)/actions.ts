@@ -10,11 +10,28 @@ import {
 import { VisibilityType } from "@/components/visibility-selector";
 import { myProvider } from "@javin/shared/lib/ai/models";
 import { SearchGroupId } from "@javin/shared/lib/utils/utils";
+import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
 // import webpush from 'web-push'
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
   cookieStore.set("chat-model", model);
+}
+
+export async function checkLegacyChatModelCookie() {
+  const cookieStore = await cookies();
+  const legacyChatModel = cookieStore.get("chat-model");
+  if (!legacyChatModel) return;
+  // Check if the cookie value is one of the legacy chat models
+  logObjects("Legacy chat model cookie found:", legacyChatModel.value);
+  if (legacyChatModel?.value === "chat-model-small") {
+    cookieStore.delete("chat-model");
+    cookieStore.set("chat-model", "gpt-4o-mini");
+  }
+  if (legacyChatModel?.value === "chat-model-large") {
+    cookieStore.delete("chat-model");
+    cookieStore.set("chat-model", "gpt-4o");
+  }
 }
 
 export async function saveSearchModeAsCookie(mode: SearchGroupId) {
