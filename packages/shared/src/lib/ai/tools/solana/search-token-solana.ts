@@ -1,11 +1,11 @@
 import { transformBirdeyeToTokenSearchResponse } from "../../../utils/utils";
 import {
-  BirdeyeTokenData,
   BirdeyeTokenSearchResponse,
   TokenSearchData,
 } from "../../../../types/token-search-response";
 import { tool } from "ai";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 const sortByOptions = [
   "fdv",
@@ -66,7 +66,8 @@ export const searchSolanaTokenMarketData = tool({
 
       return tokenSearchResponse.data;
     } catch (error) {
-      // console.error("Error searchTokenMarketData:", error);
+      console.error("Error searchSolanaTokenMarketData:", error);
+      Sentry.captureException(error);
       return "Something went wrong. Please try again";
     }
   },

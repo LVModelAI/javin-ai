@@ -1,13 +1,12 @@
-import { generateObject, generateText, tool } from "ai";
+import { generateText, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../../models";
 import {
-  getAllPaths,
   getAllPathsAndDesc,
   getPathDetails,
-  getPathInfo,
   loadOpenAPI,
 } from "../../../utils/openapi";
+import * as Sentry from "@sentry/nextjs";
 
 //@ts-ignore
 function scaleLargeNumbers(data: any) {
@@ -131,6 +130,7 @@ export const getAptosApiData = tool({
                 return scaledData;
               } catch (error) {
                 console.error("Error fetching aptos API data:", error);
+                Sentry.captureException(error);
                 return { error: "Failed to fetch data from the API." };
               }
             },
@@ -144,6 +144,7 @@ export const getAptosApiData = tool({
       return aiAgentResponse.text;
     } catch (error: any) {
       console.error("Error in getAptosApiData:", error);
+      Sentry.captureException(error);
 
       // Returning error details so AI can adapt its next action
       return {

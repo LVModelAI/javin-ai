@@ -1,5 +1,6 @@
 import $RefParser from "@apidevtools/json-schema-ref-parser";
 import { parse } from "yaml";
+import * as Sentry from "@sentry/nextjs";
 
 async function fetchYAML(url: string) {
   try {
@@ -10,6 +11,7 @@ async function fetchYAML(url: string) {
     const yamlText = await response.text();
     return parse(yamlText); // Parse YAML to OBJECT
   } catch (error) {
+    Sentry.captureException(error);
     console.error("Error fetching YAML:", error);
   }
 }

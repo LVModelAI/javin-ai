@@ -19,6 +19,7 @@
     "@aptos-labs/ts-sdk": "^1.35.0",
     "@ensdomains/ensjs": "^4.0.2",
     "@mendable/firecrawl-js": "^1.17.0",
+    "@sentry/nextjs": "^9.12.0",
     "@tavily/core": "^0.0.3",
     "ai": "4.1.17",
     "clsx": "^2.1.1",

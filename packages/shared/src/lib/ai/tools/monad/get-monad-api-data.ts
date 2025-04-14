@@ -1,18 +1,13 @@
-import { generateObject, generateText, tool } from "ai";
+import { generateObject, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../../models";
 import {
   getAllPathDetails,
-  getAllPaths,
-  getAllPathsAndDesc,
-  getPathDetails,
-  getPathInfo,
-  loadOpenAPI,
   loadOpenAPIFromJson,
 } from "../../../utils/openapi";
-import { makeBlockscoutApiRequest } from "../../../utils/make-blockscout-api-request";
 import monadJson from "./monad-opanapi.json";
 import { makeBlockVisionApiRequest } from "@javin/shared/lib/utils/make-blockvision-api-request";
+import * as Sentry from "@sentry/nextjs";
 
 export const getMonadApiData = tool({
   description: "Get real-time Monad blockchain data.",
@@ -62,7 +57,7 @@ export const getMonadApiData = tool({
       return results;
     } catch (error: any) {
       console.error("Error in getMonadApiData:", error);
-
+      Sentry.captureException(error);
       // Returning error details so AI can adapt its next action
       return {
         success: false,

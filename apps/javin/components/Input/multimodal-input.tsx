@@ -29,6 +29,7 @@ import { motion } from "framer-motion";
 import { ModelSelector } from "./model-selector";
 import { GroupSelector } from "./GroupSelector";
 import { ChevronDown } from "lucide-react";
+import * as Sentry from "@sentry/nextjs";
 
 function PureAttachmentsButton({
   fileInputRef,
@@ -274,6 +275,7 @@ function PureMultimodalInput({
       const { error } = await response.json();
       toast.error(error);
     } catch (error) {
+      Sentry.captureException(error);
       toast.error("Failed to upload file, please try again!");
     }
   };

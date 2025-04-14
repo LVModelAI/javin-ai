@@ -1,4 +1,5 @@
 import FirecrawlApp, { ScrapeResponse } from "@mendable/firecrawl-js";
+import * as Sentry from "@sentry/nextjs";
 
 const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY;
 const FIRECRAWL_API_ENDPOINT = process.env.FIRECRAWL_API_ENDPOINT;
@@ -30,6 +31,7 @@ export async function scrapeSite(linkToScrape: string) {
     };
   } catch (error) {
     console.error("Error in scrapeSite:", error);
+    Sentry.captureException(error);
     throw error; // Re-throw to allow handling by the caller
   }
 }
