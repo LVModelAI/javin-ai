@@ -97,12 +97,23 @@ export async function POST(request: Request) {
     messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
   });
 
-  logInfo("Preparing to stream text with model: " + selectedChatModel);
+  // check if the selected model is a legacy model
+  let modelToUse = selectedChatModel;
+  if (selectedChatModel === "chat-model-small") {
+    logInfo("Legacy model ID detected. Switching to 'gpt-4o-mini'.");
+    modelToUse = "gpt-4o-mini";
+  }
+  if (selectedChatModel === "chat-model-large") {
+    logInfo("Legacy model ID detected. Switching to 'gpt-4o'.");
+    modelToUse = "gpt-4o";
+  }
+
+  logInfo("Preparing to stream text with model: " + modelToUse);
   return createDataStreamResponse({
     execute: (dataStream) => {
       logInfo("Starting text stream execution.");
 
-      if (selectedChatModel === "chat-model-reasoning") {
+      if (modelToUse === "chat-model-reasoning") {
         logInfo(
           "Selected model is 'chat-model-reasoning'; no active tools will be used."
         );
@@ -111,12 +122,12 @@ export async function POST(request: Request) {
       }
 
       const result = streamText({
-        model: myProvider.languageModel(selectedChatModel),
+        model: myProvider.languageModel(modelToUse),
         system: systemPrompt,
         messages,
         maxSteps: 5,
         experimental_activeTools:
-          selectedChatModel === "chat-model-reasoning" ? [] : [...activeTools],
+          modelToUse === "chat-model-reasoning" ? [] : [...activeTools],
         experimental_transform: smoothStream({ chunking: "word" }),
         experimental_generateMessageId: generateUUID,
         tools: allTools,

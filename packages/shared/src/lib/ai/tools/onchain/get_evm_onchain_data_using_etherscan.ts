@@ -36,7 +36,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
       );
 
       const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("gpt-4o-mini"),
+        model: myProvider.languageModel("gpt-4o"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
             
               ## How to Process User Queries:

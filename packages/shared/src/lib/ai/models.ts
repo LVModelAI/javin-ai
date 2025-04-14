@@ -8,7 +8,7 @@ import {
 import { google } from "@ai-sdk/google";
 import { perplexity } from "@ai-sdk/perplexity";
 
-export const DEFAULT_CHAT_MODEL: string = "gpt-4o-mini";
+export const DEFAULT_CHAT_MODEL: string = "gpt-4o";
 
 export const myProvider: any = customProvider({
   languageModels: {
