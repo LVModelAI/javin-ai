@@ -7,7 +7,7 @@ import {
 } from "ai";
 import { google } from "@ai-sdk/google";
 
-export const DEFAULT_CHAT_MODEL: string = "gpt-4o-mini";
+export const DEFAULT_CHAT_MODEL: string = "gpt-4o";
 
 export const myProvider: any = customProvider({
   languageModels: {
