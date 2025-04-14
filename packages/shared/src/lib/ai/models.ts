@@ -7,12 +7,12 @@ import {
 } from "ai";
 import { google } from "@ai-sdk/google";
 
-export const DEFAULT_CHAT_MODEL: string = "chat-model-small";
+export const DEFAULT_CHAT_MODEL: string = "gpt-4o-mini";
 
 export const myProvider: any = customProvider({
   languageModels: {
-    "chat-model-small": openai("gpt-4o-mini"),
-    "chat-model-large": openai("gpt-4o"),
+    "gpt-4o-mini": openai("gpt-4o-mini"),
+    "gpt-4o": openai("gpt-4o"),
     "chat-model-reasoning": wrapLanguageModel({
       model: fireworks("accounts/fireworks/models/deepseek-r1"),
       middleware: extractReasoningMiddleware({ tagName: "think" }),
@@ -38,12 +38,12 @@ interface ChatModel {
 
 export const chatModels: Array<ChatModel> = [
   {
-    id: "chat-model-small",
+    id: "gpt-4o-mini",
     name: "Gpt 4o mini",
     description: "Small model for fast, lightweight tasks",
   },
   {
-    id: "chat-model-large",
+    id: "gpt-4o",
     name: "Gpt 4o",
     description: "Large model for complex, multi-step tasks",
   },
