@@ -234,9 +234,18 @@ importers:
       ai:
         specifier: 4.1.17
         version: 4.1.17(react@19.0.0-rc-45804af1-20241021)(zod@3.24.2)
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
+      drizzle-orm:
+        specifier: ^0.34.1
+        version: 0.34.1(@opentelemetry/api@1.9.0)(postgres@3.4.5)(react@19.0.0-rc-45804af1-20241021)
       next:
         specifier: 15.2.1-canary.2
         version: 15.2.1-canary.2(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.0.0-rc-45804af1-20241021)(react@19.0.0-rc-45804af1-20241021)
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.5
       react:
         specifier: 19.0.0-rc-45804af1-20241021
         version: 19.0.0-rc-45804af1-20241021
@@ -256,12 +265,18 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.29.1
         version: 8.29.1(eslint@8.56.0)(typescript@5.8.3)
+      drizzle-kit:
+        specifier: ^0.25.0
+        version: 0.25.0
       eslint:
         specifier: ^8.56.0
         version: 8.56.0
       eslint-config-next:
         specifier: 14.2.5
         version: 14.2.5(eslint@8.56.0)(typescript@5.8.3)
+      tsx:
+        specifier: ^4.19.3
+        version: 4.19.3
 
   packages/shared:
     dependencies:
@@ -5500,6 +5515,100 @@ packages:
       '@vercel/postgres': 0.10.0
       postgres: 3.4.5
       react: 18.3.1
+    dev: false
+
+  /drizzle-orm@0.34.1(@opentelemetry/api@1.9.0)(postgres@3.4.5)(react@19.0.0-rc-45804af1-20241021):
+    resolution: {integrity: sha512-t+zCwyWWt8xTqtYV4doE/xYmT7hpv1L8pQ66zddEz+3VWyedBBtctjMAp22mAJPfyWurRQXUJ1nrTtqLq+DqNA==}
+    peerDependencies:
+      '@aws-sdk/client-rds-data': '>=3'
+      '@cloudflare/workers-types': '>=3'
+      '@electric-sql/pglite': '>=0.1.1'
+      '@libsql/client': '>=0.10.0'
+      '@neondatabase/serverless': '>=0.1'
+      '@op-engineering/op-sqlite': '>=2'
+      '@opentelemetry/api': ^1.4.1
+      '@planetscale/database': '>=1'
+      '@prisma/client': '*'
+      '@tidbcloud/serverless': '*'
+      '@types/better-sqlite3': '*'
+      '@types/pg': '*'
+      '@types/react': '>=18'
+      '@types/sql.js': '*'
+      '@vercel/postgres': '>=0.8.0'
+      '@xata.io/client': '*'
+      better-sqlite3: '>=7'
+      bun-types: '*'
+      expo-sqlite: '>=13.2.0'
+      knex: '*'
+      kysely: '*'
+      mysql2: '>=2'
+      pg: '>=8'
+      postgres: '>=3'
+      prisma: '*'
+      react: '>=18'
+      sql.js: '>=1'
+      sqlite3: '>=5'
+    peerDependenciesMeta:
+      '@aws-sdk/client-rds-data':
+        optional: true
+      '@cloudflare/workers-types':
+        optional: true
+      '@electric-sql/pglite':
+        optional: true
+      '@libsql/client':
+        optional: true
+      '@neondatabase/serverless':
+        optional: true
+      '@op-engineering/op-sqlite':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
+      '@planetscale/database':
+        optional: true
+      '@prisma/client':
+        optional: true
+      '@tidbcloud/serverless':
+        optional: true
+      '@types/better-sqlite3':
+        optional: true
+      '@types/pg':
+        optional: true
+      '@types/react':
+        optional: true
+      '@types/sql.js':
+        optional: true
+      '@vercel/postgres':
+        optional: true
+      '@xata.io/client':
+        optional: true
+      better-sqlite3:
+        optional: true
+      bun-types:
+        optional: true
+      expo-sqlite:
+        optional: true
+      knex:
+        optional: true
+      kysely:
+        optional: true
+      mysql2:
+        optional: true
+      pg:
+        optional: true
+      postgres:
+        optional: true
+      prisma:
+        optional: true
+      react:
+        optional: true
+      sql.js:
+        optional: true
+      sqlite3:
+        optional: true
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      postgres: 3.4.5
+      react: 19.0.0-rc-45804af1-20241021
     dev: false
 
   /dunder-proto@1.0.1:
