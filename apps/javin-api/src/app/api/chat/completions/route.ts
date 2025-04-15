@@ -52,6 +52,20 @@ export async function POST(request: Request) {
         experimental_generateMessageId: generateUUID,
       });
 
+      await saveMessages({
+        messages: [
+          {
+            id: generateUUID(),
+            prompt: prompt,
+            response: result.text,
+            location: "chat/completions",
+            model: model,
+            stream:StreamingTrue,
+            createdAt: new Date(),
+          },
+        ],
+      });
+
       const responseMessage = {
         id: generateUUID(),
         object: "chat.completion",
@@ -74,19 +88,6 @@ export async function POST(request: Request) {
         usage: { ...result.usage },
         service_tier: null,
       };
-
-      await saveMessages({
-        messages: [
-          {
-            id: generateUUID(),
-            prompt: prompt,
-            response: result.text,
-            location: "chat/completions",
-            model: model,
-            createdAt: new Date(),
-          },
-        ],
-      });
 
       return new Response(JSON.stringify(responseMessage), {
         headers: { "Content-Type": "application/json" },
@@ -138,6 +139,7 @@ export async function POST(request: Request) {
                     response: text,
                     location: "chat/completions",
                     model: model,
+                    stream:StreamingTrue,
                     createdAt: new Date(),
                   },
                 ],
@@ -153,7 +155,7 @@ export async function POST(request: Request) {
           const streamId = generateUUID(); // Keep a consistent ID for the stream
 
           for await (const chunk of result.textStream) {
-            console.log("chunk = ", chunk);
+            // console.log("chunk = ", chunk);
             const message: ChatCompletionStreaming = {
               id: streamId,
               object: "chat.completion.chunk",

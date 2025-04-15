@@ -1,6 +1,5 @@
-import { pgTable, uuid, varchar, json, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, json, timestamp, boolean } from "drizzle-orm/pg-core";
 import type { InferSelectModel } from "drizzle-orm";
-
 export const message = pgTable("Message", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   // user prompt
@@ -11,6 +10,7 @@ export const message = pgTable("Message", {
   // this is to make sure which of our 2 APIs is being used to generate response
   location: varchar("location").notNull(),
   model: varchar("model").notNull(),
+  stream: boolean("stream").notNull(),
   createdAt: timestamp("createdAt").notNull(),
 });
 
