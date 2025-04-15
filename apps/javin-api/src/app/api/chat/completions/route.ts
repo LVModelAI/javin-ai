@@ -5,6 +5,7 @@ import { smoothStream, streamText, generateText } from "ai";
 import { PromptRequestSchema, ChatCompletionStreaming } from "./type";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
+import { saveMessages } from "@/src/lib/db/queries";
 
 export async function POST(request: Request) {
   try {
@@ -74,6 +75,19 @@ export async function POST(request: Request) {
         service_tier: null,
       };
 
+      await saveMessages({
+        messages: [
+          {
+            id: generateUUID(),
+            prompt: prompt,
+            response: result.text,
+            location: "chat/completions",
+            model: model,
+            createdAt: new Date(),
+          },
+        ],
+      });
+
       return new Response(JSON.stringify(responseMessage), {
         headers: { "Content-Type": "application/json" },
       });
@@ -113,7 +127,21 @@ export async function POST(request: Request) {
             maxSteps: 10,
             experimental_activeTools: [...activeTools],
             onChunk: async ({ chunk }) => {
-              console.log("onChunk = ", chunk);
+              // console.log("onChunk = ", chunk);
+            },
+            onFinish: async ({ text }) => {
+              await saveMessages({
+                messages: [
+                  {
+                    id: generateUUID(),
+                    prompt: prompt,
+                    response: text,
+                    location: "chat/completions",
+                    model: model,
+                    createdAt: new Date(),
+                  },
+                ],
+              });
             },
             tools: allTools,
             maxTokens: max_tokens,
