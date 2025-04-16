@@ -203,15 +203,15 @@ export async function POST(request: Request) {
             }),
             execute: async ({ userQuery }) => {
               try {
-                console.log("user query : ", userQuery);
+                logObjects("user query : ", userQuery);
 
                 // Send initial status update (without steps count and extra details)
-                console.log("onChainGraph: initialised");
+                logInfo("onChainGraph: initialised");
 
                 // create 3 variations of the search query
                 const { object: search_query_array_obj } = await generateObject(
                   {
-                    model: myProvider.languageModel("chat-model-small"),
+                    model: myProvider.languageModel("gpt-4o"),
                     schema: z.object({
                       search_query_array: z
                         .array(z.string())
@@ -235,7 +235,7 @@ export async function POST(request: Request) {
                 );
                 const search_query_array =
                   search_query_array_obj.search_query_array;
-                console.log("search query : ", search_query_array);
+                logObjects("search query : ", search_query_array);
 
                 let subGraphsData: any[] = [];
 
@@ -246,21 +246,21 @@ export async function POST(request: Request) {
                   i < search_query_array.length
                 ) {
                   const searchQuery = search_query_array[i];
-                  console.log("search query : ", searchQuery);
+                  logObjects("search query : ", searchQuery);
                   //remove spaces from the start and end of the query
                   const trimmedQuery = searchQuery.trim();
                   // Encode spaces in the middle of the query
                   const encodedQuery = encodeInternalSpacesOnly(trimmedQuery);
                   const searchQueryUrl = `https://thegraph.com/explorer/api/subgraphs/search?orderBy=Query+Count&orderDirection=desc&search=${encodedQuery}&page=1`;
 
-                  console.log("search query names : ", searchQueryUrl);
+                  logObjects("search query names : ", searchQueryUrl);
 
                   const queryResponse = await fetch(searchQueryUrl);
                   const data: SubgraphResponseInfo = await queryResponse.json();
-                  // console.log("sub graph data : ", data);
+                  // logObjects("sub graph data : ", data);
 
                   if (data.subgraphs.length == 0) {
-                    console.log("no sub graph found");
+                    logInfo("no sub graph found");
                     i++;
                     continue;
                   }
@@ -287,11 +287,11 @@ export async function POST(request: Request) {
                 if (subGraphsData.length == 0) {
                   return "No subgraph found for the given query, please try again";
                 }
-                console.log("sub graph data : ", subGraphsData);
+                logObjects("sub graph data : ", subGraphsData);
 
                 //chose the best subgraph
                 const { object: bestSubgraphIdObj } = await generateObject({
-                  model: myProvider.languageModel("chat-model-small"),
+                  model: myProvider.languageModel("gpt-4o"),
                   schema: z.object({
                     bestSubgraphId: z.string().describe("best subgraph id"),
                   }),
@@ -309,18 +309,18 @@ Return the best subgraph ID
                   `,
                 });
                 const bestSubgraphId = bestSubgraphIdObj.bestSubgraphId;
-                console.log("best subgraph id : ", bestSubgraphId);
+                logObjects("best subgraph id : ", bestSubgraphId);
                 const bestSubgraph = subGraphsData.find(
                   (subgraph) => subgraph.id === bestSubgraphId
                 );
                 if (!bestSubgraph) {
                   return "No subgraph found for the given query, please try again";
                 }
-                console.log("best subgraph : ", bestSubgraph.displayName);
+                logObjects("best subgraph : ", bestSubgraph.displayName);
                 // const bestSubgraphId =
                 //   "GENunSHWLBXm59mBSgPzQ8metBEp9YDfdqwFr91Av1UM";
 
-                console.log("getting schema of  : ", bestSubgraphId);
+                logObjects("getting schema of  : ", bestSubgraphId);
 
                 // Chunk and embed schema if not already in Pinecone
                 const alreadyExists = await schemaExists(bestSubgraphId);
@@ -332,7 +332,7 @@ Return the best subgraph ID
                   }
 
                   const queryUrl = `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${bestSubgraphId}`;
-                  console.log("schema query url : ", queryUrl);
+                  logObjects("schema query url : ", queryUrl);
 
                   const body = {
                     query: getIntrospectionQuery(),
@@ -358,9 +358,6 @@ Return the best subgraph ID
                     throw new Error(
                       "Invalid introspection result. GraphQL returned errors."
                     );
-                    throw new Error(
-                      "Invalid introspection result. GraphQL returned errors."
-                    );
                   }
 
                   if (!schemaJson.data) {
@@ -374,9 +371,9 @@ Return the best subgraph ID
                     schemaJson.data
                   );
                   await embedAndStoreChunks(bestSubgraphId, chunks);
-                  console.log("Stored schema chunks in Pinecone.");
+                  logInfo("Stored schema chunks in Pinecone.");
                 } else {
-                  console.log("Schema chunks already exist in Pinecone.");
+                  logInfo("Schema chunks already exist in Pinecone.");
                 }
 
                 // Step 4: Query Pinecone for relevant schema chunks
@@ -385,14 +382,14 @@ Return the best subgraph ID
                     bestSubgraphId,
                     userQuery
                   );
-                // console.log(
+                // logObjects(
                 //   "Relevant schema chunks from Pinecone:",
                 //   relevantSchema
                 // );
 
                 // Step 5: Generate GraphQL query using the relevant schema
                 const { object: queryObj } = await generateObject({
-                  model: myProvider.languageModel("chat-model-small"),
+                  model: myProvider.languageModel("gpt-4o"),
                   schema: z.object({
                     query: z.string().describe("graphql query"),
                   }),
@@ -436,18 +433,18 @@ User: ${userQuery}
 `,
                 });
                 const query = queryObj.query;
-                console.log("graphql query make by agent: ", query);
+                logObjects("graphql query make by agent: ", query);
                 // Step 6: Fetch data from the subgraph using the generated GraphQL query
 
-                console.log("getting data of  : ", bestSubgraphId);
+                logObjects("getting data of  : ", bestSubgraphId);
                 const apiKey = process.env.THE_GRAPH_API_KEY;
                 if (!apiKey) {
                   return "API key is not defined";
                 }
 
                 const queryUrl = `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${bestSubgraphId}`;
-                console.log("data query url : ", queryUrl);
-                // console.log("graphql query : ", query);
+                logObjects("data query url : ", queryUrl);
+                // logObjects("graphql query : ", query);
                 const body = {
                   query: query,
                 };
@@ -467,7 +464,7 @@ User: ${userQuery}
                   return "Error fetching subgraph data";
                 }
                 const dataJson = await response.json();
-                // console.log("data json : ", dataJson);
+                // logObjects("data json : ", dataJson);
 
                 return dataJson;
               } catch (error) {
