@@ -1,13 +1,12 @@
-import { generateObject, generateText, tool } from "ai";
+import { generateText, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../../models";
 import {
-  getAllPaths,
   getAllPathsAndDesc,
   getPathDetails,
-  getPathInfo,
   loadOpenAPI,
 } from "../../../utils/openapi";
+import * as Sentry from "@sentry/nextjs";
 
 //@ts-ignore
 function scaleLargeNumbers(data: any) {
@@ -61,7 +60,7 @@ export const getAptosApiData = tool({
       const aptosBaseUrl = "https://api.mainnet.aptoslabs.com/v1";
 
       const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant aptos blockchain data in a user-friendly format.
       
          you can use the below tools to get the required data:
@@ -131,6 +130,7 @@ export const getAptosApiData = tool({
                 return scaledData;
               } catch (error) {
                 console.error("Error fetching aptos API data:", error);
+                Sentry.captureException(error);
                 return { error: "Failed to fetch data from the API." };
               }
             },
@@ -144,6 +144,7 @@ export const getAptosApiData = tool({
       return aiAgentResponse.text;
     } catch (error: any) {
       console.error("Error in getAptosApiData:", error);
+      Sentry.captureException(error);
 
       // Returning error details so AI can adapt its next action
       return {

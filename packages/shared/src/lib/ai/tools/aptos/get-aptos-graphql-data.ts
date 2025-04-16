@@ -11,6 +11,7 @@ import {
   getTokenActivity,
   getTransactionBalanceChange,
 } from "../../../utils/aptosGraphqlFunctions"; // Import the functions you built earlier
+import * as Sentry from "@sentry/nextjs";
 
 // Utility to call respective functions
 export const getAptosGraphqlData = tool({
@@ -25,7 +26,7 @@ export const getAptosGraphqlData = tool({
 
       // Step 2: Ask the AI agent to select the best tool to fetch the data.
       const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         system: `You are an intelligent API assistant. Your job is to process user queries and call the relevant tool to fetch the data from Aptos. 
         Choose the appropriate tool from the list and provide the required parameters.`,
         prompt: `User query: "${userQuery}".`,
@@ -121,6 +122,7 @@ export const getAptosGraphqlData = tool({
       return aiAgentResponse.text;
     } catch (error: any) {
       console.error("Error in fetching data:", error);
+      Sentry.captureException(error);
       return {
         success: false,
         message: "Error fetching data.",

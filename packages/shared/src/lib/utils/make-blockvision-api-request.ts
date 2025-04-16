@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/nextjs";
+
 export const makeBlockVisionApiRequest = async (url: string) => {
   const apiKey = process.env.BLOCKVISION_API_KEY;
   if (!apiKey) {
@@ -25,7 +27,7 @@ export const makeBlockVisionApiRequest = async (url: string) => {
     return apiResultString;
   } catch (error: any) {
     console.error("Error in making api call:", url, error);
-
+    Sentry.captureException(error);
     // Returning error details so AI can adapt its next action
     throw new Error("Error in making api call:", error);
   }

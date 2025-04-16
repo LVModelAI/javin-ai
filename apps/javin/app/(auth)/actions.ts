@@ -182,6 +182,7 @@ export async function forgotPassword(
     return { status: "success" };
   } catch (err) {
     console.log("Error while running forgotPassword action = ", err);
+    Sentry.captureException(err);
     return { status: "failed" };
   }
 }
@@ -240,6 +241,7 @@ export async function verifyAndResetPassword(
     return { status: "success" };
   } catch (err) {
     console.log("Error while running verifyAndResetPassword action = ", err);
+    Sentry.captureException(err);
     return { status: "failed" };
   }
 }

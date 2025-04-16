@@ -105,22 +105,22 @@ export async function POST(request: Request) {
   } = await request.json();
 
   // logObjects("Request data:", { id, messages, selectedChatModel, group });
-  logObjects("Search group:", group);
+  // logObjects("Search group:", group);
 
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
     console.error("User not authenticated.");
     return new Response("Please login to start chatting!", { status: 401 });
   }
-  logObjects("User session:", session.user);
+  // logObjects("User session:", session.user);
 
   const { tools: activeTools, systemPrompt } = await getGroupConfig(group);
-  logObjects("Group configuration loaded. Active tools:", activeTools);
+  // logObjects("Group configuration loaded. Active tools:", activeTools);
   // logInfo("System prompt:", systemPrompt);
 
   const users = await getUserById(session.user.id!);
   const user_info = users[0];
-  logObjects("Retrieved user info:", user_info);
+  // logObjects("Retrieved user info:", user_info);
 
   if (user_info.dailyMessageRemaining <= 0) {
     if (user_info.tier === "free") {
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
     console.error("No user message found in the request.");
     return new Response("No user message found", { status: 400 });
   }
-  logObjects("Most recent user message:", userMessage);
+  // logObjects("Most recent user message:", userMessage);
 
   const chat = await getChatById({ id });
   if (!chat) {
@@ -161,12 +161,23 @@ export async function POST(request: Request) {
     messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
   });
 
-  logInfo("Preparing to stream text with model: " + selectedChatModel);
+  // check if the selected model is a legacy model
+  let modelToUse = selectedChatModel;
+  if (selectedChatModel === "chat-model-small") {
+    logInfo("Legacy model ID detected. Switching to 'gpt-4o-mini'.");
+    modelToUse = "gpt-4o-mini";
+  }
+  if (selectedChatModel === "chat-model-large") {
+    logInfo("Legacy model ID detected. Switching to 'gpt-4o'.");
+    modelToUse = "gpt-4o";
+  }
+
+  logInfo("Preparing to stream text with model: " + modelToUse);
   return createDataStreamResponse({
     execute: (dataStream) => {
       logInfo("Starting text stream execution.");
 
-      if (selectedChatModel === "chat-model-reasoning") {
+      if (modelToUse === "chat-model-reasoning") {
         logInfo(
           "Selected model is 'chat-model-reasoning'; no active tools will be used."
         );
@@ -175,12 +186,12 @@ export async function POST(request: Request) {
       }
 
       const result = streamText({
-        model: myProvider.languageModel(selectedChatModel),
+        model: myProvider.languageModel(modelToUse),
         system: systemPrompt,
         messages,
         maxSteps: 5,
         experimental_activeTools:
-          selectedChatModel === "chat-model-reasoning" ? [] : [...activeTools],
+          modelToUse === "chat-model-reasoning" ? [] : [...activeTools],
         experimental_transform: smoothStream({ chunking: "word" }),
         experimental_generateMessageId: generateUUID,
         tools: {
@@ -467,7 +478,7 @@ User: ${userQuery}
           }),
         },
         onStepFinish(event) {
-          // logInfo("Step finished.");
+          logInfo("Step finished.");
           // logObjects("Step Event:", event);
         },
         onFinish: async ({ response, reasoning }) => {

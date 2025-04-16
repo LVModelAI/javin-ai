@@ -8,6 +8,8 @@ import {
   TextCompletionStreaming,
 } from "./type";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
+import { saveMessages } from "@/src/lib/db/queries";
 
 export async function POST(request: Request) {
   try {
@@ -52,6 +54,21 @@ export async function POST(request: Request) {
         temperature: temperature,
         experimental_generateMessageId: generateUUID,
       });
+
+      await saveMessages({
+        messages: [
+          {
+            id: generateUUID(),
+            prompt: prompt,
+            response: result.text,
+            location: "completions",
+            model: model,
+            stream:StreamingTrue,
+            createdAt: new Date(),
+          },
+        ],
+      });
+
       const responseMessage: TextCompletion = {
         id: generateUUID(),
         object: "text_completion",
@@ -88,7 +105,22 @@ export async function POST(request: Request) {
             onChunk: async ({ chunk }) => {
               // MAKE THIS INTO OPENAI API STANDARD MESSAGE AND PUSH IN CONTROLLER
               // IF YOU WANT TO SEND TOOL INFORMATION
-              console.log("onChunk = ", chunk);
+              // console.log("onChunk = ", chunk);
+            },
+            onFinish: async ({ text }) => {
+              await saveMessages({
+                messages: [
+                  {
+                    id: generateUUID(),
+                    prompt: prompt,
+                    response: text,
+                    location: "completions",
+                    model: model,
+                    stream:StreamingTrue,
+                    createdAt: new Date(),
+                  },
+                ],
+              });
             },
             tools: allTools,
             maxTokens: max_tokens,
@@ -97,7 +129,7 @@ export async function POST(request: Request) {
             experimental_generateMessageId: generateUUID,
           });
           for await (const chunk of result.textStream) {
-            console.log("chunk = ", chunk);
+            // console.log("chunk = ", chunk);
             const message: TextCompletionStreaming = {
               id: generateUUID(),
               object: "text_completion",
@@ -132,6 +164,7 @@ export async function POST(request: Request) {
           controller.close();
         } catch (error) {
           console.error("Streaming error:", error);
+          Sentry.captureException(error);
           controller.enqueue(
             encoder.encode(
               `data: ${JSON.stringify({ error: "Internal Server Error" })}\n\n`
@@ -160,7 +193,7 @@ export async function POST(request: Request) {
         }
       );
     }
-
+    Sentry.captureException(error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

@@ -1,6 +1,7 @@
 import { getStatPageScreenshot } from "../../../utils/get-stat-page-sceenshot";
 import { tool } from "ai";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 export const getAptosStats = tool({
   description: "Get Aptos blockchain statistics",
@@ -19,7 +20,7 @@ export const getAptosStats = tool({
       return response;
     } catch (error: any) {
       console.error("Error in getAptosStats:", error);
-
+      Sentry.captureException(error);
       return {
         success: false,
         message: "Error in getting aptos stats.",

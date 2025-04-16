@@ -4,6 +4,8 @@ import { openai } from "@ai-sdk/openai";
 import { smoothStream, streamText, generateText } from "ai";
 import { PromptRequestSchema, ChatCompletionStreaming } from "./type";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
+import { saveMessages } from "@/src/lib/db/queries";
 
 export async function POST(request: Request) {
   try {
@@ -48,6 +50,20 @@ export async function POST(request: Request) {
         maxTokens: max_tokens,
         temperature: temperature,
         experimental_generateMessageId: generateUUID,
+      });
+
+      await saveMessages({
+        messages: [
+          {
+            id: generateUUID(),
+            prompt: prompt,
+            response: result.text,
+            location: "chat/completions",
+            model: model,
+            stream:StreamingTrue,
+            createdAt: new Date(),
+          },
+        ],
       });
 
       const responseMessage = {
@@ -112,7 +128,22 @@ export async function POST(request: Request) {
             maxSteps: 10,
             experimental_activeTools: [...activeTools],
             onChunk: async ({ chunk }) => {
-              console.log("onChunk = ", chunk);
+              // console.log("onChunk = ", chunk);
+            },
+            onFinish: async ({ text }) => {
+              await saveMessages({
+                messages: [
+                  {
+                    id: generateUUID(),
+                    prompt: prompt,
+                    response: text,
+                    location: "chat/completions",
+                    model: model,
+                    stream:StreamingTrue,
+                    createdAt: new Date(),
+                  },
+                ],
+              });
             },
             tools: allTools,
             maxTokens: max_tokens,
@@ -124,7 +155,7 @@ export async function POST(request: Request) {
           const streamId = generateUUID(); // Keep a consistent ID for the stream
 
           for await (const chunk of result.textStream) {
-            console.log("chunk = ", chunk);
+            // console.log("chunk = ", chunk);
             const message: ChatCompletionStreaming = {
               id: streamId,
               object: "chat.completion.chunk",
@@ -170,6 +201,7 @@ export async function POST(request: Request) {
           controller.close();
         } catch (error) {
           console.error("Streaming error:", error);
+          Sentry.captureException(error);
           controller.enqueue(
             encoder.encode(
               `data: ${JSON.stringify({ error: "Internal Server Error" })}\n\n`
@@ -198,7 +230,7 @@ export async function POST(request: Request) {
         }
       );
     }
-
+    Sentry.captureException(error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

@@ -1,4 +1,5 @@
 import { getZerionApiKey } from "../../../utils/utils";
+import * as Sentry from "@sentry/nextjs";
 
 export const fetchApi = async ({
   url,
@@ -52,6 +53,7 @@ export const fetchApi = async ({
     return apiResult;
   } catch (error: any) {
     console.error("Error in onChainQuery while fetching " + url + " : ", error);
+    Sentry.captureException(error);
 
     // Returning error details so AI can adapt its next action
     return {

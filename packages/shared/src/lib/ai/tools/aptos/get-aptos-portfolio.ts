@@ -1,6 +1,7 @@
 import { getPortfolio } from "@javin/shared/lib/utils/aptosGraphqlFunctions";
 import { tool } from "ai";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 // Recursive function to process numbers in the response
 const processNumbers = (data: any): any => {
@@ -41,6 +42,7 @@ export const getAptosPortfolio = tool({
       return portfolio;
     } catch (error: any) {
       console.error("Error in getAptosPortfolio:", error);
+      Sentry.captureException(error);
       // Returning error details so AI can adapt its next action
       return {
         success: false,

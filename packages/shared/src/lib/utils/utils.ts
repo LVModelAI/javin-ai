@@ -225,6 +225,13 @@ export const searchGroups = [
   //   img: "/images/icon/wormhole-logo.png",
   // },
   {
+    id: "aptos",
+    name: "Aptos",
+    description: "Everything Aptos. Search, transactions and more.",
+    icon: Network,
+    img: "/images/icon/aptos/aptos-logo.png",
+  },
+  {
     id: "on_chain_graph" as const,
     name: "On Chain Graph",
     description: "Indepth onchain analysis",
@@ -260,13 +267,7 @@ export const searchGroups = [
     icon: Network,
     img: "/images/icon/zeta/zetachain-logo.png",
   },
-  {
-    id: "aptos",
-    name: "Aptos",
-    description: "Everything Aptos. Search, transactions and more.",
-    icon: Network,
-    img: "/images/icon/aptos/aptos-logo.png",
-  },
+
   {
     id: "monad",
     name: "Monad",

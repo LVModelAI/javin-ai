@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/nextjs";
+
 function scaleLargeNumbersInJson(jsonString: string): string {
   return jsonString.replace(/"(\d{15,})"/g, (_match, num) => {
     const scaledNum = (Number(num) / 1e18).toFixed(8) + " (scaled)";
@@ -32,7 +34,7 @@ export const makeBlockscoutApiRequest = async (url: string) => {
     return result;
   } catch (error: any) {
     console.error("Error in making api call:", error);
-
+    Sentry.captureException(error);
     // Returning error details so AI can adapt its next action
     throw new Error("Error in making api call:", error);
   }

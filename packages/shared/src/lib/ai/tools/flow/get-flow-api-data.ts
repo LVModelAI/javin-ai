@@ -1,8 +1,9 @@
-import { generateObject, generateText, tool } from "ai";
+import { generateObject, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../../models";
-import { getAllPaths, getPathInfo, loadOpenAPI } from "../../../utils/openapi";
+import { getAllPaths, loadOpenAPI } from "../../../utils/openapi";
 import { makeBlockscoutApiRequest } from "../../../utils/make-blockscout-api-request";
+import * as Sentry from "@sentry/nextjs";
 
 function scaleLargeNumbersInJson(jsonString: string): string {
   return jsonString.replace(/"(\d{15,})"/g, (_match, num) => {
@@ -24,7 +25,7 @@ export const getFlowApiData = tool({
       const allPaths = await getAllPaths(openapidata);
       console.log("use prompt is -- ", userQuery);
       const { object: apiEndpointsArray } = await generateObject({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         output: "array",
         schema: z.string().describe("the api endpoint"),
         system: `\n
@@ -56,7 +57,7 @@ export const getFlowApiData = tool({
       return results;
     } catch (error: any) {
       console.error("Error in getFlowApiData:", error);
-
+      Sentry.captureException(error);
       // Returning error details so AI can adapt its next action
       return {
         success: false,

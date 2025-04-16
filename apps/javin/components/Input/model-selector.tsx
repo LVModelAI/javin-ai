@@ -1,6 +1,9 @@
 "use client";
 import { startTransition, useMemo, useOptimistic, useState } from "react";
-import { saveChatModelAsCookie } from "@/app/(chat)/actions";
+import {
+  checkLegacyChatModelCookie,
+  saveChatModelAsCookie,
+} from "@/app/(chat)/actions";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +18,7 @@ import { useEffect } from "react";
 import { CheckCircleFillIcon, ChevronDownIcon } from "@/components/icons";
 import BottomSheet from "../bottom-sheet";
 import { useWindowSize } from "usehooks-ts";
+import { logInfo } from "@javin/shared/lib/utils/logging";
 
 const tailwindMd = 768;
 
@@ -33,6 +37,14 @@ export function ModelSelector({
     () => chatModels.find((chatModel) => chatModel.id === optimisticModelId),
     [optimisticModelId]
   );
+
+  useEffect(() => {
+    const fetchLegacyCookie = async () => {
+      logInfo("Checking for legacy chat model cookie...");
+      await checkLegacyChatModelCookie();
+    };
+    fetchLegacyCookie();
+  }, []);
 
   return (
     <>
