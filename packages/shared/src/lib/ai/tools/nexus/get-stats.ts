@@ -4,7 +4,7 @@ import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
 
 export const getNexusStats = tool({
-  description: "Get ZetaChain blockchain statistics",
+  description: "Get Nexus blockchain statistics",
   parameters: z.object({}),
   execute: async () => {
     try {

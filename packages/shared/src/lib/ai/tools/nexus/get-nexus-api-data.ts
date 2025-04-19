@@ -7,7 +7,7 @@ import * as Sentry from "@sentry/nextjs";
 import { logInfo } from "@javin/shared/lib/utils/logging";
 
 export const getNexusApiData = tool({
-  description: "Get real-time Zeta Chain blockchain data.",
+  description: "Get real-time Nexus Chain blockchain data.",
   parameters: z.object({
     userQuery: z.string().describe("Query of user."),
     limit: z
@@ -60,12 +60,12 @@ export const getNexusApiData = tool({
 
       return results;
     } catch (error: any) {
-      console.error("Error in getZetaApiData:", error);
+      console.error("Error in getNexusApiData:", error);
       Sentry.captureException(error);
       // Returning error details so AI can adapt its next action
       return {
         success: false,
-        message: "Error fetching zetachain blockchain data.",
+        message: "Error fetching nexus blockchain data.",
         error: error.message || "Unknown error",
       };
     }
