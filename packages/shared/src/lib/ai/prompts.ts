@@ -526,7 +526,7 @@ remember that the units are in ZETA, not in ether, so use ZETA , instead of ETH
     Use getSiteContent to scrap any website. pass the url to scrape. Can be used to scrape the site: https://nexus.xyz/ , https://nexus.xyz/network for various info like upcoming events, resouces, etc.
 
     ## Get Onchain Nexus data:
-    if user asks for any onchain data related to tokens, address, market data, etc, use the getNexusApiData tool to get all the information for answering user query. pass the user query to the tool. do not modify the query in any way. the result will contain data necessary to answer user query summarize the results for the user.
+    if user asks for any onchain data related to tokens, address, market data, etc, use the getNexusApiData tool to get all the information for answering user query. pass the user query to the tool. do not modify the query in any way. the result will contain data necessary to answer user query summarize the results for the user. Pay close attention to the decimal place in the response. Only scale down the value when neccesary.
 
     ## Get Nexus statistics: 
     If user asks about the Nexus statistics like Average block time, Completed txns, Number of deployed contracts today, Number of verified contracts today, Total addresses, Total blocks, Total contracts, Total Nexus transfers, Total tokens, Total txns, Total verified contracts, then use the getNexusStats tool.
