@@ -197,9 +197,18 @@ export type SearchGroupId =
   | "flow"
   | "zeta"
   | "monad"
-  | "aptos";
+  | "aptos"
+  | "nexus";
 
-export const searchGroups = [
+export type SearchGroup = {
+  id: SearchGroupId;
+  name: string;
+  description: string;
+  icon: React.ComponentType<any>;
+  img: string;
+};
+
+export const searchGroups:SearchGroup[] = [
   {
     id: "search" as const,
     name: "Web",
@@ -231,11 +240,11 @@ export const searchGroups = [
     img: "/images/icon/aptos/aptos-logo.png",
   },
   {
-    id: "creditcoin" as const,
-    name: "Creditcoin",
-    description: "Everything Creditcoin. Search, transactions and more.",
+    id: "nexus",
+    name: "Nexus",
+    description: "Everything Nexus. Search, transactions and more.",
     icon: Network,
-    img: "/images/icon/creditcoin/creditcoin-white.png",
+    img: "/images/chain-logo/nexus.png",
   },
   {
     id: "vana" as const,
@@ -258,7 +267,13 @@ export const searchGroups = [
     icon: Network,
     img: "/images/icon/zeta/zetachain-logo.png",
   },
-
+  {
+    id: "creditcoin" as const,
+    name: "Creditcoin",
+    description: "Everything Creditcoin. Search, transactions and more.",
+    icon: Network,
+    img: "/images/icon/creditcoin/creditcoin-white.png",
+  },
   {
     id: "monad",
     name: "Monad",
@@ -267,8 +282,6 @@ export const searchGroups = [
     img: "/images/icon/monad/monad-logo.jpg",
   },
 ] as const;
-
-export type SearchGroup = (typeof searchGroups)[number];
 
 export function shortenWalletAddresses(markdownText: string) {
   // Regex to match Ethereum-style addresses (both with and without code backticks)
