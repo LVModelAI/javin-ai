@@ -22,7 +22,7 @@ export const myProvider: any = customProvider({
     //@ts-ignore
     "gemini-2.0-flash": google("gemini-2.0-flash"),
     //@ts-ignore
-    "gemini-2.0-flash-lite": google("gemini-2.0-flash-lite"),
+    // "gemini-2.0-flash-lite": google("gemini-2.0-flash-lite"),
   },
   imageModels: {
     "small-model": openai.image("dall-e-2"),
@@ -52,11 +52,11 @@ export const chatModels: Array<ChatModel> = [
     name: "Gemini 2.0 Flash",
     description: "Google's Gemini 2.0 Flash model",
   },
-  {
-    id: "gemini-2.0-flash-lite",
-    name: "Gemini 2.0 Flash Lite",
-    description: "Lite version of Gemini 2.0 Flash model",
-  },
+  // {
+  //   id: "gemini-2.0-flash-lite",
+  //   name: "Gemini 2.0 Flash Lite",
+  //   description: "Lite version of Gemini 2.0 Flash model",
+  // },
   // {
   //   id: 'chat-model-reasoning',
   //   name: 'Reasoning model',
