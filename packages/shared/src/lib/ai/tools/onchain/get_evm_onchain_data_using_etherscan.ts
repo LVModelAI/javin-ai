@@ -9,35 +9,38 @@ import {
 import { etherscanBaseURL } from "./constant";
 import { ensToAddress } from "../ens-to-address";
 import * as Sentry from "@sentry/nextjs";
+import { logInfo } from "@javin/shared/lib/utils/logging";
 
-export const getEvmOnchainDataUsingEtherscan = tool({
-  description:
-    "Get real-time data from Ethereum-based blockchains using Etherscan.",
-  parameters: z.object({
-    userQuery: z.string().describe("Query of user."),
-  }),
-  execute: async ({ userQuery }: { userQuery?: string }) => {
-    console.log("using etherscan ...");
-    try {
-      console.log(
-        "User query for getEvmOnchainDataUsingEtherscan :",
-        userQuery
-      );
-      const apiKey = process.env.ETHERSCAN_API_KEY;
-      if (!apiKey) {
-        throw new Error("Etherscan API key not found");
-      }
+// This function returns a tool that fetches data from Etherscan based on chainId provided it
+export const getToolWhichGetsDataFromEtherscanByChain = (
+  chainId: number,
+  description: string
+) => {
+  return tool({
+    description: description,
+    parameters: z.object({
+      userQuery: z.string().describe("Query of user."),
+    }),
+    execute: async ({ userQuery }: { userQuery?: string }) => {
+      try {
+        logInfo(
+          `Using getEvmOnchainDataUsingEtherscan with chainId:${chainId} and userQuery: ${userQuery}`
+        );
+        const apiKey = process.env.ETHERSCAN_API_KEY;
+        if (!apiKey) {
+          throw new Error("Etherscan API key not found");
+        }
 
-      const etherscanOpenapidata = await loadOpenAPI(
-        "https://raw.githubusercontent.com/PurrProof/etherscan-openapi/refs/heads/main/etherscan-openapi31-bundled.yml"
-      );
-      const etherscanAllPathsAndDesc = await getAllPathsAndDesc(
-        etherscanOpenapidata
-      );
+        const etherscanOpenapidata = await loadOpenAPI(
+          "https://raw.githubusercontent.com/PurrProof/etherscan-openapi/refs/heads/main/etherscan-openapi31-bundled.yml"
+        );
+        const etherscanAllPathsAndDesc = await getAllPathsAndDesc(
+          etherscanOpenapidata
+        );
 
-      const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("gpt-4o"),
-        system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
+        const aiAgentResponse = await generateText({
+          model: myProvider.languageModel("gpt-4o"),
+          system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
             
               ## How to Process User Queries:
               1. **Match User Query to API Path**:  
@@ -58,74 +61,87 @@ export const getEvmOnchainDataUsingEtherscan = tool({
               - Do **not** return raw JSON unless explicitly requested.  
               - If no relevant data is found, respond appropriately instead of returning an empty result.  
               `,
-        prompt: JSON.stringify(
-          `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}`
-        ),
-        tools: {
-          ensToAddress: ensToAddress,
-          getPathParametersAndBaseUrl: tool({
-            description:
-              "Retrieve all parameters required for a given API path.",
-            parameters: z.object({
-              path: z
-                .string()
-                .describe(
-                  "The API path, e.g., '/?module=account&action=balance'"
-                ),
+          prompt: JSON.stringify(
+            `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}`
+          ),
+          tools: {
+            ensToAddress: ensToAddress,
+            getPathParametersAndBaseUrl: tool({
+              description:
+                "Retrieve all parameters required for a given API path.",
+              parameters: z.object({
+                path: z
+                  .string()
+                  .describe(
+                    "The API path, e.g., '/?module=account&action=balance'"
+                  ),
+              }),
+              execute: async ({ path }) => {
+                console.log("Fetching parameters for path:", path);
+                const etherscanPathsDetails = await getPathDetails(
+                  etherscanOpenapidata,
+                  path
+                );
+                return etherscanPathsDetails;
+              },
             }),
-            execute: async ({ path }) => {
-              console.log("Fetching parameters for path:", path);
-              const etherscanPathsDetails = await getPathDetails(
-                etherscanOpenapidata,
-                path
-              );
-              return etherscanPathsDetails;
-            },
-          }),
-          makeApiCall: tool({
-            description: "Fetch real-time blockchain data from etherscan API.",
-            parameters: z.object({
-              url: z.string().describe("The full API query URL."),
+            makeApiCall: tool({
+              description:
+                "Fetch real-time blockchain data from etherscan API.",
+              parameters: z.object({
+                url: z.string().describe("The full API query URL."),
+              }),
+              execute: async ({ url }) => {
+                try {
+                  const options = {
+                    method: "GET",
+                    headers: {
+                      accept: "application/json",
+                    },
+                  };
+                  const fullUrl = `${url}&apikey=${apiKey}&chainid=${chainId}`;
+                  console.log("fetching --- ", fullUrl);
+                  const response = await fetch(fullUrl, options);
+                  if (!response.ok)
+                    throw new Error(
+                      `API call failed with status ${response.status}`
+                    );
+                  const json = await response.json();
+                  console.log("Fetched API response:", json);
+                  return json; // Return parsed JSON data for further processing
+                } catch (error) {
+                  console.error("Error fetching API data:", error);
+                  Sentry.captureException(error);
+                  return { error: "Failed to fetch data from the API." };
+                }
+              },
             }),
-            execute: async ({ url }) => {
-              try {
-                const options = {
-                  method: "GET",
-                  headers: {
-                    accept: "application/json",
-                  },
-                };
-                const fullUrl = `${url}&apikey=${apiKey}`;
-                console.log("fetching --- ", fullUrl);
-                const response = await fetch(fullUrl, options);
-                if (!response.ok)
-                  throw new Error(
-                    `API call failed with status ${response.status}`
-                  );
-                const json = await response.json();
-                console.log("Fetched API response:", json);
-                return json; // Return parsed JSON data for further processing
-              } catch (error) {
-                console.error("Error fetching API data:", error);
-                Sentry.captureException(error);
-                return { error: "Failed to fetch data from the API." };
-              }
-            },
-          }),
-        },
-        maxSteps: 5,
-      });
+          },
+          maxSteps: 5,
+        });
 
-      console.log(`AI response is `, aiAgentResponse.text);
-      return aiAgentResponse.text;
-    } catch (error: any) {
-      console.error("Error in getEvmOnchainDataUsingEtherscan:", error);
-      Sentry.captureException(error);
-      return {
-        success: false,
-        message: "Error retrieving API data.",
-        error: error.message || "Unknown error",
-      };
-    }
-  },
-});
+        console.log(`AI response is `, aiAgentResponse.text);
+        return aiAgentResponse.text;
+      } catch (error: any) {
+        console.error(
+          `Error in getEvmOnchainDataUsingEtherscan in chainId:${chainId} :`,
+          error
+        );
+        Sentry.captureException(error);
+        return {
+          success: false,
+          message: "Error retrieving API data.",
+          error: error.message || "Unknown error",
+        };
+      }
+    },
+  });
+};
+
+export const getEvmOnchainDataUsingEtherscan =
+  getToolWhichGetsDataFromEtherscanByChain(
+    1,
+    "Get real-time data from Ethereum-based blockchains using Etherscan."
+  );
+// 1 is the default chain id and is for Ethereum Mainnet
+// source: trust me bro --> https://docs.etherscan.io/etherscan-v2/getting-started/supported-chains
