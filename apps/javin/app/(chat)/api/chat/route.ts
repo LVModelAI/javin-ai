@@ -16,6 +16,7 @@ import {
   getUserById,
   saveChat,
   saveMessages,
+  saveToolTracking,
 } from "@/lib/db/queries";
 import {
   generateUUID,
@@ -24,6 +25,7 @@ import {
 } from "@javin/shared/lib/utils/utils";
 import { generateTitleFromUserMessage } from "../../actions";
 import * as Sentry from "@sentry/nextjs";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: Request) {
   logInfo("Received POST request for chat.");
@@ -136,9 +138,9 @@ export async function POST(request: Request) {
           // logObjects("Step Event:", event);
         },
         onFinish: async ({ response, reasoning }) => {
-          // logInfo("Stream finished. Response received from model.");
-          // logObjects("Response messages:", response.messages);
-          // logObjects("Model reasoning:", reasoning);
+          logInfo("Stream finished. Response received from model.");
+          logObjects("Response messages:", response);
+          logObjects("Model reasoning:", reasoning);
 
           if (session.user?.id) {
             try {
@@ -146,17 +148,43 @@ export async function POST(request: Request) {
                 messages: response.messages,
                 reasoning,
               });
-              // logObjects(
-              //   "Sanitized response messages:",
-              //   sanitizedResponseMessages
-              // );
+              logObjects(
+                "Sanitized response messages:",
+                sanitizedResponseMessages
+              );
+              const dateOfMessageCreation = new Date();
+              await saveToolTracking({
+                toolTrackingData: {
+                  id: uuidv4(),
+                  userPrompt: userMessage.content,
+                  aiResponse:
+                    sanitizedResponseMessages[
+                      sanitizedResponseMessages.length - 1
+                    ].role == "assistant"
+                      ? sanitizedResponseMessages[
+                          sanitizedResponseMessages.length - 1
+                          // @ts-ignore
+                        ].content[0].text
+                      : "Couldnt capture",
+                  toolsCalled: sanitizedResponseMessages
+                    .filter((a) => a.role == "tool")
+                    .map((b) => ({
+                      toolName: b.content[0].toolName,
+                      toolResponse: b.content[0].result,
+                    })),
+                  toolsCalledNames: sanitizedResponseMessages
+                    .filter((a) => a.role == "tool")
+                    .map((b) => b.content[0].toolName),
+                  createdAt: dateOfMessageCreation,
+                },
+              });
               await saveMessages({
                 messages: sanitizedResponseMessages.map((message) => ({
                   id: message.id,
                   chatId: id,
                   role: message.role,
                   content: message.content,
-                  createdAt: new Date(),
+                  createdAt: dateOfMessageCreation,
                 })),
               });
               logInfo("Response messages saved to database.");

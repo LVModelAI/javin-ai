@@ -11,7 +11,6 @@ import {
   boolean,
   integer,
 } from "drizzle-orm/pg-core";
-
 export const user = pgTable("User", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   email: varchar("email", { length: 64 }).unique(),
@@ -65,6 +64,23 @@ export const message = pgTable("Message", {
 });
 
 export type Message = InferSelectModel<typeof message>;
+
+// just for reference. this is what the json will contain.
+type toolsCalled = {
+  toolName: string;
+  toolResponse: any;
+}[];
+
+export const toolTracking = pgTable("ToolTracking", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  userPrompt: varchar("userPrompt").notNull(),
+  aiResponse: json("aiResponse").notNull(),
+  toolsCalled: json("toolsCalled").array().notNull(),
+  toolsCalledNames: varchar("toolsCalledNames").array().notNull(),
+  createdAt: timestamp("createdAt").notNull(),
+});
+
+export type ToolTracking = InferSelectModel<typeof toolTracking>;
 
 export const vote = pgTable(
   "Vote",
