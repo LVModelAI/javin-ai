@@ -1,5 +1,8 @@
 import { allTools, getGroupConfig } from "@javin/shared/src/lib/ai/prompts";
-import { generateUUID } from "@javin/shared/src/lib/utils/utils";
+import {
+  generateUUID,
+  sanitizeResponseMessages,
+} from "@javin/shared/src/lib/utils/utils";
 import { openai } from "@ai-sdk/openai";
 import { smoothStream, streamText, generateText } from "ai";
 import {
@@ -9,7 +12,8 @@ import {
 } from "./type";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
-import { saveMessages } from "@/src/lib/db/queries";
+import { saveMessages, saveToolTracking } from "@/src/lib/db/queries";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: Request) {
   try {
@@ -55,6 +59,37 @@ export async function POST(request: Request) {
         experimental_generateMessageId: generateUUID,
       });
 
+      const dateOfMessageCreation = new Date();
+      const sanitizedResponseMessages = sanitizeResponseMessages({
+        // @ts-ignore
+        messages: result.response.messages,
+        reasoning: result.reasoning,
+      });
+      await saveToolTracking({
+        toolTrackingData: {
+          id: uuidv4(),
+          userPrompt: prompt,
+          aiResponse:
+            sanitizedResponseMessages[sanitizedResponseMessages.length - 1]
+              .role == "assistant"
+              ? sanitizedResponseMessages[
+                  sanitizedResponseMessages.length - 1
+                  // @ts-ignore
+                ].content[0].text
+              : "Couldnt capture",
+          toolsCalled: sanitizedResponseMessages
+            .filter((a) => a.role == "tool")
+            .map((b) => ({
+              toolName: b.content[0].toolName,
+              toolResponse: b.content[0].result,
+            })),
+          toolsCalledNames: sanitizedResponseMessages
+            .filter((a) => a.role == "tool")
+            .map((b) => b.content[0].toolName),
+          createdAt: dateOfMessageCreation,
+        },
+      });
+
       await saveMessages({
         messages: [
           {
@@ -63,7 +98,7 @@ export async function POST(request: Request) {
             response: result.text,
             location: "completions",
             model: model,
-            stream:StreamingTrue,
+            stream: StreamingTrue,
             createdAt: new Date(),
           },
         ],
@@ -107,7 +142,37 @@ export async function POST(request: Request) {
               // IF YOU WANT TO SEND TOOL INFORMATION
               // console.log("onChunk = ", chunk);
             },
-            onFinish: async ({ text }) => {
+            onFinish: async ({ text, response, reasoning }) => {
+              const dateOfMessageCreation = new Date();
+              const sanitizedResponseMessages = sanitizeResponseMessages({
+                messages: response.messages,
+                reasoning: reasoning,
+              });
+              await saveToolTracking({
+                toolTrackingData: {
+                  id: uuidv4(),
+                  userPrompt: prompt,
+                  aiResponse:
+                    sanitizedResponseMessages[
+                      sanitizedResponseMessages.length - 1
+                    ].role == "assistant"
+                      ? sanitizedResponseMessages[
+                          sanitizedResponseMessages.length - 1
+                          // @ts-ignore
+                        ].content[0].text
+                      : "Couldnt capture",
+                  toolsCalled: sanitizedResponseMessages
+                    .filter((a) => a.role == "tool")
+                    .map((b) => ({
+                      toolName: b.content[0].toolName,
+                      toolResponse: b.content[0].result,
+                    })),
+                  toolsCalledNames: sanitizedResponseMessages
+                    .filter((a) => a.role == "tool")
+                    .map((b) => b.content[0].toolName),
+                  createdAt: dateOfMessageCreation,
+                },
+              });
               await saveMessages({
                 messages: [
                   {
@@ -116,7 +181,7 @@ export async function POST(request: Request) {
                     response: text,
                     location: "completions",
                     model: model,
-                    stream:StreamingTrue,
+                    stream: StreamingTrue,
                     createdAt: new Date(),
                   },
                 ],

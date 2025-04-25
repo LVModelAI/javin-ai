@@ -7,6 +7,7 @@ import { generateObject, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../models";
 import * as Sentry from "@sentry/nextjs";
+import { logObjects } from "../../utils/logging";
 
 export const novesSupportedChains = [
   "arbitrum",
@@ -141,10 +142,10 @@ export const translateTransactions = tool({
           try {
             const response = await request;
             const json = await response.json();
-            console.log("API Response:", json);
+            logObjects("API Response from translate transaciton:", json);
             return json;
           } catch (error) {
-            console.error("Error parsing API response:", error);
+            console.error("Error parsing API response in translate transaction:", error);
             Sentry.captureException(error);
             return null;
           }

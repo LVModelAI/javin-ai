@@ -16,6 +16,8 @@ import {
   message,
   vote,
   password_reset_tokens,
+  ToolTracking,
+  toolTracking,
 } from "./schema";
 
 // Optionally, if not using email/pass login, you can
@@ -190,6 +192,20 @@ export async function getChatById({ id }: { id: string }) {
     return selectedChat;
   } catch (error) {
     console.error("Failed to get chat by id from database");
+    Sentry.captureException(error);
+    throw error;
+  }
+}
+
+export async function saveToolTracking({
+  toolTrackingData,
+}: {
+  toolTrackingData: ToolTracking;
+}) {
+  try {
+    return await db.insert(toolTracking).values(toolTrackingData);
+  } catch (error) {
+    console.error("Failed to save tool tracking data in database", error);
     Sentry.captureException(error);
     throw error;
   }
