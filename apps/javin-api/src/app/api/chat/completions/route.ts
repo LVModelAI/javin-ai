@@ -75,14 +75,24 @@ export async function POST(request: Request) {
                 ].content[0].text
               : "Couldnt capture",
           toolsCalled: sanitizedResponseMessages
-            .filter((a) => a.role == "tool")
-            .map((b) => ({
-              toolName: b.content[0].toolName,
-              toolResponse: b.content[0].result,
-            })),
+            .filter((a) => a.role === "tool")
+            .flatMap((b) =>
+              b.content
+                .filter((c) => c.type === "tool-result")
+                .map((c) => ({
+                  toolName: c.toolName,
+                  toolResponse: c.result,
+                }))
+            ),
           toolsCalledNames: sanitizedResponseMessages
-            .filter((a) => a.role == "tool")
-            .map((b) => b.content[0].toolName),
+            .filter((a) => a.role === "tool")
+            .map((b, index) => ({
+              stepNumber: index,
+              toolsCalled: b.content
+                .filter((c) => c.type === "tool-result")
+                .map((c) => c.toolName),
+            }))
+            .filter((entry) => entry.toolsCalled.length > 0),
           createdAt: dateOfMessageCreation,
         },
       });
@@ -185,14 +195,24 @@ export async function POST(request: Request) {
                         ].content[0].text
                       : "Couldnt capture",
                   toolsCalled: sanitizedResponseMessages
-                    .filter((a) => a.role == "tool")
-                    .map((b) => ({
-                      toolName: b.content[0].toolName,
-                      toolResponse: b.content[0].result,
-                    })),
+                    .filter((a) => a.role === "tool")
+                    .flatMap((b) =>
+                      b.content
+                        .filter((c) => c.type === "tool-result")
+                        .map((c) => ({
+                          toolName: c.toolName,
+                          toolResponse: c.result,
+                        }))
+                    ),
                   toolsCalledNames: sanitizedResponseMessages
-                    .filter((a) => a.role == "tool")
-                    .map((b) => b.content[0].toolName),
+                    .filter((a) => a.role === "tool")
+                    .map((b, index) => ({
+                      stepNumber: index,
+                      toolsCalled: b.content
+                        .filter((c) => c.type === "tool-result")
+                        .map((c) => c.toolName),
+                    }))
+                    .filter((entry) => entry.toolsCalled.length > 0),
                   createdAt: dateOfMessageCreation,
                 },
               });
