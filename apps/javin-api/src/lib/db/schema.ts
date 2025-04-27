@@ -34,7 +34,7 @@ export const toolTracking = pgTable("ToolTracking", {
   userPrompt: varchar("userPrompt").notNull(),
   aiResponse: json("aiResponse").notNull(),
   toolsCalled: json("toolsCalled").array().notNull(),
-  toolsCalledNames: varchar("toolsCalledNames").array().notNull(),
+  toolsCalledNames: json("toolsCalledNames").array().notNull(),
   createdAt: timestamp("createdAt").notNull(),
 });
 
