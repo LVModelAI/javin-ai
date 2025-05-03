@@ -78,7 +78,7 @@ const SelectionContent = ({
               <img
                 src={selectedGroup.img || ""}
                 alt="icon"
-                className="bg-white rounded-full w-full h-full object-contain"
+                className="rounded-full w-full h-full object-contain"
               />
             ) : (
               Icon && <Icon height={25} width={25} />
@@ -111,7 +111,7 @@ const SelectionContent = ({
                     alt="icon"
                     width={20}
                     height={20}
-                    className="bg-white rounded-full"
+                    className="rounded-full"
                   />
                 ) : (
                   <IconLocal className="size-4" />
