@@ -35,7 +35,7 @@ export const getNexusApiData = tool({
         output: "array",
         schema: z.string().describe("the api endpoint"),
         system: `\n
-        You will return the array of the  urls to call in the given list of available api endpoints, which can be helpfull to answers user query. Do not modify it in any way. give the actual query url, by inserting appropriates values in placeholders. do not give more than 5 apis`,
+        You will return the array of the urls to call in the given list of available API endpoints, which can be helpful to answer the user query. Do not modify it in any way. Give the actual query URL, by inserting appropriate values in placeholders. Do not give more than 5 APIS`,
         prompt: JSON.stringify(
           `The list of api endpoints and their summary are ${allPaths} and user Query is ${userQuery}`
         ),

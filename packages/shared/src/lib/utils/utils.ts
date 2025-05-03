@@ -240,7 +240,7 @@ export const searchGroups:SearchGroup[] = [
     img: "/images/icon/aptos/aptos-logo.png",
   },
   {
-    id: "nexus",
+    id: "nexus" as const,
     name: "Nexus",
     description: "Everything Nexus. Search, transactions and more.",
     icon: Network,
