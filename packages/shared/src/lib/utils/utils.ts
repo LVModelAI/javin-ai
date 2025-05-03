@@ -194,9 +194,7 @@ export type SearchGroupId =
   | "creditcoin"
   | "vana"
   | "wormhole"
-  | "flow"
   | "zeta"
-  | "monad"
   | "aptos"
   | "nexus";
 
@@ -208,7 +206,7 @@ export type SearchGroup = {
   img: string;
 };
 
-export const searchGroups:SearchGroup[] = [
+export const searchGroups: SearchGroup[] = [
   {
     id: "search" as const,
     name: "Web",
@@ -233,32 +231,25 @@ export const searchGroups:SearchGroup[] = [
   //   img: "/images/icon/wormhole-logo.png",
   // },
   {
+    id: "nexus" as const,
+    name: "Nexus",
+    description: "Search, transactions and more on Nexus Network.",
+    icon: Network,
+    img: "/images/chain-logo/nexus1.png",
+  },
+  {
     id: "aptos",
     name: "Aptos",
     description: "Everything Aptos. Search, transactions and more.",
     icon: Network,
-    img: "/images/icon/aptos/aptos-logo.png",
-  },
-  {
-    id: "nexus" as const,
-    name: "Nexus",
-    description: "Everything Nexus. Search, transactions and more.",
-    icon: Network,
-    img: "/images/chain-logo/nexus.png",
+    img: "/images/icon/aptos/aptos-logo-1.png",
   },
   {
     id: "vana" as const,
     name: "Vana",
     description: "Everything Vana. Search, transactions and more.",
     icon: Network,
-    img: "/images/icon/vana/vana-icon-black.png",
-  },
-  {
-    id: "flow" as const,
-    name: "Flow",
-    description: "Everything Flow. Search, transactions and more.",
-    icon: Network,
-    img: "/images/icon/flow-logo.png",
+    img: "/images/icon/vana/vana-icon-black-white-bg.png",
   },
   {
     id: "zeta",
@@ -273,13 +264,6 @@ export const searchGroups:SearchGroup[] = [
     description: "Everything Creditcoin. Search, transactions and more.",
     icon: Network,
     img: "/images/icon/creditcoin/creditcoin-white.png",
-  },
-  {
-    id: "monad",
-    name: "Monad",
-    description: "Everything Monad. Search, transactions and more.",
-    icon: Network,
-    img: "/images/icon/monad/monad-logo.jpg",
   },
 ] as const;
 
