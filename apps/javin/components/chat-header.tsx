@@ -121,7 +121,7 @@ function PureChatHeader({
             ) : (
               <button
                 type="button"
-                className="px-4  rounded-full border border-zinc-200 dark:border-zinc-700 flex items-center justify-center gap-2 bg-secondary hover:bg-zinc-800 h-10 "
+                className="border rounded-full  bg-gray-900 dark:bg-zinc-50 text-white dark:text-black font-semibold text-sm px-5 h-10"
                 onClick={() => {
                   router.push("/login");
                 }}
