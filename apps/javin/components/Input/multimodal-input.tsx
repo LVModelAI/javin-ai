@@ -227,7 +227,7 @@ function PureMultimodalInput({
     if (!user || !user.email) {
       //redirect to login page
       router.push("/login");
-      toast.error("Please login to continue", { position: "bottom-center" });
+      toast.error("Please login to continue", { position: "top-left" });
       return;
     }
     window.history.replaceState({}, "", `/chat/${chatId}`);

@@ -60,8 +60,11 @@ export function SidebarUserNav({ user }: { user: User }) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </div>
-            <DropdownMenuItem className="cursor-pointer">
-              <Link href="/pricing">
+            <DropdownMenuItem className="cursor-pointer p-0">
+              <Link
+                className="bg-javinOrange text-white font-bold w-full text-center p-2 rounded-sm "
+                href="/pricing"
+              >
                 <p>Upgrade to pro</p>
               </Link>
             </DropdownMenuItem>

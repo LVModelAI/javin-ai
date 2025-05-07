@@ -35,12 +35,13 @@ export function Pricing({ user }: { user?: User }) {
                 </li>
                 <li>
                   <div className="flex items-center gap-2">
-                    <Check size={16} /> <p>Automatic data enrichment</p>
+                    <Check size={16} /> <p>Access to all basic modes</p>
                   </div>
                 </li>
                 <li>
                   <div className="flex items-center gap-2">
-                    <Check size={16} /> <p>Up to 3 seats</p>
+                    <Check size={16} />{" "}
+                    <p>3 deep research queries/mo &#40;coming soon&#41;</p>
                   </div>
                 </li>
               </ul>

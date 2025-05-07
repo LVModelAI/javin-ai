@@ -9,7 +9,10 @@ export default function Footer() {
   const pathname = usePathname();
 
   // Don't show footer on /chat/:id routes
-  const hideFooter = pathname.startsWith("/chat/");
+  const hideFooter =
+    pathname.startsWith("/chat/") ||
+    pathname === "/login" ||
+    pathname === "/register";
   if (hideFooter) return null;
 
   const isActive = (path: string) => pathname === path;
