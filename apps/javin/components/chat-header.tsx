@@ -44,7 +44,7 @@ function PureChatHeader({
 
   return (
     <div className="flex flex-col">
-      <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2 justify-between">
+      <header className="relative flex  top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2 justify-between">
         {/* left side */}
         <div className="flex items-center justify-start gap-2  w-fit">
           {isSimplePage ? (
@@ -82,28 +82,35 @@ function PureChatHeader({
 
         {/* logo */}
         {(messages.length > 0 || isSimplePage) && (
-          <Link href={"/"} className="font-semibold">
-            {resolvedTheme == "dark" ? (
-              <img
-                alt="Javin.ai"
-                src="/images/javin/banner/javin-banner-white.svg"
-                className="w-24 h-auto"
-              />
-            ) : (
-              resolvedTheme == "light" && (
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <Link href="/" className="font-semibold">
+              {resolvedTheme === "dark" ? (
                 <img
                   alt="Javin.ai"
-                  src="/images/javin/banner/javin-banner-black.svg"
+                  src="/images/javin/banner/javin-banner-white.svg"
                   className="w-24 h-auto"
                 />
-              )
-            )}
-          </Link>
+              ) : (
+                resolvedTheme === "light" && (
+                  <img
+                    alt="Javin.ai"
+                    src="/images/javin/banner/javin-banner-black.svg"
+                    className="w-24 h-auto"
+                  />
+                )
+              )}
+            </Link>
+          </div>
         )}
 
         {/* right side */}
         <div className="flex justify-end w-fit items-center gap-2">
-          {messages.length == 0 && !isSimplePage && <TextStrip />}
+          <div className="hidden lg:block">
+            <TextStrip />
+          </div>
+          <div className=" lg:hidden">
+            {messages.length === 0 && !isSimplePage && <TextStrip />}
+          </div>
 
           {/* prfile */}
           <div className="">
