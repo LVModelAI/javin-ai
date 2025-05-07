@@ -1,5 +1,6 @@
 "use client";
 import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 import type { User } from "next-auth";
 import { signOut } from "next-auth/react";
@@ -28,7 +29,7 @@ export function SidebarUserNav({ user }: { user: User }) {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10">
+            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent bg-secondary data-[state=open]:text-sidebar-accent-foreground h-10 border rounded-full ">
               {user?.image ? (
                 <Image
                   src={user.image}
@@ -46,7 +47,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                   className="rounded-full"
                 />
               )}
-              <span className="hidden md:block truncate">{user?.email}</span>
+              <span className="hidden md:block truncate">{user?.name}</span>
               <ChevronDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -57,6 +58,12 @@ export function SidebarUserNav({ user }: { user: User }) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </div>
+            <DropdownMenuItem className="cursor-pointer">
+              <Link href="/pricing">
+                <p>Upgrade to pro</p>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               className="cursor-pointer"
               onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}

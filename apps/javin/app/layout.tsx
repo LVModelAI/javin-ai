@@ -3,19 +3,21 @@ import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { cookies } from "next/headers";
+import { auth } from "@/app/(auth)/auth";
+import Footer from "@/components/footer";
 
 const baseUrl = "https://javin.ai";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: "Javin.ai",
-  description:
-    "A focused, no-nonsense AI search engine for crypto.",
+  description: "A focused, no-nonsense AI search engine for crypto.",
   manifest: "/manifest.json",
   openGraph: {
     title: "Javin.ai",
-    description:
-      "A focused, no-nonsense AI search engine for crypto.",
+    description: "A focused, no-nonsense AI search engine for crypto.",
     images: [
       {
         url: `${baseUrl}/images/javin/preview/javin_preview_banner.png`,
@@ -56,6 +58,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [session, cookieStore] = await Promise.all([auth(), cookies()]);
+  const isCollapsed = cookieStore.get("sidebar:state")?.value !== "true";
+
   return (
     <html
       lang="en"
@@ -81,8 +86,11 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Toaster position="top-center" />
-            {children}
+            <SidebarProvider defaultOpen={!isCollapsed}>
+              <Toaster position="top-center" />
+              {children}
+              <Footer />
+            </SidebarProvider>
           </ThemeProvider>
         </SessionProvider>
       </body>

@@ -15,6 +15,8 @@ import { SidebarUserNav } from "./sidebar-user-nav";
 import { Message } from "ai";
 import { useTheme } from "next-themes";
 import TextStrip from "./text-strip";
+import { usePathname } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 function PureChatHeader({
   chatId,
@@ -24,10 +26,10 @@ function PureChatHeader({
   messages,
   user,
 }: {
-  chatId: string;
-  selectedModelId: string;
-  selectedVisibilityType: VisibilityType;
-  isReadonly: boolean;
+  chatId?: string;
+  selectedModelId?: string;
+  selectedVisibilityType?: VisibilityType;
+  isReadonly?: boolean;
   messages: Message[];
   user?: User;
 }) {
@@ -37,73 +39,75 @@ function PureChatHeader({
 
   const { width: windowWidth } = useWindowSize();
   // console.log("user in chat header", user);
+  const pathname = usePathname();
+  const isSimplePage = pathname === "/pricing" || pathname === "/about";
+
   return (
     <div className="flex flex-col">
-      <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
-        <div className="flex items-center justify-start gap-2 w-full">
-          <SidebarToggle />
-
-          <div className="">
-            {(!open || windowWidth < 768) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="order-2 md:order-1 md:px-2 px-2 md:h-fit ml-auto md:ml-0"
-                    onClick={() => {
-                      router.push("/");
-                      router.refresh();
-                    }}
-                  >
-                    <PlusIcon />
-                    <span className="sr-only md:not-sr-only">New Chat</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>New Chat</TooltipContent>
-              </Tooltip>
-            )}
-          </div>
-
-          {/* {!isReadonly && (
-          <ModelSelector selectedModelId={selectedModelId} className=" " />
-        )} */}
+      <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2 justify-between">
+        {/* left side */}
+        <div className="flex items-center justify-start gap-2  w-fit">
+          {isSimplePage ? (
+            <button
+              onClick={() => router.back()}
+              className="px-3 py-2 rounded-full border border-zinc-200 dark:border-zinc-700 flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800"
+            >
+              <ArrowLeft size={16} />
+              <p className="text-sm">Back</p>
+            </button>
+          ) : (
+            <>
+              <SidebarToggle />
+              {(!open || windowWidth < 768) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="order-2 md:order-1 md:px-3 px-3 md:h-fit  md:ml-0 bg-secondary rounded-full"
+                      onClick={() => {
+                        router.push("/");
+                        router.refresh();
+                      }}
+                    >
+                      <PlusIcon />
+                      <span className="sr-only md:not-sr-only">New Chat</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>New Chat</TooltipContent>
+                </Tooltip>
+              )}
+            </>
+          )}
         </div>
-        {messages.length > 0 && (
+
+        {/* logo */}
+        {(messages.length > 0 || isSimplePage) && (
           <Link href={"/"} className="font-semibold">
             {resolvedTheme == "dark" ? (
               <img
                 alt="Javin.ai"
                 src="/images/javin/banner/javin-banner-white.svg"
-                className="w-48 h-auto"
+                className="w-24 h-auto"
               />
             ) : (
               resolvedTheme == "light" && (
                 <img
                   alt="Javin.ai"
                   src="/images/javin/banner/javin-banner-black.svg"
-                  className="w-48 h-auto"
+                  className="w-24 h-auto"
                 />
               )
             )}
           </Link>
         )}
-        {/* REPLACE TEXT WITH THE ACTUAL LOGO WHEN YOU GET ONE WITH WHITE TEXT */}
-        {/* <Image src={"/javin-logo.png"} width={100} height={30} alt="Javin.ai" /> */}
 
-        <div className="flex justify-end w-full">
+        {/* right side */}
+        <div className="flex justify-end w-fit items-center gap-2">
+          {messages.length == 0 && !isSimplePage && <TextStrip />}
+
+          {/* prfile */}
           <div className="">
             {user && user?.email ? (
-              // <button
-              //   type="button"
-              //   className="border py-1 rounded bg-gray-900 dark:bg-zinc-50 text-white dark:text-black font-semibold text-sm px-3"
-              //   onClick={() => {
-              //     signOut({
-              //       redirectTo: "/",
-              //     });
-              //   }}
-              // >
-              //   Logout
-              // </button>
               <div>
                 <SidebarUserNav user={user} />
               </div>
@@ -120,16 +124,7 @@ function PureChatHeader({
             )}
           </div>
         </div>
-
-        {/* {!isReadonly && (
-        <VisibilitySelector
-          chatId={chatId}
-          selectedVisibilityType={selectedVisibilityType}
-          className="order-1 md:order-3"
-        />
-      )} */}
       </header>
-      <TextStrip />
     </div>
   );
 }
