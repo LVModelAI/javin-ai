@@ -68,7 +68,7 @@ export async function getConsumerUsingApiKey({ apiKey }: { apiKey: string }) {
       .where(eq(consumerTable.apiKey, apiKey));
     return consumer;
   } catch (error) {
-    console.error("Failed to save tool tracking data in database", error);
+    console.error("Failed to retrieve consumer data using API key", error);
     Sentry.captureException(error);
     throw error;
   }
