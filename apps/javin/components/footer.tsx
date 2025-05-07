@@ -13,7 +13,7 @@ export default function Footer() {
   if (hideFooter) return null;
 
   return (
-    <div className="flex flex-col gap-2 p-4 text-white fixed bottom-0 w-full z-40">
+    <div className="flex flex-col gap-2 p-4 text-white fixed bottom-0 w-full z-40 bg-background">
       <div className="flex justify-center gap-4 items-center text-sm text-zinc-600">
         <Link href="/" className="hover:text-muted-foreground">
           Home
