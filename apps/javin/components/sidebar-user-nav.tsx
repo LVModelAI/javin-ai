@@ -47,7 +47,9 @@ export function SidebarUserNav({ user }: { user: User }) {
                   className="rounded-full"
                 />
               )}
-              <span className="hidden md:block truncate">{user?.name}</span>
+              <span className="hidden md:block truncate">
+                {user?.name ?? user?.email}
+              </span>
               <ChevronDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
