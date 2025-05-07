@@ -2,6 +2,7 @@ import { allTools, getGroupConfig } from "@javin/shared/src/lib/ai/prompts";
 import {
   generateUUID,
   sanitizeResponseMessages,
+  SearchGroupId,
 } from "@javin/shared/src/lib/utils/utils";
 import { openai } from "@ai-sdk/openai";
 import { smoothStream, streamText, generateText } from "ai";
@@ -12,16 +13,40 @@ import {
 } from "./type";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
-import { saveMessages, saveToolTracking } from "@/src/lib/db/queries";
+import {
+  getConsumerUsingApiKey,
+  saveMessages,
+  saveToolTracking,
+} from "@/src/lib/db/queries";
 import { v4 as uuidv4 } from "uuid";
+import { ConsumerEnumType } from "@/src/lib/db/schema";
+import { logInfo } from "@javin/shared/lib/utils/logging";
 
 export async function POST(request: Request) {
   try {
-    const EXTERNALAPIKEY = process.env.SENTIENT_EXTERNAL_APIKEY;
-
     const authHeader = request.headers.get("Authorization");
 
-    if (!authHeader || authHeader !== `Bearer ${EXTERNALAPIKEY}`) {
+    const extractedApiKey = authHeader?.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : null;
+
+    if (!extractedApiKey) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized, contact tech team to get api key",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const consumerInfo = await getConsumerUsingApiKey({
+      apiKey: extractedApiKey,
+    });
+
+    if (!consumerInfo) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
@@ -40,8 +65,11 @@ export async function POST(request: Request) {
 
     const model = "gpt-4o-mini";
     const { tools: activeTools, systemPrompt } = await getGroupConfig(
-      "on_chain"
+      // BIG ASSUMPTION, pay attention here
+      consumerInfo.mode as SearchGroupId
     );
+
+    logInfo("mode selected " + consumerInfo.mode);
 
     const system_fingerprint = process.env.VERCEL_GIT_COMMIT_SHA || "";
 
@@ -101,6 +129,7 @@ export async function POST(request: Request) {
       });
 
       await saveMessages({
+        consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
         messages: [
           {
             id: generateUUID(),
@@ -194,6 +223,7 @@ export async function POST(request: Request) {
                 },
               });
               await saveMessages({
+                consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
                 messages: [
                   {
                     id: generateUUID(),

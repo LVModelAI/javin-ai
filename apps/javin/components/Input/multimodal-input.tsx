@@ -30,6 +30,7 @@ import { ModelSelector } from "./model-selector";
 import { GroupSelector } from "./GroupSelector";
 import { ChevronDown } from "lucide-react";
 import * as Sentry from "@sentry/nextjs";
+import { useRouter } from "next/navigation";
 
 function PureAttachmentsButton({
   fileInputRef,
@@ -164,7 +165,7 @@ function PureMultimodalInput({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
   const [isFocused, setIsFocused] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     if (textareaRef.current) {
       adjustHeight();
@@ -224,6 +225,8 @@ function PureMultimodalInput({
 
   const submitForm = useCallback(() => {
     if (!user || !user.email) {
+      //redirect to login page
+      router.push("/login");
       toast.error("Please login to continue", { position: "bottom-center" });
       return;
     }
