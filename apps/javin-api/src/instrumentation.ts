@@ -18,7 +18,17 @@ export const onRequestError = (err: unknown, req: Request) => {
     url.includes("127.0.0.1") ||
     url.includes("::1");
 
-  if (!isLocalhost) {
-    Sentry.captureException(err);
+  if (isLocalhost) return;
+
+  // Skip known AI quota error
+  if (
+    err instanceof Error &&
+    err.name === "AI_RetryError" &&
+    err.message.includes("You exceeded your current quota")
+  ) {
+    return;
   }
+
+  Sentry.captureException(err);
+
 };

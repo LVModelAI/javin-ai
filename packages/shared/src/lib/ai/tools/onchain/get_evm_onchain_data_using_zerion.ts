@@ -29,7 +29,7 @@ export const getEvmOnchainDataUsingZerion = tool({
       const zerionAllPathsAndDesc = await getAllPathsAndDesc(zerionOpenapidata);
 
       const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("gpt-4o"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
       
         ## How to Process User Queries:
