@@ -281,6 +281,8 @@ Comply with user requests to the best of your abilities using the appropriate to
   - Data from the yields/APY dashboard
   - Data from the volumes dashboards
   - Data of fees and revenue of all protocol and chains
+
+  # If the topic is not related to Blockchain in general. Tell the user that you cant assist with the request no matter what.
 `,
 
   wormhole: `
