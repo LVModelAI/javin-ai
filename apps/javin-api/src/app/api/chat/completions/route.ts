@@ -17,6 +17,8 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { ConsumerEnumType } from "@/src/lib/db/schema";
 import { logInfo } from "@javin/shared/lib/utils/logging";
+import { enforceRateLimit } from "@/src/lib/utils/rateLimit";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
@@ -48,6 +50,10 @@ export async function POST(request: Request) {
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    // RATE LIMITING
+    const rateLimitResponse = await enforceRateLimit(consumerInfo);
+    if (rateLimitResponse instanceof NextResponse) return rateLimitResponse;
 
     const body = await request.json();
     const validatedData = PromptRequestSchema.parse(body);
