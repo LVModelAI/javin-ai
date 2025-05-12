@@ -5,6 +5,7 @@ import {
   json,
   timestamp,
   boolean,
+  integer,
 } from "drizzle-orm/pg-core";
 import type { InferSelectModel } from "drizzle-orm";
 
@@ -65,6 +66,7 @@ export const consumerTable = pgTable("ConsumerTable", {
   tableName: varchar("tableName").notNull(),
   description: varchar("description").notNull(),
   createdAt: timestamp("createdAt").notNull(),
+  rate_limit: integer("rate_limit").notNull().default(10),
 });
 
 export type ConsumerTable = InferSelectModel<typeof consumerTable>;
