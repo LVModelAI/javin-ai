@@ -9,6 +9,9 @@ import {
 import zerionJson from "./zerion-openapi.json";
 import { zerionBaseURL } from "./constant";
 import { getZerionApiKey } from "../../../utils/utils";
+import { ensToAddress } from "../ens-to-address";
+import * as Sentry from "@sentry/nextjs";
+
 export const getEvmOnchainDataUsingZerion = tool({
   description: "Get real-time data from Ethereum based blockchains.",
   parameters: z.object({
@@ -26,7 +29,7 @@ export const getEvmOnchainDataUsingZerion = tool({
       const zerionAllPathsAndDesc = await getAllPathsAndDesc(zerionOpenapidata);
 
       const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
       
         ## How to Process User Queries:
@@ -52,6 +55,7 @@ export const getEvmOnchainDataUsingZerion = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${zerionAllPathsAndDesc}. Base URL: ${zerionBaseURL}`
         ),
         tools: {
+          ensToAddress: ensToAddress,
           getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",
@@ -96,6 +100,7 @@ export const getEvmOnchainDataUsingZerion = tool({
                 return json; // Return parsed JSON data for further processing
               } catch (error) {
                 console.error("Error fetching API data:", error);
+                Sentry.captureException(error);
                 return { error: "Failed to fetch data from the API." };
               }
             },
@@ -108,7 +113,7 @@ export const getEvmOnchainDataUsingZerion = tool({
       return aiAgentResponse.text;
     } catch (error: any) {
       console.error("Error in getEvmOnchainDataUsingZerion:", error);
-
+      Sentry.captureException(error);
       // Returning error details so AI can adapt its next action
       return {
         success: false,

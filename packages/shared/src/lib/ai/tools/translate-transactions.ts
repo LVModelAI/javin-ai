@@ -1,12 +1,13 @@
 import {
-  getAllPaths,
   getAllPathsAndDesc,
   loadOpenAPI,
   loadOpenAPIFromJson,
-} from  "../../utils/openapi";
+} from "../../utils/openapi";
 import { generateObject, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../models";
+import * as Sentry from "@sentry/nextjs";
+import { logObjects } from "../../utils/logging";
 
 export const novesSupportedChains = [
   "arbitrum",
@@ -107,7 +108,7 @@ export const translateTransactions = tool({
       // console.log("transaction data is  ----------- ", transactionDetails);
 
       const { object: apiEndpointsArray } = await generateObject({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         output: "array",
         schema: z.string().describe("the api endpoint"),
         system: `\n
@@ -141,10 +142,11 @@ export const translateTransactions = tool({
           try {
             const response = await request;
             const json = await response.json();
-            console.log("API Response:", json);
+            logObjects("API Response from translate transaciton:", json);
             return json;
           } catch (error) {
-            console.error("Error parsing API response:", error);
+            console.error("Error parsing API response in translate transaction:", error);
+            Sentry.captureException(error);
             return null;
           }
         })
@@ -154,6 +156,7 @@ export const translateTransactions = tool({
       return results;
     } catch (error) {
       console.error("Error in summarizing transactions:", error);
+      Sentry.captureException(error);
       return error; // Re-throw to allow handling by the caller
     }
   },

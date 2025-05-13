@@ -11,6 +11,15 @@ import { SubmitButton } from "@/components/submit-button";
 import { register, type RegisterActionState } from "../actions";
 import { useTheme } from "next-themes";
 
+type AuthFormProps = {
+  action: (formData: FormData) => void;
+  defaultEmail?: string;
+  fieldErrors?: {
+    email?: string;
+    password?: string;
+  };
+};
+
 export default function Page() {
   const router = useRouter();
   const { resolvedTheme } = useTheme();
@@ -75,7 +84,12 @@ export default function Page() {
             Create an account with your email and password
           </p>
         </div>
-        <AuthForm action={handleSubmit} defaultEmail={email}>
+        <AuthForm
+          action={handleSubmit}
+          defaultEmail={email}
+          fieldErrors={state.fieldErrors}
+          forgotPasswordNeeded={false}
+        >
           <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
             {"Already have an account? "}

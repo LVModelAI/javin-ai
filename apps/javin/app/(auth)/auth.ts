@@ -1,10 +1,12 @@
 import { compare } from "bcrypt-ts";
 import NextAuth, { type User, type Session } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
-import { getUser } from "@/lib/db/queries";
+import { createUser, getUser } from "@/lib/db/queries";
 
 import { authConfig } from "./auth.config";
+import { generateUUID } from "@javin/shared/lib/utils/utils";
 
 export const {
   handlers: { GET, POST },
@@ -25,21 +27,40 @@ export const {
         return users[0] as any;
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.tier = user.tier; // Add tier to the token
-        token.messageCount = user.messageCount as number; // Add tier to the token
+      if (user?.email) {
+        // Only fetch or create user the first time
+        let dbUser;
+        const [existingUser] = await getUser(user.email);
+
+        if (!existingUser) {
+          const generatedId = generateUUID();
+          await createUser(generatedId, user.email, null);
+          dbUser = {
+            id: generatedId,
+            tier: "free",
+            messageCount: 0,
+          };
+        } else {
+          dbUser = existingUser;
+        }
+
+        // Attach to token
+        token.id = dbUser.id;
       }
+
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.tier = token.tier as string; // Assign tier from token to session
-        session.user.messageCount = token.messageCount as number; // Assign tier from token to session
       }
       return session;
     },

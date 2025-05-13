@@ -16,7 +16,10 @@
       "env": [
         "FIRECRAWL_API_KEY",
         "FIRECRAWL_API_ENDPOINT",
-        "POSTGRES_URL"
+        "POSTGRES_URL",
+        "SENTRY_AUTH_TOKEN",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN"
       ]
     },
     "lint": {},

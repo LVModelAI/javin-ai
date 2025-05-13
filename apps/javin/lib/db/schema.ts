@@ -11,17 +11,33 @@ import {
   boolean,
   integer,
 } from "drizzle-orm/pg-core";
-
 export const user = pgTable("User", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
-  email: varchar("email", { length: 64 }).notNull().unique(),
+  email: varchar("email", { length: 64 }).unique(),
   walletAddress: varchar("walletAddress", { length: 64 }),
   password: varchar("password", { length: 64 }),
   tier: varchar("tier", { length: 64 }).notNull().default("free"),
   messageCount: integer("messageCount").notNull().default(0),
+  dailyMessageRemaining: integer("dailyMessageRemaining")
+    .notNull()
+    .default(Number(process.env.FREE_USER_MESSAGE_LIMIT) || 20),
+  // do this in future when we directly do pro tier when creating user
+  // right now only free tier users are created then upgraded to pro
+  // .default(
+  //   sql`CASE WHEN tier = 'free' THEN ${process.env.FREE_USER_MESSAGE_LIMIT} WHEN tier = 'pro' THEN ${process.env.PRO_USER_MESSAGE_LIMIT} END`
+  // ),
 });
 
 export type User = InferSelectModel<typeof user>;
+
+export const password_reset_tokens = pgTable("PasswordResetToken", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  email: varchar("email", { length: 64 }).notNull().unique(),
+  token: varchar("token").notNull(),
+  expiry: timestamp("expiry").notNull(),
+});
+
+export type PasswordResetToken = InferSelectModel<typeof password_reset_tokens>;
 
 export const chat = pgTable("Chat", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -48,6 +64,23 @@ export const message = pgTable("Message", {
 });
 
 export type Message = InferSelectModel<typeof message>;
+
+// just for reference. this is what the json will contain.
+type toolsCalled = {
+  toolName: string;
+  toolResponse: any;
+}[];
+
+export const toolTracking = pgTable("ToolTracking", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  userPrompt: varchar("userPrompt").notNull(),
+  aiResponse: json("aiResponse").notNull(),
+  toolsCalled: json("toolsCalled").array().notNull(),
+  toolsCalledNames: json("toolsCalledNames").array().notNull(),
+  createdAt: timestamp("createdAt").notNull(),
+});
+
+export type ToolTracking = InferSelectModel<typeof toolTracking>;
 
 export const vote = pgTable(
   "Vote",

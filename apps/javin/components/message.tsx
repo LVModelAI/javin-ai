@@ -3,30 +3,24 @@
 import type { ChatRequestOptions, Message } from "ai";
 import cx from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
-import { memo, useMemo, useState } from "react";
+import { memo, useState } from "react";
 
 import type { Vote } from "@/lib/db/schema";
-import {
-  ChevronDownIcon,
-  LoaderIcon,
-  PencilEditIcon,
-  SparklesIcon,
-  JavinMan,
-} from "./icons";
+import { PencilEditIcon, JavinMan } from "./icons";
 import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";
 import { PreviewAttachment } from "./preview-attachment";
-import { Weather } from "./weather";
 import equal from "fast-deep-equal";
-import { cn } from "@javin/shared/lib/utils/utils";
+import { cn, SearchGroupId } from "@javin/shared/lib/utils/utils";
 import { Button } from "./ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
 import MultiSearch from "./multi-search";
 import PortfolioTable from "./birdeye/PortfolioTable";
 import TokenInfoTable from "./birdeye/TokenInfoTable";
 import { Check } from "lucide-react";
+import AptosPortfolioTable from "@/components/aptos/AptosPortfolioTable";
+import ToolCallLoader from "@/components/ui/tool-call-loader";
 
 const PurePreviewMessage = ({
   chatId,
@@ -34,6 +28,7 @@ const PurePreviewMessage = ({
   vote,
   isLoading,
   setMessages,
+  selectedGroup,
   reload,
   isReadonly,
   showIcon = true,
@@ -45,6 +40,7 @@ const PurePreviewMessage = ({
   setMessages: (
     messages: Message[] | ((messages: Message[]) => Message[])
   ) => void;
+  selectedGroup: SearchGroupId;
   reload: (
     chatRequestOptions?: ChatRequestOptions
   ) => Promise<string | null | undefined>;
@@ -99,18 +95,13 @@ const PurePreviewMessage = ({
               />
             )}
 
-            {message.toolInvocations && message.toolInvocations.length > 0 && (
+            {message.toolInvocations && message.toolInvocations?.length > 0 && (
               <div className="flex flex-col gap-4">
                 {message.toolInvocations.map((toolInvocation) => {
                   const { toolName, toolCallId, state, args } = toolInvocation;
 
                   if (state === "result") {
-                    const { result } = toolInvocation;
-                    // console.log(
-                    //   toolName,
-                    //   " -- tool result ------------ ",
-                    //   result
-                    // );
+                    const result = toolInvocation.result;
                     return (
                       <div key={toolCallId}>
                         {toolName === "webSearch" ? (
@@ -122,96 +113,76 @@ const PurePreviewMessage = ({
                           toolName === "getEvmMultiChainWalletPortfolio" ||
                           toolName === "getTokenBalances" ? (
                           <PortfolioTable result={result} />
+                        ) : toolName === "getAptosPortfolio" ? (
+                          <AptosPortfolioTable result={result} />
                         ) : toolName === "getCreditcoinApiData" ||
                           toolName === "getVanaApiData" ||
                           toolName === "getEvmOnchainDataUsingZerion" ? (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Exploring the blockchain
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Exploring the blockchain"
+                            isFinished
+                          />
                         ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Exploring ethereum
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Exploring ethereum"
+                            isFinished
+                          />
                         ) : toolName === "ensToAddress" ||
                           toolName === "aptosNames" ? (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Looking for you in the blockchain
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Looking for you in the blockchain"
+                            isFinished
+                          />
                         ) : toolName === "translateTransactions" ? (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Summarizing transactions
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Summarizing transactions"
+                            isFinished
+                          />
+                        ) : toolName === "getSiteContent" ? (
+                          <ToolCallLoader
+                            loadingMessage="Exploring the protocol"
+                            isFinished
+                          />
                         ) : (
-                          <div className="text-sm">
-                            <p className="flex flex-row gap-1 items-center">
-                              Finding info
-                              <Check size={14} className="text-green-500" />
-                            </p>
-                          </div>
+                          <ToolCallLoader
+                            loadingMessage="Finding info"
+                            isFinished
+                          />
                         )}
                       </div>
                     );
                   }
-                  // else when tool is loading
+
+                  // tool is still loading
                   return (
-                    <div
-                      key={toolCallId}
-                      className={cx({
-                        skeleton: ["getWeather"].includes(toolName),
-                      })}
-                    >
+                    <div key={toolCallId}>
                       {toolName === "webSearch" ? (
                         <div className="mt-4">
                           <MultiSearch result={null} args={args} />
                         </div>
                       ) : toolName === "getSolanaChainWalletPortfolio" ||
-                        toolName === "getEvmMultiChainWalletPortfolio" ? (
-                        <div className="text-sm">
-                          <p className="py-1">Fetching portfolio...</p>
-                        </div>
+                        toolName === "getEvmMultiChainWalletPortfolio" ||
+                        toolName === "getAptosPortfolio" ? (
+                        <ToolCallLoader loadingMessage="Fetching portfolio..." />
                       ) : toolName === "getCreditcoinApiData" ||
                         toolName === "getVanaApiData" ||
                         toolName === "getEvmOnchainDataUsingZerion" ? (
-                        <div className="text-sm">
-                          <p className="py-1">Exploring the blockchain...</p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Exploring the blockchain..." />
                       ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
-                        <div className="text-sm">
-                          <p className="py-1">Exploring ethereum...</p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Exploring ethereum..." />
                       ) : toolName === "creditCoinApiFetch" ||
                         toolName === "vanaApiFetch" ||
                         toolName === "onChainQuery" ? (
-                        <div className="text-sm">
-                          <p className="py-1">Fetching data...</p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Fetching data..." />
                       ) : toolName === "ensToAddress" ||
                         toolName === "aptosNames" ? (
-                        <div className="text-sm">
-                          <p className="py-1">
-                            Looking for you in the blockchain...
-                          </p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Looking for you in the blockchain..." />
                       ) : toolName === "translateTransactions" ? (
-                        <div className="text-sm">
-                          <p className="flex flex-row gap-1 items-center">
-                            Summarizing transactions...
-                          </p>
-                        </div>
+                        <ToolCallLoader loadingMessage="Summarizing transactions..." />
+                      ) : toolName === "getSiteContent" ? (
+                        <ToolCallLoader loadingMessage="Exploring the protocol..." />
                       ) : (
-                        <div className="text-sm">Finding info...</div>
+                        <ToolCallLoader loadingMessage="Finding info..." />
                       )}
                     </div>
                   );
@@ -256,6 +227,7 @@ const PurePreviewMessage = ({
                   message={message}
                   setMode={setMode}
                   setMessages={setMessages}
+                  selectedGroup={selectedGroup}
                   reload={reload}
                 />
               </div>
@@ -292,6 +264,7 @@ export const PreviewMessage = memo(
     )
       return false;
     if (!equal(prevProps.vote, nextProps.vote)) return false;
+    if (!equal(prevProps.selectedGroup, nextProps.selectedGroup)) return false;
 
     return true;
   }

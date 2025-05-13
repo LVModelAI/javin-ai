@@ -10,11 +10,28 @@ import {
 import { VisibilityType } from "@/components/visibility-selector";
 import { myProvider } from "@javin/shared/lib/ai/models";
 import { SearchGroupId } from "@javin/shared/lib/utils/utils";
+import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
 // import webpush from 'web-push'
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
   cookieStore.set("chat-model", model);
+}
+
+export async function checkLegacyChatModelCookie() {
+  const cookieStore = await cookies();
+  const legacyChatModel = cookieStore.get("chat-model");
+  if (!legacyChatModel) return;
+  // Check if the cookie value is one of the legacy chat models
+  logObjects("Legacy chat model cookie found:", legacyChatModel.value);
+  if (legacyChatModel?.value === "chat-model-small") {
+    cookieStore.delete("chat-model");
+    cookieStore.set("chat-model", "gpt-4o-mini");
+  }
+  if (legacyChatModel?.value === "chat-model-large") {
+    cookieStore.delete("chat-model");
+    cookieStore.set("chat-model", "gpt-4o");
+  }
 }
 
 export async function saveSearchModeAsCookie(mode: SearchGroupId) {
@@ -58,39 +75,37 @@ export async function updateChatVisibility({
 }) {
   await updateChatVisiblityById({ chatId, visibility });
 }
- 
 
 // VAPID below
 // DONT DELETE. WILL BE IMP IN FUTURE
-
 
 // webpush.setVapidDetails(
 //   'mailto:mohammad@lvmodel.com',
 //   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
 //   process.env.VAPID_PRIVATE_KEY!
 // )
- 
+
 // let subscription: PushSubscription | null = null
- 
+
 // export async function subscribeUser(sub: PushSubscription) {
 //   subscription = sub
 //   // In a production environment, you would want to store the subscription in a database
 //   // For example: await db.subscriptions.create({ data: sub })
 //   return { success: true }
 // }
- 
+
 // export async function unsubscribeUser() {
 //   subscription = null
 //   // In a production environment, you would want to remove the subscription from the database
 //   // For example: await db.subscriptions.delete({ where: { ... } })
 //   return { success: true }
 // }
- 
+
 // export async function sendNotification(message: string) {
 //   if (!subscription) {
 //     throw new Error('No subscription available')
 //   }
- 
+
 //   try {
 //     await webpush.sendNotification(
 //       // @ts-expect-error

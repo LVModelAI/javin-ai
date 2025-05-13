@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { tavily } from "@tavily/core";
+import * as Sentry from "@sentry/nextjs";
 
 function sanitizeUrl(url: string): string {
   return url.replace(/\s+/g, "%20");
@@ -21,7 +22,8 @@ async function isValidImageUrl(url: string): Promise<boolean> {
       response.ok &&
       (response.headers.get("content-type")?.startsWith("image/") ?? false)
     );
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     return false;
   }
 }

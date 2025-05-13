@@ -1,4 +1,8 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -14,4 +18,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+  org: "lvmodel",
+  project: "javascript-nextjs",
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  disableLogger: true,
+  automaticVercelMonitors: true,
+});

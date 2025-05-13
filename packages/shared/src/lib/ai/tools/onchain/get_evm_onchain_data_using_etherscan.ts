@@ -1,4 +1,4 @@
-import { generateObject, generateText, tool } from "ai";
+import { generateText, tool } from "ai";
 import { z } from "zod";
 import { myProvider } from "../../models";
 import {
@@ -7,8 +7,8 @@ import {
   loadOpenAPI,
 } from "../../../utils/openapi";
 import { etherscanBaseURL } from "./constant";
-import { groq } from "@ai-sdk/groq";
-import { translateTransactions } from "../translate-transactions";
+import { ensToAddress } from "../ens-to-address";
+import * as Sentry from "@sentry/nextjs";
 
 export const getEvmOnchainDataUsingEtherscan = tool({
   description:
@@ -19,7 +19,10 @@ export const getEvmOnchainDataUsingEtherscan = tool({
   execute: async ({ userQuery }: { userQuery?: string }) => {
     console.log("using etherscan ...");
     try {
-      console.log("User query:", userQuery);
+      console.log(
+        "User query for getEvmOnchainDataUsingEtherscan :",
+        userQuery
+      );
       const apiKey = process.env.ETHERSCAN_API_KEY;
       if (!apiKey) {
         throw new Error("Etherscan API key not found");
@@ -33,7 +36,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
       );
 
       const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
             
               ## How to Process User Queries:
@@ -59,6 +62,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}`
         ),
         tools: {
+          ensToAddress: ensToAddress,
           getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",
@@ -103,6 +107,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
                 return json; // Return parsed JSON data for further processing
               } catch (error) {
                 console.error("Error fetching API data:", error);
+                Sentry.captureException(error);
                 return { error: "Failed to fetch data from the API." };
               }
             },
@@ -115,6 +120,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
       return aiAgentResponse.text;
     } catch (error: any) {
       console.error("Error in getEvmOnchainDataUsingEtherscan:", error);
+      Sentry.captureException(error);
       return {
         success: false,
         message: "Error retrieving API data.",

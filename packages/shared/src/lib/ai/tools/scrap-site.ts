@@ -1,6 +1,7 @@
 import { scrapeSite } from "../../utils/scrape-site";
 import { tool } from "ai";
 import { z } from "zod";
+import * as Sentry from "@sentry/nextjs";
 
 type FirecrawlData = {
   success: string;
@@ -21,13 +22,12 @@ export const getSiteContent = tool({
   }),
   execute: async ({ linkToScrape }) => {
     try {
-      console.log("scraping link : ", linkToScrape);
-
       const response = await scrapeSite(linkToScrape);
 
       return response;
     } catch (error) {
       console.error("Error in getSiteContent:", error);
+      Sentry.captureException(error);
       return error; // Re-throw to allow handling by the caller
     }
   },
