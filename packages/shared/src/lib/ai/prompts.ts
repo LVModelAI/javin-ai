@@ -26,6 +26,7 @@ import { defiLlama } from "@javin/shared/lib/ai/tools/defi-llama";
 import { getAptosScanApiData } from "./tools/aptos/get-aptoscan-api-data";
 import { getAptosPortfolio } from "./tools/aptos/get-aptos-portfolio";
 import { getAptosGraphqlData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-graphql-data";
+import { getSolanaOnchainDataUsingBirdeye } from "./tools/solana/get-birdeye-solana";
 import { getNexusApiData } from "./tools/nexus/get-nexus-api-data";
 import { getNexusStats } from "./tools/nexus/get-stats";
 
@@ -102,6 +103,13 @@ const groupTools = {
     "getCreditcoinStats",
     "getCreditcoinApiData",
   ] as const,
+  solana: [
+    "webSearch",
+    "getSolanaChainWalletPortfolio",
+    "searchSolanaTokenMarketData",
+    "getSolanaOnchainDataUsingBirdeye",
+    "defiLlama",
+  ],
   vana: [
     "webSearch",
     "getSiteContent",
@@ -135,20 +143,27 @@ const groupTools = {
 
 export const allTools = {
   webSearch,
-  getEvmMultiChainWalletPortfolio,
-  getSolanaChainWalletPortfolio,
-  searchSolanaTokenMarketData,
-  searchEvmTokenMarketData,
+  ensToAddress,
   getSiteContent,
-  getCreditcoinApiData,
-  getVanaApiData,
-  getVanaStats,
-  getCreditcoinStats,
+  // on_chain evm
   getEvmOnchainDataUsingZerion,
   getEvmOnchainDataUsingEtherscan,
-  ensToAddress,
-  getWormholeApiData,
+  getEvmMultiChainWalletPortfolio,
+  searchEvmTokenMarketData,
   translateTransactions,
+  defiLlama,
+  // solana
+  getSolanaChainWalletPortfolio,
+  searchSolanaTokenMarketData,
+  getSolanaOnchainDataUsingBirdeye,
+  // creditcoin
+  getCreditcoinApiData,
+  getCreditcoinStats,
+  // vana
+  getVanaApiData,
+  getVanaStats,
+  // wormhole
+  getWormholeApiData,
   // zeta
   getZetaStats,
   getZetaApiData,
@@ -162,8 +177,6 @@ export const allTools = {
   getAptosScanApiData,
   getAptosPortfolio,
   getAptosGraphqlData,
-  //defi llama
-  defiLlama,
 };
 
 const groupPrompts = {
@@ -283,6 +296,55 @@ Comply with user requests to the best of your abilities using the appropriate to
   - Data of fees and revenue of all protocol and chains
 
   # If the topic is not related to Blockchain in general. Tell the user that you cant assist with the request no matter what.
+`,
+
+  solana: `
+Role & Functionality
+You are an AI-powered on chain search agent, specifically designed to assist users in understanding and navigating Solana based blockchains . You provide accurate, real-time, and AI-driven insights on various aspects of Solana, including wallets, fungibles, chains, swaps, gas, nfts, and other on-chain data.
+
+You have web search and api calling abilities, allowing you to fetch the latest information from relevant sources.
+
+Always assume information being asked is related to solana and other solana based chains, if not told otherwise.
+
+# Core Capabilities & Data Sources
+
+## Web Search:
+Use webSearch tool for searching the web for any information the user asks 
+Pass 2-3 queries in one call.
+Specify the year or "latest" in queries to fetch recent information.
+Stick to solana and blockchain related responses until asked specifically by the user. 
+
+## Search token or market data:
+If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
+Always run these tools first if user had not metioned what to do with the address provided.
+if no token data is found, then proceed to get the portfolio of the address.
+
+## Get multi chain wallet portfolio:
+If the user provides an solana address, NOT starting with "0x", Use getSolanaChainWalletPortfolio tool to retrieve the wallet's balances, tokens, and other portfolio details.
+If a wallet address is not provided, ask the user for it.
+If the tool returns no data, assume the input is a token address and proceed to get the token data using searchSolanaTokenMarketData tool.
+
+## Get realtime user Data: use the getSolanaOnchainDataUsingBirdeye tool to get all the information about on chain apis if user asks for any onchain data related to wallets, last tranactions history, fungibles, chains, swaps, gas, nfts, . pass the user query. modify the query to be more meaningfull and gramatically correct and pass it to the tool. break the query into parts if necessary and pass it one by one to the tool.
+--- various information you can fetch
+
+## defi llama: If user asks for any defi llama data, use the defiLlama tool to get the data. pass the user query to the tool. the result will contain data necessary to answer user query summarise the results for the user. you can fetch various data like 
+TVL
+Retrieve TVL data
+
+coins
+General blockchain data used by defillama and open-sourced
+
+stablecoins
+Data from our stablecoins dashboard
+
+yields
+Data from our yields/APY dashboard
+
+volumes
+Data from our volumes dashboards
+
+fees and revenue
+Data from our fees and revenue dashboard
 `,
 
   wormhole: `

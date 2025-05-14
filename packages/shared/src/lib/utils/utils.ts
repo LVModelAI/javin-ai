@@ -191,6 +191,7 @@ export function getMostRecentUserMessage(messages: Array<Message>) {
 export type SearchGroupId =
   | "search"
   | "on_chain"
+  | "solana"
   | "creditcoin"
   | "vana"
   | "wormhole"
@@ -264,6 +265,13 @@ export const searchGroups: SearchGroup[] = [
     description: "Everything Creditcoin. Search, transactions and more.",
     icon: Network,
     img: "/images/icon/creditcoin/creditcoin-white.png",
+  },
+  {
+    id: "solana" as const,
+    name: "Solana",
+    description: "Access data from Solana",
+    icon: Network,
+    img: "/images/chain-logo/solana_2.png",
   },
 ] as const;
 
