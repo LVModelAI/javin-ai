@@ -30,7 +30,7 @@ export const getSolanaOnchainDataUsingBirdeye = tool({
       );
 
       const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("chat-model-small"),
+        model: myProvider.languageModel("gpt-4o-mini"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
             
               ## How to Process User Queries:
@@ -103,7 +103,7 @@ export const getSolanaOnchainDataUsingBirdeye = tool({
                   );
                 const respObj = await response.json();
                 // console.log("Fetched API response:", respObj);
-                if (respObj.data.solana.length > limit) {
+                if (respObj.data.solana?.length > limit) {
                   // used to limit txn_lists
                   console.log(
                     `found ${respObj.data.solana.length} results. truncating to ${limit} results`
