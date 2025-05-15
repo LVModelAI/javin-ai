@@ -9,6 +9,7 @@ import {
 } from "../../../utils/openapi";
 import { translateTransactions } from "../translate-transactions";
 import birdEyeOpenApiSPec from "./birdeye_openapi.json";
+import { snsToAddress } from "./sns-to-address";
 
 const BIRDEYE_BASE_URL = "https://public-api.birdeye.so";
 
@@ -41,6 +42,9 @@ export const getSolanaOnchainDataUsingBirdeye = tool({
               2. **Retrieve Required Parameters**:  
                  - Use the **getPathParametersAndBaseUrl** tool to fetch all necessary parameters.  
                  - If any required parameters are missing, prompt the user for input.  
+
+              4. **Sns lookup**:
+                If user enters a SNS name (Solana Name Service), like somename.sol or someName.someChain.sol then use the snsToAddress tool to get the corresponding address. Use this address for further queries. Use this tools to get the actual address so that you can pass it to other tools.
             
               3. **Construct and Execute API Call**:  
                  - Form a complete API URL using the **base URL** (${BIRDEYE_BASE_URL}) and the retrieved parameters.  
@@ -55,6 +59,7 @@ export const getSolanaOnchainDataUsingBirdeye = tool({
           `User query: "${userQuery}". Available API paths and descriptions: ${solanaBirdeyeAllPathsAndDesc}. Base URL: ${BIRDEYE_BASE_URL}`
         ),
         tools: {
+          snsToAddress: snsToAddress,
           getPathParametersAndBaseUrl: tool({
             description:
               "Retrieve all parameters required for a given API path.",

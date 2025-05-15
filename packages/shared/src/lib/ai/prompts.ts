@@ -29,6 +29,7 @@ import { getAptosGraphqlData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-
 import { getSolanaOnchainDataUsingBirdeye } from "./tools/solana/get-birdeye-solana";
 import { getNexusApiData } from "./tools/nexus/get-nexus-api-data";
 import { getNexusStats } from "./tools/nexus/get-stats";
+import { snsToAddress } from "./tools/solana/sns-to-address";
 
 export const codePrompt = ``;
 
@@ -105,6 +106,7 @@ const groupTools = {
   ] as const,
   solana: [
     "webSearch",
+    "snsToAddress",
     "getSolanaChainWalletPortfolio",
     "searchSolanaTokenMarketData",
     "getSolanaOnchainDataUsingBirdeye",
@@ -153,6 +155,7 @@ export const allTools = {
   translateTransactions,
   defiLlama,
   // solana
+  snsToAddress,
   getSolanaChainWalletPortfolio,
   searchSolanaTokenMarketData,
   getSolanaOnchainDataUsingBirdeye,
@@ -313,6 +316,10 @@ Use webSearch tool for searching the web for any information the user asks
 Pass 2-3 queries in one call.
 Specify the year or "latest" in queries to fetch recent information.
 Stick to solana and blockchain related responses until asked specifically by the user. 
+
+## Sns lookup:
+If user enters a SNS name (Solana Name Service), like somename.sol or someName.someChain.sol then use the snsToAddress tool to get the corresponding address. Use this address for further queries. Use this tools to get the actual address so that you can pass it to other tools.
+  
 
 ## Search token or market data:
 If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
