@@ -6,12 +6,6 @@ import { Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
 import { getDomainKey, NameRegistryState } from "@bonfida/spl-name-service";
 
 // Create a connection
-const conn = new Connection(
-  process.env.SOLANA_QUICKNODE_RPC_ENDPOINT as string,
-  {
-    commitment: "confirmed",
-  }
-);
 
 /**
  * Resolve a .sol domain to its owner address.
@@ -22,6 +16,13 @@ async function resolveSNS(domain: string) {
   if (process.env.SOLANA_QUICKNODE_RPC_ENDPOINT === undefined) {
     throw new Error("SOLANA_QUICKNODE_RPC_ENDPOINT is not defined");
   }
+  const conn = new Connection(
+    process.env.SOLANA_QUICKNODE_RPC_ENDPOINT as string,
+    {
+      commitment: "confirmed",
+    }
+  );
+
   // strip .sol if present
   const name = domain.replace(/\.sol$/, "");
 
