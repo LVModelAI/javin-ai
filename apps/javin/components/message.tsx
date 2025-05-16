@@ -128,7 +128,8 @@ const PurePreviewMessage = ({
                             isFinished
                           />
                         ) : toolName === "ensToAddress" ||
-                          toolName === "aptosNames" ? (
+                          toolName === "aptosNames" ||
+                          toolName === "snsToAddress" ? (
                           <ToolCallLoader
                             loadingMessage="Looking for you in the blockchain"
                             isFinished

@@ -43,12 +43,13 @@ export const getSolanaOnchainDataUsingBirdeye = tool({
                  - Use the **getPathParametersAndBaseUrl** tool to fetch all necessary parameters.  
                  - If any required parameters are missing, prompt the user for input.  
 
-              4. **Sns lookup**:
-                If user enters a SNS name (Solana Name Service), like somename.sol or someName.someChain.sol then use the snsToAddress tool to get the corresponding address. Use this address for further queries. Use this tools to get the actual address so that you can pass it to other tools.
+              4. **SNS lookup**:
+                 - If user enters a SNS name (Solana Name Service), like somename.sol or someName.someChain.sol then use the snsToAddress tool to get the corresponding address. Use this address for further queries. Use this tools to get the actual address so that you can pass it to other tools.
             
               3. **Construct and Execute API Call**:  
                  - Form a complete API URL using the **base URL** (${BIRDEYE_BASE_URL}) and the retrieved parameters.  
                  - Use the **makeApiCall** tool to fetch data.
+                 - Put the wallet address in the url. Not the domain name of solana name service. Use the Sns lookup tool to get the address.
                     
               ## **Final Response Format:**  
               - Always provide a **clear, structured, human-readable answer** to the user.  
