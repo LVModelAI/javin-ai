@@ -15,13 +15,47 @@ export async function scrapeSite(linkToScrape: string) {
   try {
     console.log("scraping link : ", linkToScrape);
 
+    // SCRAPING PREPARATION ==================================================
+    let waitMilliseconds = 1; //cant put 0, as it will throw error
+    if (linkToScrape.includes("solanacompass.com/statistics/staking")) {
+      waitMilliseconds = 5000;
+    }
+
+    // MAIN SCRAPING LOGIC ==============================
     const scrapeResult = (await app.scrapeUrl(linkToScrape, {
       formats: ["markdown", "links"],
+      actions: [{ type: "wait", milliseconds: waitMilliseconds }],
     })) as ScrapeResponse;
 
     if (!scrapeResult.success) {
       throw new Error(`Failed to scrape: ${scrapeResult.error}`);
     }
+
+    // LINK SPECIFIC FILTERING FOR SCRAPED DATA ==============================
+    if (
+      scrapeResult.markdown &&
+      linkToScrape.includes("solanacompass.com/statistics/staking")
+    ) {
+      // This is a hack for exclusing any text which comes after the second occurance of the text "Epoch History" in the markdown
+      const keyword = "Epoch History";
+
+      // find first occurrence
+      const firstIndex = scrapeResult.markdown.indexOf(keyword);
+      if (firstIndex !== -1) {
+        // find second occurrence, starting just after the first keyword
+        const secondIndex = scrapeResult.markdown.indexOf(
+          keyword,
+          firstIndex + keyword.length
+        );
+        if (secondIndex !== -1) {
+          scrapeResult.markdown = scrapeResult.markdown.substring(
+            0,
+            secondIndex
+          );
+        }
+      }
+    }
+
 
     console.log("scrapeResult.markdown----------------", scrapeResult.markdown);
     console.log("scrapeResult.links----------------", scrapeResult.links);
