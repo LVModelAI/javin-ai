@@ -4,6 +4,7 @@ import {
   message,
   Message,
   nexusMessage,
+  solanaMessage,
   toolTracking,
   ToolTracking,
 } from "./schema";
@@ -34,9 +35,11 @@ export async function saveMessages({
       case "NEXUS":
         targetTable = nexusMessage;
         break;
-      default:
-        targetTable = message;
+      case "SOLANA_HACKATHON":
+        targetTable = solanaMessage;
         break;
+      default:
+        return;
     }
     return await db.insert(targetTable).values(messages);
   } catch (error) {
