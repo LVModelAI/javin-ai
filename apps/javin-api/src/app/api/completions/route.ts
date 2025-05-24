@@ -1,4 +1,4 @@
-import { allTools, getGroupConfig } from "@javin/shared/src/lib/ai/prompts";
+import { allTools, getAllToolsWithModel, getGroupConfig } from "@javin/shared/src/lib/ai/prompts";
 import {
   generateUUID,
   sanitizeResponseMessages,
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
         prompt: prompt,
         maxSteps: 10,
         experimental_activeTools: [...activeTools],
-        tools: allTools,
+        tools: getAllToolsWithModel(model),
         maxTokens: max_tokens,
         temperature: temperature,
         experimental_generateMessageId: generateUUID,
@@ -249,7 +249,7 @@ export async function POST(request: Request) {
                 ],
               });
             },
-            tools: allTools,
+            tools: getAllToolsWithModel(model),
             maxTokens: max_tokens,
             temperature: temperature,
             experimental_transform: smoothStream({ chunking: "word" }),

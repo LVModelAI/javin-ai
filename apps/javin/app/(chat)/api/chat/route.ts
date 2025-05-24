@@ -26,6 +26,7 @@ import {
 import { generateTitleFromUserMessage } from "../../actions";
 import * as Sentry from "@sentry/nextjs";
 import { v4 as uuidv4 } from "uuid";
+import { getAllToolsWithModel } from "@javin/shared/src/lib/ai/prompts";
 
 export async function POST(request: Request) {
   logInfo("Received POST request for chat.");
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
           modelToUse === "chat-model-reasoning" ? [] : [...activeTools],
         experimental_transform: smoothStream({ chunking: "word" }),
         experimental_generateMessageId: generateUUID,
-        tools: allTools,
+        tools: getAllToolsWithModel("gpt-4o-mini"),
         onStepFinish(event) {
           logInfo("Step finished.");
           // logObjects("Step Event:", event);

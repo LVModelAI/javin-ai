@@ -1,4 +1,8 @@
-import { allTools, getGroupConfig } from "@javin/shared/src/lib/ai/prompts";
+import {
+  allTools,
+  getAllToolsWithModel,
+  getGroupConfig,
+} from "@javin/shared/src/lib/ai/prompts";
 import {
   generateUUID,
   sanitizeResponseMessages,
@@ -19,7 +23,10 @@ import { ConsumerEnumType } from "@/src/lib/db/schema";
 import { logInfo } from "@javin/shared/lib/utils/logging";
 import { enforceRateLimit } from "@/src/lib/utils/rateLimit";
 import { NextResponse } from "next/server";
-import { getModelByConsumerMode, myProvider } from "@javin/shared/lib/ai/models";
+import {
+  getModelByConsumerMode,
+  myProvider,
+} from "@javin/shared/lib/ai/models";
 
 export async function POST(request: Request) {
   try {
@@ -86,7 +93,7 @@ export async function POST(request: Request) {
         prompt: prompt,
         maxSteps: 10,
         experimental_activeTools: [...activeTools],
-        tools: allTools,
+        tools: getAllToolsWithModel(model),
         maxTokens: max_tokens,
         temperature: temperature,
         experimental_generateMessageId: generateUUID,

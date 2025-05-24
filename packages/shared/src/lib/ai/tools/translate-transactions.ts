@@ -80,7 +80,7 @@ export const novesSupportedChains = [
   "zora",
 ] as const;
 
-export const translateTransactions = tool({
+export const translateTransactions = (modelName: string) => tool({
   description:
     "Translate raw blockchain transactions into human-friendly, enriched form.",
   parameters: z.object({
@@ -108,7 +108,7 @@ export const translateTransactions = tool({
       // console.log("transaction data is  ----------- ", transactionDetails);
 
       const { object: apiEndpointsArray } = await generateObject({
-        model: myProvider.languageModel("gpt-4o-mini"),
+        model: myProvider.languageModel(modelName),
         output: "array",
         schema: z.string().describe("the api endpoint"),
         system: `\n
