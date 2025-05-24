@@ -30,6 +30,7 @@ import { getSolanaOnchainDataUsingBirdeye } from "./tools/solana/get-birdeye-sol
 import { getNexusApiData } from "./tools/nexus/get-nexus-api-data";
 import { getNexusStats } from "./tools/nexus/get-stats";
 import { snsToAddress } from "./tools/solana/sns-to-address";
+import { supportedChainsAndId } from "@javin/shared/lib/ai/tools/onchain/constant";
 
 export const codePrompt = ``;
 
@@ -278,8 +279,13 @@ Comply with user requests to the best of your abilities using the appropriate to
   - Get single NFT by ID
   
   ## Get realtime user Data using getEvmOnchainDataUsingEtherscan:
-  Use the getEvmOnchainDataUsingEtherscan tool to get various info about on chain data like Accounts, Contracts, Transactions, Blocks, Logs, Geth/Parity Proxy, Tokens, Gas Tracker, Stats, Chain Specific, Usage. Pass the user query and also include the blockchain address.
-  
+  Use the getEvmOnchainDataUsingEtherscan tool to get various info about on chain data like Accounts, Contracts, Transactions, Blocks, Logs, Geth/Parity Proxy, Tokens, Gas Tracker, Stats, Chain Specific, Usage. Pass the user query and also include the blockchain address. pass the user query and the chain id of the chain the user is asking about. The chains and their ids are as follows:
+  ${JSON.stringify(
+    supportedChainsAndId,
+    null,
+    2
+  )}. if the user has not specified the chain id, then use 1 as default.
+
   ## Ens lookup:
   If user enters a ENS name, like somename.eth or someName.someChain.eth then use the ensToAddress tool to get the corresponding address. Use this address for further queries. Use this tools to get the actual address so that you can pass it to other tools.
   

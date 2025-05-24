@@ -6,21 +6,28 @@ import {
   getPathDetails,
   loadOpenAPI,
 } from "../../../utils/openapi";
-import { etherscanBaseURL } from "./constant";
+import { etherscanBaseURL, supportedChainsAndId } from "./constant";
 import { ensToAddress } from "../ens-to-address";
 import * as Sentry from "@sentry/nextjs";
 
 export const getEvmOnchainDataUsingEtherscan = tool({
   description:
-    "Get real-time data from Ethereum-based blockchains using Etherscan.",
+    "Get real-time data from Ethereum-based blockchains using Etherscan v2 API.",
   parameters: z.object({
     userQuery: z.string().describe("Query of user."),
+    chainId: z.number().describe("The blockchain chain ID.").default(1), // default to Ethereum Mainnet
   }),
-  execute: async ({ userQuery }: { userQuery?: string }) => {
-    console.log("using etherscan ...");
+  execute: async ({
+    userQuery,
+    chainId = 1, // default to Ethereum Mainnet
+  }: {
+    userQuery?: string;
+    chainId?: number;
+  }) => {
+    console.log("using etherscan v2 ...");
     try {
       console.log(
-        "User query for getEvmOnchainDataUsingEtherscan :",
+        `User query for getEvmOnchainDataUsingEtherscan (chainId: ${chainId}):`,
         userQuery
       );
       const apiKey = process.env.ETHERSCAN_API_KEY;
@@ -46,11 +53,11 @@ export const getEvmOnchainDataUsingEtherscan = tool({
             
               2. **Retrieve Required Parameters**:  
                  - Use the **getPathParametersAndBaseUrl** tool to fetch all necessary parameters.  
-                 - pass The API path, e.g., '/?module=account&action=balance'
+                 - Pass the API path, e.g., '/?module=account&action=balance'
                  - If any required parameters are missing, prompt the user for input.  
             
               3. **Construct and Execute API Call**:  
-                 - Form a complete API URL using the **base URL** (${etherscanBaseURL}) and the retrieved parameters.  
+                 - Form a complete API URL using the **base URL** (${etherscanBaseURL}) + **chainid** + retrieved parameters.  
                  - Use the **makeApiCall** tool to fetch data.
                     
               ## **Final Response Format:**  
@@ -59,7 +66,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
               - If no relevant data is found, respond appropriately instead of returning an empty result.  
               `,
         prompt: JSON.stringify(
-          `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}`
+          `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}?chainid=${chainId}`
         ),
         tools: {
           ensToAddress: ensToAddress,
@@ -83,11 +90,12 @@ export const getEvmOnchainDataUsingEtherscan = tool({
             },
           }),
           makeApiCall: tool({
-            description: "Fetch real-time blockchain data from etherscan API.",
+            description:
+              "Fetch real-time blockchain data from Etherscan v2 API.",
             parameters: z.object({
-              url: z.string().describe("The full API query URL."),
+              path: z.string().describe("The API path with query parameters."),
             }),
-            execute: async ({ url }) => {
+            execute: async ({ path }) => {
               try {
                 const options = {
                   method: "GET",
@@ -95,7 +103,9 @@ export const getEvmOnchainDataUsingEtherscan = tool({
                     accept: "application/json",
                   },
                 };
-                const fullUrl = `${url}&apikey=${apiKey}`;
+                const cleanPath = path.startsWith("/?") ? path.slice(2) : path;
+                const fullUrl = `${etherscanBaseURL}?chainid=${chainId}&${cleanPath}&apikey=${apiKey}`;
+
                 console.log("fetching --- ", fullUrl);
                 const response = await fetch(fullUrl, options);
                 if (!response.ok)
@@ -104,7 +114,7 @@ export const getEvmOnchainDataUsingEtherscan = tool({
                   );
                 const json = await response.json();
                 console.log("Fetched API response:", json);
-                return json; // Return parsed JSON data for further processing
+                return json;
               } catch (error) {
                 console.error("Error fetching API data:", error);
                 Sentry.captureException(error);
