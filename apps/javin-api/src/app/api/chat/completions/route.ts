@@ -19,6 +19,7 @@ import { ConsumerEnumType } from "@/src/lib/db/schema";
 import { logInfo } from "@javin/shared/lib/utils/logging";
 import { enforceRateLimit } from "@/src/lib/utils/rateLimit";
 import { NextResponse } from "next/server";
+import { getModelByConsumerMode, myProvider } from "@javin/shared/lib/ai/models";
 
 export async function POST(request: Request) {
   try {
@@ -65,21 +66,22 @@ export async function POST(request: Request) {
       stream: StreamingTrue,
     } = validatedData;
 
-    const model = "gpt-4o-mini";
+    const model = getModelByConsumerMode(consumerInfo.mode);
+
+    logInfo("mode selected " + consumerInfo.mode);
+    logInfo("model selected " + model);
 
     const { tools: activeTools, systemPrompt } = await getGroupConfig(
       // BIG ASSUMPTION, pay attention here
       consumerInfo.mode as SearchGroupId
     );
 
-    logInfo("mode selected " + consumerInfo.mode);
-
     const system_fingerprint = process.env.VERCEL_GIT_COMMIT_SHA || "";
 
     if (!StreamingTrue) {
       // NON STREAMING - Convert to chat completion format
       const result = await generateText({
-        model: openai(model),
+        model: myProvider.languageModel(model),
         system: systemPrompt,
         prompt: prompt,
         maxSteps: 10,
@@ -202,7 +204,7 @@ export async function POST(request: Request) {
           );
 
           const result = streamText({
-            model: openai(model),
+            model: myProvider.languageModel(model),
             system: systemPrompt,
             prompt: prompt,
             maxSteps: 10,

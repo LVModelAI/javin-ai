@@ -21,7 +21,10 @@ export const myProvider: any = customProvider({
     "block-model": openai("gpt-4o-mini"),
     //@ts-ignore
     "gemini-2.0-flash": google("gemini-2.0-flash"),
-    //@ts-ignore
+    "llama-v3p1-70b-instruct": wrapLanguageModel({
+      model: fireworks("accounts/fireworks/models/llama-v3p1-70b-instruct"),
+      middleware: extractReasoningMiddleware({ tagName: "think" }),
+    }),
     // "gemini-2.0-flash-lite": google("gemini-2.0-flash-lite"),
   },
   imageModels: {
@@ -52,14 +55,13 @@ export const chatModels: Array<ChatModel> = [
     name: "Gemini 2.0 Flash",
     description: "Google's Gemini 2.0 Flash model",
   },
-  // {
-  //   id: "gemini-2.0-flash-lite",
-  //   name: "Gemini 2.0 Flash Lite",
-  //   description: "Lite version of Gemini 2.0 Flash model",
-  // },
-  // {
-  //   id: 'chat-model-reasoning',
-  //   name: 'Reasoning model',
-  //   description: 'Uses advanced reasoning',
-  // },
 ];
+
+export const getModelByConsumerMode = (consumerMode: string): string => {
+  switch (consumerMode) {
+    case "on_chain":
+      return "llama-v3p1-70b-instruct";
+    default:
+      return "gpt-4o-mini";
+  }
+};
