@@ -6,7 +6,7 @@ import {
 } from "ai";
 import { auth } from "@/app/(auth)/auth";
 import { myProvider } from "@javin/shared/lib/ai/models";
-import { allTools, getGroupConfig } from "@javin/shared/lib/ai/prompts";
+import { getGroupConfig } from "@javin/shared/lib/ai/prompts";
 import { logObjects, logInfo } from "@javin/shared/lib/utils/logging";
 import {
   decrementRemainingMessageCount,
@@ -26,6 +26,7 @@ import {
 import { generateTitleFromUserMessage } from "../../actions";
 import * as Sentry from "@sentry/nextjs";
 import { v4 as uuidv4 } from "uuid";
+import { getAllToolsWithModel } from "@javin/shared/src/lib/ai/prompts";
 
 export async function POST(request: Request) {
   logInfo("Received POST request for chat.");
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
           modelToUse === "chat-model-reasoning" ? [] : [...activeTools],
         experimental_transform: smoothStream({ chunking: "word" }),
         experimental_generateMessageId: generateUUID,
-        tools: allTools,
+        tools: getAllToolsWithModel("gpt-4o-mini"),
         onStepFinish(event) {
           logInfo("Step finished.");
           // logObjects("Step Event:", event);

@@ -145,43 +145,45 @@ const groupTools = {
   ] as const,
 } as const;
 
-export const allTools = {
-  webSearch,
-  ensToAddress,
-  getSiteContent,
-  // on_chain evm
-  getEvmOnchainDataUsingZerion,
-  getEvmOnchainDataUsingEtherscan,
-  getEvmMultiChainWalletPortfolio,
-  searchEvmTokenMarketData,
-  translateTransactions,
-  defiLlama,
-  // solana
-  snsToAddress,
-  getSolanaChainWalletPortfolio,
-  searchSolanaTokenMarketData,
-  getSolanaOnchainDataUsingBirdeye,
-  // creditcoin
-  getCreditcoinApiData,
-  getCreditcoinStats,
-  // vana
-  getVanaApiData,
-  getVanaStats,
-  // wormhole
-  getWormholeApiData,
-  // zeta
-  getZetaStats,
-  getZetaApiData,
-  // nexon
-  getNexusApiData,
-  getNexusStats,
-  // aptos
-  getAptosStats,
-  getAptosApiData,
-  aptosNames,
-  getAptosScanApiData,
-  getAptosPortfolio,
-  getAptosGraphqlData,
+export const getAllToolsWithModel = (modelName: string) => {
+  return {
+    webSearch,
+    ensToAddress,
+    getSiteContent,
+    // on_chain evm
+    getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion(modelName),
+    getEvmOnchainDataUsingEtherscan: getEvmOnchainDataUsingEtherscan(modelName),
+    getEvmMultiChainWalletPortfolio,
+    searchEvmTokenMarketData,
+    translateTransactions: translateTransactions(modelName),
+    defiLlama: defiLlama(modelName),
+    // solana
+    snsToAddress,
+    getSolanaChainWalletPortfolio,
+    searchSolanaTokenMarketData,
+    getSolanaOnchainDataUsingBirdeye,
+    // creditcoin
+    getCreditcoinApiData,
+    getCreditcoinStats,
+    // vana
+    getVanaApiData,
+    getVanaStats,
+    // wormhole
+    getWormholeApiData,
+    // zeta
+    getZetaStats,
+    getZetaApiData,
+    // nexon
+    getNexusApiData,
+    getNexusStats,
+    // aptos
+    getAptosStats,
+    getAptosApiData,
+    aptosNames,
+    getAptosScanApiData,
+    getAptosPortfolio,
+    getAptosGraphqlData,
+  };
 };
 
 const groupPrompts = {
