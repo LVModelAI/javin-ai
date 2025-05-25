@@ -186,47 +186,6 @@ export const getAllToolsWithModel = (modelName: string) => {
   };
 };
 
-export const allTools = {
-  webSearch,
-  ensToAddress,
-  getSiteContent,
-  // on_chain evm
-  getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion(
-    "llama-v3p1-70b-instruct"
-  ),
-  getEvmOnchainDataUsingEtherscan,
-  getEvmMultiChainWalletPortfolio,
-  searchEvmTokenMarketData,
-  translateTransactions,
-  defiLlama,
-  // solana
-  snsToAddress,
-  getSolanaChainWalletPortfolio,
-  searchSolanaTokenMarketData,
-  getSolanaOnchainDataUsingBirdeye,
-  // creditcoin
-  getCreditcoinApiData,
-  getCreditcoinStats,
-  // vana
-  getVanaApiData,
-  getVanaStats,
-  // wormhole
-  getWormholeApiData,
-  // zeta
-  getZetaStats,
-  getZetaApiData,
-  // nexon
-  getNexusApiData,
-  getNexusStats,
-  // aptos
-  getAptosStats,
-  getAptosApiData,
-  aptosNames,
-  getAptosScanApiData,
-  getAptosPortfolio,
-  getAptosGraphqlData,
-};
-
 const groupPrompts = {
   search: `
   You are an AI web search engine called Javin, designed to help users find crypto and blockchain-related information on the internet with no unnecessary chatter and more focus on the content.

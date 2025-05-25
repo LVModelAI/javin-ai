@@ -1,4 +1,4 @@
-import { allTools, getAllToolsWithModel, getGroupConfig } from "@javin/shared/src/lib/ai/prompts";
+import { getAllToolsWithModel, getGroupConfig } from "@javin/shared/src/lib/ai/prompts";
 import {
   generateUUID,
   sanitizeResponseMessages,

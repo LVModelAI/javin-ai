@@ -6,7 +6,7 @@ import {
 } from "ai";
 import { auth } from "@/app/(auth)/auth";
 import { myProvider } from "@javin/shared/lib/ai/models";
-import { allTools, getGroupConfig } from "@javin/shared/lib/ai/prompts";
+import { getGroupConfig } from "@javin/shared/lib/ai/prompts";
 import { logObjects, logInfo } from "@javin/shared/lib/utils/logging";
 import {
   decrementRemainingMessageCount,

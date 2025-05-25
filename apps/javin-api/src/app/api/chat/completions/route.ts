@@ -1,5 +1,4 @@
 import {
-  allTools,
   getAllToolsWithModel,
   getGroupConfig,
 } from "@javin/shared/src/lib/ai/prompts";
