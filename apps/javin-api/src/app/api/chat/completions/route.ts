@@ -275,7 +275,7 @@ export async function POST(request: Request) {
                 ],
               });
             },
-            tools: allTools,
+            tools: getAllToolsWithModel(model),
             maxTokens: max_tokens,
             temperature: temperature,
             experimental_transform: smoothStream({ chunking: "word" }),
