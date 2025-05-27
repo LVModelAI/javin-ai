@@ -151,12 +151,13 @@ export const getAllToolsWithModel = (modelName: string) => {
     ensToAddress,
     getSiteContent,
     // on_chain evm
-    getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion(modelName),
-    getEvmOnchainDataUsingEtherscan: getEvmOnchainDataUsingEtherscan(modelName),
+    getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion("gpt-4o-mini"),
+    getEvmOnchainDataUsingEtherscan:
+      getEvmOnchainDataUsingEtherscan("gpt-4o-mini"),
     getEvmMultiChainWalletPortfolio,
     searchEvmTokenMarketData,
-    translateTransactions: translateTransactions(modelName),
-    defiLlama: defiLlama(modelName),
+    translateTransactions: translateTransactions("gpt-4o-mini"),
+    defiLlama: defiLlama("gpt-4o-mini"),
     // solana
     snsToAddress,
     getSolanaChainWalletPortfolio,
