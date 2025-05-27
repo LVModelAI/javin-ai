@@ -91,6 +91,7 @@ export async function POST(request: Request) {
         system: systemPrompt,
         prompt: prompt,
         maxSteps: 10,
+        maxRetries: 0,
         experimental_activeTools: [...activeTools],
         tools: getAllToolsWithModel(model),
         maxTokens: max_tokens,
@@ -214,6 +215,7 @@ export async function POST(request: Request) {
             system: systemPrompt,
             prompt: prompt,
             maxSteps: 10,
+            maxRetries: 0,
             experimental_activeTools: [...activeTools],
             onChunk: async ({ chunk }) => {
               // console.log("onChunk = ", chunk);

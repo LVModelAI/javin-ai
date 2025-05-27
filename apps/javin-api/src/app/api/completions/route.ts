@@ -1,4 +1,7 @@
-import { getAllToolsWithModel, getGroupConfig } from "@javin/shared/src/lib/ai/prompts";
+import {
+  getAllToolsWithModel,
+  getGroupConfig,
+} from "@javin/shared/src/lib/ai/prompts";
 import {
   generateUUID,
   sanitizeResponseMessages,
@@ -91,6 +94,7 @@ export async function POST(request: Request) {
         model: myProvider.languageModel(model),
         system: systemPrompt,
         prompt: prompt,
+        maxRetries: 0,
         maxSteps: 10,
         experimental_activeTools: [...activeTools],
         tools: getAllToolsWithModel(model),
@@ -187,6 +191,7 @@ export async function POST(request: Request) {
             system: systemPrompt,
             prompt: prompt,
             maxSteps: 10,
+            maxRetries: 0,
             experimental_activeTools: [...activeTools],
             onChunk: async ({ chunk }) => {
               // MAKE THIS INTO OPENAI API STANDARD MESSAGE AND PUSH IN CONTROLLER
