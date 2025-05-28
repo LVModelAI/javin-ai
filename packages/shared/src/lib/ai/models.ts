@@ -60,8 +60,8 @@ export const chatModels: Array<ChatModel> = [
 export const getModelByConsumerMode = (consumerMode: string): string => {
   switch (consumerMode) {
     case "on_chain":
-      return "llama-v3p1-70b-instruct";
-    // return "gpt-4o-mini";
+      // return "llama-v3p1-70b-instruct";
+      return "gpt-4o-mini";
     default:
       return "gpt-4o-mini";
   }
