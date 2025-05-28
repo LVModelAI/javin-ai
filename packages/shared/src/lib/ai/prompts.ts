@@ -30,6 +30,8 @@ import { getSolanaOnchainDataUsingBirdeye } from "./tools/solana/get-birdeye-sol
 import { getNexusApiData } from "./tools/nexus/get-nexus-api-data";
 import { getNexusStats } from "./tools/nexus/get-stats";
 import { snsToAddress } from "./tools/solana/sns-to-address";
+import { xaiLiveSearch } from "@javin/shared/lib/ai/tools/xai-live-search";
+
 import { supportedChainsAndId } from "@javin/shared/lib/ai/tools/onchain/constant";
 
 export const codePrompt = ``;
@@ -85,6 +87,7 @@ const groupTools = {
   ] as const,
   on_chain: [
     "webSearch",
+    "xaiLiveSearch",
     //solana
     "getSolanaChainWalletPortfolio",
     "searchSolanaTokenMarketData",
@@ -148,6 +151,7 @@ const groupTools = {
 export const getAllToolsWithModel = (modelName: string) => {
   return {
     webSearch,
+    xaiLiveSearch,
     ensToAddress,
     getSiteContent,
     // on_chain evm
@@ -239,7 +243,11 @@ Comply with user requests to the best of your abilities using the appropriate to
   Use webSearch tool for searching the web for any information the user asks 
   Pass 2-3 queries in one call.
   Specify the year or "latest" in queries to fetch recent information.
-  Stick to evm and blockchain related responses until asked specifically by the user. 
+  Stick to evm and blockchain related responses until asked specifically by the user.
+  
+  ## X/twitter search
+  use the xaiLiveSearch tool to search the x/twitter for any information the user asks.
+  pass the user query to the tool.
   
   ## Search token or market data:
   If the user provides an evm address, starting with "0x", run searchEvmTokenMarketData tool.
