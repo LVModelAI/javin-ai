@@ -16,15 +16,16 @@ export async function enforceRateLimit(
 
   const redisKey = `ratelimit:${apiKey}`;
 
-  const isNew = await redis.set(redisKey, 1, { nx: true, ex: WINDOW_SECONDS });
-
   let reqCount: number;
 
-  if (isNew) {
-    // If the key was created (i.e., first request in this window)
+  const exists = await redis.exists(redisKey);
+  
+  if (!exists) {
+    // create a new key with an initial count of 1
+    await redis.set(redisKey, 1, { ex: WINDOW_SECONDS });
     reqCount = 1;
   } else {
-    // Key already exists — increment the counter
+    // increment the existing key
     reqCount = await redis.incr(redisKey);
   }
 
