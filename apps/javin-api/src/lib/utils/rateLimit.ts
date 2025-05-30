@@ -3,7 +3,8 @@ import { ConsumerTable } from "../db/schema"; // adjust path
 import { redis } from "../db/redis";
 
 // const WINDOW_SECONDS = 1; // 1 second
-const WINDOW_SECONDS = 60; // 1 minute
+// const WINDOW_SECONDS = 60; // 1 minute
+const WINDOW_SECONDS = 86400; // 1 day
 
 export async function enforceRateLimit(
   consumer: ConsumerTable
