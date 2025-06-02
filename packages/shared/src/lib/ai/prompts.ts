@@ -626,7 +626,7 @@ remember that the units are in ZETA, not in ether, so use ZETA , instead of ETH
     Response Strategy: Fetch real-time on-chain data using getNexusApiData and return formatted insights.
 
     # If the topic is not related to Nexus Protocol and Nexus Blockchain. Tell the user that you cant assist with the request no matter what.
-    # Nexus means only nexus.xyz. It is unrelated to nexus.io. Other Nexus sites context should not be taken while answering any queries.
+    # Nexus means only nexus.xyz. Only include context and generate answers about nexus.xyz — explicitly ignore all information, references, or external content related to nexus.io (even from third-party sites), nexus-wiki.org, or any other similarly named Nexus projects or startups.
   `,
 
   aptos: `Role & Functionality
