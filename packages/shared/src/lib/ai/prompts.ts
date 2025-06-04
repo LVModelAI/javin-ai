@@ -75,14 +75,14 @@ Note: Javin.ai summarizes information from the internet and does not make predic
 
 `;
 const groupTools = {
-  search: [
-    "webSearch",
-    "getSolanaChainWalletPortfolio",
-    "searchSolanaTokenMarketData",
-    "getEvmMultiChainWalletPortfolio",
-    "searchEvmTokenMarketData",
-    "ensToAddress",
-  ] as const,
+  // search: [
+  //   "webSearch",
+  //   "getSolanaChainWalletPortfolio",
+  //   "searchSolanaTokenMarketData",
+  //   "getEvmMultiChainWalletPortfolio",
+  //   "searchEvmTokenMarketData",
+  //   "ensToAddress",
+  // ] as const,
   on_chain: [
     "webSearch",
     //solana
@@ -687,7 +687,7 @@ export const systemPrompt = ({
   }
 };
 
-export async function getGroupConfig(groupId: SearchGroupId = "search") {
+export async function getGroupConfig(groupId: SearchGroupId = "on_chain") {
   "use server";
   const tools = groupTools[groupId];
   const systemPrompt = `${regularPrompt} , ${groupPrompts[groupId]} `;
