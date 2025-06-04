@@ -194,7 +194,7 @@ function PureMultimodalInput({
   );
 
   const [localStorageChatMode, setLocalStorageChatMode] =
-    useLocalStorage<SearchGroupId>("chatMode", "search");
+    useLocalStorage<SearchGroupId>("chatMode", "on_chain");
 
   useEffect(() => {
     if (textareaRef.current) {

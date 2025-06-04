@@ -66,7 +66,7 @@ export function Chat({
     fetcher
   );
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
-  const [selectedGroup, setSelectedGroup] = useState<SearchGroupId>("search");
+  const [selectedGroup, setSelectedGroup] = useState<SearchGroupId>("on_chain");
   const [isAtBottom, setIsAtBottom] = useState(true);
 
   return (
