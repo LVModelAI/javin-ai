@@ -1,5 +1,5 @@
 import {
-  getAllToolsWithModel,
+  getAllToolsWithConfigs,
   getGroupConfig,
 } from "@javin/shared/src/lib/ai/prompts";
 import {
@@ -97,7 +97,7 @@ export async function POST(request: Request) {
         maxRetries: 0,
         maxSteps: 10,
         experimental_activeTools: [...activeTools],
-        tools: getAllToolsWithModel(model),
+        tools: getAllToolsWithConfigs({ modelName: model, mode: consumerInfo.mode as SearchGroupId }),
         maxTokens: max_tokens,
         temperature: temperature,
         experimental_generateMessageId: generateUUID,
@@ -117,9 +117,9 @@ export async function POST(request: Request) {
             sanitizedResponseMessages[sanitizedResponseMessages.length - 1]
               .role == "assistant"
               ? sanitizedResponseMessages[
-                  sanitizedResponseMessages.length - 1
-                  // @ts-ignore
-                ].content[0].text
+                sanitizedResponseMessages.length - 1
+                // @ts-ignore
+              ].content[0].text
               : "Couldnt capture",
           toolsCalled: sanitizedResponseMessages
             .filter((a) => a.role === "tool")
@@ -213,9 +213,9 @@ export async function POST(request: Request) {
                       sanitizedResponseMessages.length - 1
                     ].role == "assistant"
                       ? sanitizedResponseMessages[
-                          sanitizedResponseMessages.length - 1
-                          // @ts-ignore
-                        ].content[0].text
+                        sanitizedResponseMessages.length - 1
+                        // @ts-ignore
+                      ].content[0].text
                       : "Couldnt capture",
                   toolsCalled: sanitizedResponseMessages
                     .filter((a) => a.role === "tool")
@@ -254,7 +254,7 @@ export async function POST(request: Request) {
                 ],
               });
             },
-            tools: getAllToolsWithModel(model),
+            tools: getAllToolsWithConfigs({ modelName: model, mode: consumerInfo.mode as SearchGroupId }),
             maxTokens: max_tokens,
             temperature: temperature,
             experimental_transform: smoothStream({ chunking: "word" }),

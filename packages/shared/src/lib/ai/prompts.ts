@@ -145,9 +145,14 @@ const groupTools = {
   ] as const,
 } as const;
 
-export const getAllToolsWithModel = (modelName: string) => {
+type getAllToolsWithConfigsParams = {
+  modelName: string;
+  mode?: SearchGroupId;
+};
+
+export const getAllToolsWithConfigs = ({ modelName, mode }: getAllToolsWithConfigsParams) => {
   return {
-    webSearch,
+    webSearch: webSearch({ mode: mode }),
     ensToAddress,
     getSiteContent,
     // on_chain evm
