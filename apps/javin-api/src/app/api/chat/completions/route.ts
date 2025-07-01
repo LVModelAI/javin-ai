@@ -26,7 +26,6 @@ import {
   myProvider,
 } from "@javin/shared/lib/ai/models";
 
-
 export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get("Authorization");
@@ -72,6 +71,10 @@ export async function POST(request: Request) {
       stream: StreamingTrue,
     } = validatedData;
 
+    // const outputId = generateUUID();
+    // const trailingText = "\n/\nsOutput ID: " + outputId;
+    const trailingText = "";
+
     const model = getModelByConsumerMode(consumerInfo.mode);
 
     logInfo("mode selected " + consumerInfo.mode);
@@ -93,7 +96,10 @@ export async function POST(request: Request) {
         maxSteps: 10,
         maxRetries: 0,
         experimental_activeTools: [...activeTools],
-        tools: getAllToolsWithConfigs({ modelName: model, mode: consumerInfo.mode as SearchGroupId }),
+        tools: getAllToolsWithConfigs({
+          modelName: model,
+          mode: consumerInfo.mode as SearchGroupId,
+        }),
         maxTokens: max_tokens,
         temperature: temperature,
         experimental_generateMessageId: generateUUID,
@@ -113,9 +119,9 @@ export async function POST(request: Request) {
             sanitizedResponseMessages[sanitizedResponseMessages.length - 1]
               .role == "assistant"
               ? sanitizedResponseMessages[
-                sanitizedResponseMessages.length - 1
-                // @ts-ignore
-              ].content[0].text
+                  sanitizedResponseMessages.length - 1
+                  // @ts-ignore
+                ].content[0].text
               : "Couldnt capture",
           toolsCalled: sanitizedResponseMessages
             .filter((a) => a.role === "tool")
@@ -140,13 +146,15 @@ export async function POST(request: Request) {
         },
       });
 
+      const finalResultText = result.text + trailingText;
+
       await saveMessages({
         consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
         messages: [
           {
             id: generateUUID(),
             prompt: prompt,
-            response: result.text,
+            response: finalResultText,
             location: "chat/completions",
             model: model,
             stream: StreamingTrue,
@@ -164,7 +172,7 @@ export async function POST(request: Request) {
             index: 0,
             message: {
               role: "assistant",
-              content: result.text,
+              content: finalResultText,
               refusal: null,
               annotations: [],
             },
@@ -235,9 +243,9 @@ export async function POST(request: Request) {
                       sanitizedResponseMessages.length - 1
                     ].role == "assistant"
                       ? sanitizedResponseMessages[
-                        sanitizedResponseMessages.length - 1
-                        // @ts-ignore
-                      ].content[0].text
+                          sanitizedResponseMessages.length - 1
+                          // @ts-ignore
+                        ].content[0].text
                       : "Couldnt capture",
                   toolsCalled: sanitizedResponseMessages
                     .filter((a) => a.role === "tool")
@@ -267,7 +275,7 @@ export async function POST(request: Request) {
                   {
                     id: generateUUID(),
                     prompt: prompt,
-                    response: text,
+                    response: text + trailingText,
                     location: "chat/completions",
                     model: model,
                     stream: StreamingTrue,
@@ -276,7 +284,10 @@ export async function POST(request: Request) {
                 ],
               });
             },
-            tools: getAllToolsWithConfigs({ modelName: model, mode: consumerInfo.mode as SearchGroupId }),
+            tools: getAllToolsWithConfigs({
+              modelName: model,
+              mode: consumerInfo.mode as SearchGroupId,
+            }),
             maxTokens: max_tokens,
             temperature: temperature,
             experimental_transform: smoothStream({ chunking: "word" }),
@@ -308,6 +319,27 @@ export async function POST(request: Request) {
               encoder.encode(`data: ${JSON.stringify(message)}\n\n`)
             );
           }
+
+          const trailingMessageChunk: ChatCompletionStreaming = {
+            id: streamId,
+            object: "chat.completion.chunk",
+            created: Math.floor(Date.now() / 1000),
+            model,
+            system_fingerprint: system_fingerprint,
+            choices: [
+              {
+                index: 0,
+                delta: {
+                  content: trailingText,
+                },
+                finish_reason: null,
+              },
+            ],
+          };
+
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify(trailingMessageChunk)}\n\n`)
+          );
 
           // Send the final chunk with finish_reason
           const stopMessage: ChatCompletionStreaming = {
