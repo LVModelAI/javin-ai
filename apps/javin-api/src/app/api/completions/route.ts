@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     } = validatedData;
 
     const outputId = uuidv4();
-    const trailingText = "\n/\n Nonce: " + outputId;
+    const trailingText = "\n\n Nonce: " + outputId;
     // const trailingText = "";
 
     const model = getModelByConsumerMode(consumerInfo.mode);

@@ -21,8 +21,8 @@ const normalMessageDbObject = {
   model: varchar("model").notNull(),
   stream: boolean("stream").notNull(),
   createdAt: timestamp("createdAt").notNull(),
-  nonce: varchar("nonce").notNull(),
-  hash: varchar("hash").notNull(),
+  nonce: varchar("nonce"),
+  hash: varchar("hash"),
 };
 
 export const message = pgTable("Message", normalMessageDbObject);

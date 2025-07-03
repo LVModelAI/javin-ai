@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sha256 } from "@javin/shared/lib/utils/crypto";
+import { verifyHashIntegrity } from "@javin/shared/lib/utils/crypto";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,11 +12,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const computedHash = sha256(output);
+    const hashResult = await verifyHashIntegrity(output)
 
-    console.log("Computed hash:", computedHash);
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: hashResult });
   } catch (error) {
     console.error("Verification error:", error);
     return NextResponse.json(
