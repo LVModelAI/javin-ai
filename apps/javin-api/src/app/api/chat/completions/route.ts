@@ -25,6 +25,7 @@ import {
   getModelByConsumerMode,
   myProvider,
 } from "@javin/shared/lib/ai/models";
+import { pushOnchainReturnHash } from "@javin/shared/lib/utils/crypto";
 
 export async function POST(request: Request) {
   try {
@@ -71,9 +72,9 @@ export async function POST(request: Request) {
       stream: StreamingTrue,
     } = validatedData;
 
-    // const outputId = generateUUID();
-    // const trailingText = "\n/\nsOutput ID: " + outputId;
-    const trailingText = "";
+    const outputId = uuidv4();
+    const trailingText = "\n/\n Nonce: " + outputId;
+    // const trailingText = "";
 
     const model = getModelByConsumerMode(consumerInfo.mode);
 
@@ -148,6 +149,8 @@ export async function POST(request: Request) {
 
       const finalResultText = result.text + trailingText;
 
+      const hash = await pushOnchainReturnHash(finalResultText);
+
       await saveMessages({
         consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
         messages: [
@@ -159,6 +162,8 @@ export async function POST(request: Request) {
             model: model,
             stream: StreamingTrue,
             createdAt: dateOfMessageCreation,
+            nonce: outputId,
+            hash: hash,
           },
         ],
       });
@@ -269,17 +274,23 @@ export async function POST(request: Request) {
                   createdAt: dateOfMessageCreation,
                 },
               });
+
+              const finalResultText = text + trailingText;
+
+              const hash = await pushOnchainReturnHash(finalResultText);
               await saveMessages({
                 consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
                 messages: [
                   {
                     id: generateUUID(),
                     prompt: prompt,
-                    response: text + trailingText,
+                    response: finalResultText,
                     location: "chat/completions",
                     model: model,
                     stream: StreamingTrue,
                     createdAt: dateOfMessageCreation,
+                    nonce: outputId,
+                    hash: hash,
                   },
                 ],
               });

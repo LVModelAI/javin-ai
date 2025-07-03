@@ -90,7 +90,18 @@ function PureChatHeader({
         {/* REPLACE TEXT WITH THE ACTUAL LOGO WHEN YOU GET ONE WITH WHITE TEXT */}
         {/* <Image src={"/javin-logo.png"} width={100} height={30} alt="Javin.ai" /> */}
 
-        <div className="flex justify-end w-full">
+        <div className="flex justify-end items-center w-full">
+          <Button
+            variant="link"
+            className=""
+            onClick={() => {
+              router.push("/verify");
+              router.refresh();
+            }}
+            size={"sm"}
+          >
+            <span className="">Verify</span>
+          </Button>
           <div className="">
             {user && user?.email ? (
               // <button
