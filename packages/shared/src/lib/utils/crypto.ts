@@ -20,13 +20,35 @@ const actor = "hashstore2";
 
 const apiClient = new APIClient({ provider: new FetchProvider(endpoint) });
 
-export const stringToCanonicalText = async (
-  markdown: string
-): Promise<string> => {
-  const html = await marked(markdown);
-  const plainText = htmlToText(html);
+const stripToImportantCharacters = (input: string): string => {
+  console.log("🔍 Stripping to important characters...");
+  console.log("🔍 Input Content:", input);
+  const decoded = input.replace(/\\n/g, "\n"); // Convert escaped newlines to real ones
+  const a = decoded
+    .replace(/\s+/g, "") // Remove all spaces, newlines, tabs
+    .replace(/[^\p{L}\p{N}]/gu, ""); // Remove all non-letter, non-digit (including punctuation). letters, emojis and digits are retained.
+  console.log("🔍 Stripped Content:", a);
+  return a;
+};
+
+const plainTextToCanonicalText = (plainText: string): string => {
+  console.log("📄 Converting Plaintext to Canonical...");
+  console.log("📄 Plain Text Content:", plainText);
   const canonicalText = plainText.replace(/\r\n/g, "\n").trim();
   console.log("📄 Canonical Text:", canonicalText);
+  return canonicalText;
+};
+
+const markdownToCanonicalText = async (
+  markdown: string
+): Promise<string> => {
+  console.log("📄 Converting Markdown to HTML...");
+  console.log("📄 Markdown Content:", markdown);
+  const decoded = markdown.replace(/\\n/g, "\n"); // Convert escaped newlines to real ones
+  const html = await marked(decoded);
+  console.log("📄 HTML Content:", html);
+  const plainText = htmlToText(html);
+  const canonicalText = plainTextToCanonicalText(plainText);
   return canonicalText;
 };
 
@@ -43,7 +65,7 @@ export async function pushHashToChain(hash: string): Promise<void> {
     path: "/v1/chain/get_abi",
     params: { account_name: contractAccount },
   });
-  const { abi } = abiRes;
+  const { abi } = abiRes as any;
 
   const untypedAction: AnyAction = {
     account: contractAccount,
@@ -93,6 +115,9 @@ export async function checkHashOnChain(hash: string): Promise<boolean> {
   const found = !!match;
   console.log("✅ Hash found in table:", found);
   return found;
+  // const tmp =
+  //   "dc5119d13d0ad787cc2eeec7a264ca80e753a7d1f60a117019e2b3f94f3ab6b2";
+  // return tmp == hash;
 }
 
 async function readHashTable() {
@@ -112,7 +137,7 @@ async function readHashTable() {
 export const pushOnchainReturnHash = async (
   content: string
 ): Promise<string> => {
-  const canonical = await stringToCanonicalText(content);
+  const canonical = await markdownToCanonicalText(content);
   const hash = sha256(canonical);
   await pushHashToChain(hash);
   return hash;
@@ -123,7 +148,7 @@ export const verifyHashIntegrity = async (
 ): Promise<boolean> => {
   console.log("reading hash table...");
   await readHashTable();
-  const canonical = await stringToCanonicalText(content);
+  const canonical = await markdownToCanonicalText(content);
   const hash = sha256(canonical);
   console.log("verifying hash onchain:", hash);
   return await checkHashOnChain(hash);
