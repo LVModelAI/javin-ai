@@ -346,6 +346,9 @@ importers:
       react:
         specifier: 18.3.1
         version: 18.3.1
+      remove-markdown:
+        specifier: ^0.6.2
+        version: 0.6.2
       tailwind-merge:
         specifier: ^2.5.2
         version: 2.5.2
@@ -9347,6 +9350,10 @@ packages:
       '@types/mdast': 4.0.4
       mdast-util-to-markdown: 2.1.2
       unified: 11.0.5
+    dev: false
+
+  /remove-markdown@0.6.2:
+    resolution: {integrity: sha512-EijDXJZbzpGbQBd852ViUzcqgpMujthM+SAEHiWCMcZonRbZ+xViWKLJA/vrwbDwYdxrs1aFDjpBhcGrZoJRGA==}
     dev: false
 
   /require-from-string@2.0.2:
