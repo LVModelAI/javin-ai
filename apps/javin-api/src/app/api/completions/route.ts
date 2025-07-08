@@ -7,7 +7,6 @@ import {
   sanitizeResponseMessages,
   SearchGroupId,
 } from "@javin/shared/src/lib/utils/utils";
-import { openai } from "@ai-sdk/openai";
 import { smoothStream, streamText, generateText } from "ai";
 import {
   PromptRequestSchema,
@@ -30,6 +29,8 @@ import {
   getModelByConsumerMode,
   myProvider,
 } from "@javin/shared/lib/ai/models";
+import { pushOnchainReturnHash } from "@javin/shared/lib/utils/crypto";
+import { APIClient, FetchProvider } from "@wireio/core";
 
 export async function POST(request: Request) {
   try {
@@ -76,9 +77,9 @@ export async function POST(request: Request) {
       stream: StreamingTrue,
     } = validatedData;
 
-    // const outputId = generateUUID();
-    // const trailingText = "\n/\nsOutput ID: " + outputId;
-    const trailingText = "";
+    const outputId = uuidv4();
+    const trailingText = "\n\n Nonce: " + outputId;
+    // const trailingText = "";
 
     const model = getModelByConsumerMode(consumerInfo.mode);
 
@@ -91,6 +92,22 @@ export async function POST(request: Request) {
     );
 
     const system_fingerprint = process.env.VERCEL_GIT_COMMIT_SHA || "";
+
+    // wire network api client
+    const privateKey = process.env.PRIVATE_KEY!;
+    const endpoint = process.env.API_ENDPOINT!;
+    const contractAccount = process.env.CONTRACT_ACCOUNT!;
+    const actor = process.env.ACTOR!;
+
+    if (!privateKey || !endpoint || !contractAccount || !actor) {
+      throw new Error(
+        "Missing required environment variables: PRIVATE_KEY, API_ENDPOINT, CONTRACT_ACCOUNT, ACTOR"
+      );
+    }
+
+    const apiClient = new APIClient({
+      provider: new FetchProvider(endpoint!),
+    });
 
     if (!StreamingTrue) {
       // NON STREAMING
@@ -153,6 +170,14 @@ export async function POST(request: Request) {
 
       const finalResultText = result.text + trailingText;
 
+      const hash = await pushOnchainReturnHash(
+        apiClient,
+        finalResultText,
+        contractAccount,
+        actor,
+        privateKey
+      );
+
       await saveMessages({
         consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
         messages: [
@@ -164,6 +189,8 @@ export async function POST(request: Request) {
             model: model,
             stream: StreamingTrue,
             createdAt: new Date(),
+            nonce: outputId,
+            hash: hash,
           },
         ],
       });
@@ -248,17 +275,29 @@ export async function POST(request: Request) {
                   createdAt: dateOfMessageCreation,
                 },
               });
+
+              const finalResultText = text + trailingText;
+
+              const hash = await pushOnchainReturnHash(
+                apiClient,
+                finalResultText,
+                contractAccount,
+                actor,
+                privateKey
+              );
               await saveMessages({
                 consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
                 messages: [
                   {
                     id: generateUUID(),
                     prompt: prompt,
-                    response: text + trailingText,
+                    response: finalResultText,
                     location: "completions",
                     model: model,
                     stream: StreamingTrue,
                     createdAt: new Date(),
+                    nonce: outputId,
+                    hash: hash,
                   },
                 ],
               });

@@ -20,6 +20,7 @@
     "@javin/shared": "^0.0.0",
     "@sentry/nextjs": "^9.12.0",
     "@upstash/redis": "^1.34.9",
+    "@wireio/core": "^0.1.7",
     "ai": "4.1.17",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.34.1",

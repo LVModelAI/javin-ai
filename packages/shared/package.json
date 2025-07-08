@@ -21,11 +21,15 @@
     "@sentry/nextjs": "^9.12.0",
     "@solana/web3.js": "^1.98.2",
     "@tavily/core": "^0.0.3",
+    "@wireio/core": "^0.1.7",
     "ai": "4.1.17",
     "clsx": "^2.1.1",
+    "dotenv": "^16.4.7",
     "graphql": "^16.10.0",
     "graphql-request": "^7.1.2",
+    "html-to-text": "^9.0.5",
     "lucide-react": "^0.446.0",
+    "marked": "^16.0.0",
     "next": "15.2.1-canary.2",
     "next-auth": "5.0.0-beta.25",
     "react": "18.3.1",
@@ -36,6 +40,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/html-to-text": "^9.0.4",
     "@types/node": "^22.8.6",
     "eslint": "^8.56.0",
     "postcss": "^8.5.3",
