@@ -24,6 +24,7 @@
     "@wireio/core": "^0.1.7",
     "ai": "4.1.17",
     "clsx": "^2.1.1",
+    "dotenv": "^16.4.7",
     "graphql": "^16.10.0",
     "graphql-request": "^7.1.2",
     "html-to-text": "^9.0.5",

@@ -30,6 +30,7 @@ import {
   myProvider,
 } from "@javin/shared/lib/ai/models";
 import { pushOnchainReturnHash } from "@javin/shared/lib/utils/crypto";
+import { APIClient, FetchProvider } from "@wireio/core";
 
 export async function POST(request: Request) {
   try {
@@ -92,6 +93,22 @@ export async function POST(request: Request) {
 
     const system_fingerprint = process.env.VERCEL_GIT_COMMIT_SHA || "";
 
+    // wire network api client
+    const privateKey = process.env.PRIVATE_KEY!;
+    const endpoint = process.env.API_ENDPOINT!;
+    const contractAccount = process.env.CONTRACT_ACCOUNT!;
+    const actor = process.env.ACTOR!;
+
+    if (!privateKey || !endpoint || !contractAccount || !actor) {
+      throw new Error(
+        "Missing required environment variables: PRIVATE_KEY, API_ENDPOINT, CONTRACT_ACCOUNT, ACTOR"
+      );
+    }
+
+    const apiClient = new APIClient({
+      provider: new FetchProvider(endpoint!),
+    });
+
     if (!StreamingTrue) {
       // NON STREAMING
       const result = await generateText({
@@ -153,7 +170,13 @@ export async function POST(request: Request) {
 
       const finalResultText = result.text + trailingText;
 
-      const hash = await pushOnchainReturnHash(finalResultText);
+      const hash = await pushOnchainReturnHash(
+        apiClient,
+        finalResultText,
+        contractAccount,
+        actor,
+        privateKey
+      );
 
       await saveMessages({
         consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
@@ -255,7 +278,13 @@ export async function POST(request: Request) {
 
               const finalResultText = text + trailingText;
 
-              const hash = await pushOnchainReturnHash(finalResultText);
+              const hash = await pushOnchainReturnHash(
+                apiClient,
+                finalResultText,
+                contractAccount,
+                actor,
+                privateKey
+              );
               await saveMessages({
                 consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
                 messages: [

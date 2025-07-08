@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyHashIntegrity } from "@javin/shared/lib/utils/crypto";
+import { APIClient, FetchProvider } from "@wireio/core";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +13,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const hashResult = await verifyHashIntegrity(output)
+    const privateKey = process.env.PRIVATE_KEY!;
+    const endpoint = process.env.API_ENDPOINT!;
+    const contractAccount = process.env.CONTRACT_ACCOUNT!;
+    const actor = process.env.ACTOR!;
+
+    if (!privateKey || !endpoint || !contractAccount || !actor) {
+      throw new Error(
+        "Missing required environment variables: PRIVATE_KEY, API_ENDPOINT, CONTRACT_ACCOUNT, ACTOR"
+      );
+    }
+
+    const apiClient = new APIClient({
+      provider: new FetchProvider(endpoint),
+    });
+
+    const hashResult = await verifyHashIntegrity(
+      apiClient,
+      output,
+      contractAccount
+    );
 
     return NextResponse.json({ success: hashResult });
   } catch (error) {

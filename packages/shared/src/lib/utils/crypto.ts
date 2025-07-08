@@ -4,7 +4,6 @@ import { htmlToText } from "html-to-text";
 import {
   API,
   APIClient,
-  FetchProvider,
   PrivateKey,
   SignedTransaction,
   Transaction,
@@ -13,55 +12,35 @@ import {
   PackedTransaction,
 } from "@wireio/core";
 
-const endpoint = "http://localhost:8888";
-const contractAccount = "contract3fa5";
-const actor = "contract3fa5";
-
-const apiClient = new APIClient({ provider: new FetchProvider(endpoint) });
-
-const stripToImportantCharacters = (input: string): string => {
-  console.log("🔍 Stripping to important characters...");
-  console.log("🔍 Input Content:", input);
-  const decoded = input.replace(/\\n/g, "\n"); // Convert escaped newlines to real ones
-  const a = decoded
-    .replace(/\s+/g, "") // Remove all spaces, newlines, tabs
-    .replace(/[^\p{L}\p{N}]/gu, ""); // Remove all non-letter, non-digit (including punctuation). letters, emojis and digits are retained.
-  console.log("🔍 Stripped Content:", a);
-  return a;
-};
-
-const plainTextToCanonicalText = (plainText: string): string => {
-  console.log("📄 Converting Plaintext to Canonical...");
-  // console.log("📄 Plain Text Content:", plainText);
-  const canonicalText = plainText.replace(/\r\n/g, "\n").trim();
-  // console.log("📄 Canonical Text:", canonicalText);
-  return canonicalText;
-};
+// stateless helper functions
+const plainTextToCanonicalText = (plainText: string): string =>
+  plainText.replace(/\r\n/g, "\n").trim();
 
 const markdownToCanonicalText = async (markdown: string): Promise<string> => {
-  console.log("📄 Converting Markdown to HTML...");
-  // console.log("📄 Markdown Content:", markdown);
-  const decoded = markdown.replace(/\\n/g, "\n"); // Convert escaped newlines to real ones
+  const decoded = markdown.replace(/\\n/g, "\n");
   const html = await marked(decoded);
-  // console.log("📄 HTML Content:", html);
   const plainText = htmlToText(html);
-  const canonicalText = plainTextToCanonicalText(plainText);
-  return canonicalText;
+  return plainTextToCanonicalText(plainText);
 };
 
-export const sha256 = (data: string): string => {
-  const result = crypto.createHash("sha256").update(data).digest("hex");
-  console.log("🔑 SHA256 Hash:", result);
-  return result;
-};
+export const sha256 = (data: string): string =>
+  crypto.createHash("sha256").update(data).digest("hex");
 
-export async function pushHashToChain(hash: string): Promise<void> {
-  console.log("🚀 Pushing hash onchain:", hash);
+// core logic that now accepts `apiClient` and config
+export async function pushHashToChain(
+  apiClient: APIClient,
+  hash: string,
+  contractAccount: string,
+  actor: string,
+  privateKey: string
+): Promise<void> {
   const info = await apiClient.v1.chain.get_info();
+  // console.log("Chain info:", info);
   const abiRes = await apiClient.call({
     path: "/v1/chain/get_abi",
     params: { account_name: contractAccount },
   });
+
   const { abi } = abiRes as any;
 
   const untypedAction: AnyAction = {
@@ -88,14 +67,13 @@ export async function pushHashToChain(hash: string): Promise<void> {
     path: "/v1/chain/push_transaction",
     params: packed,
   });
-
-  console.log("✅ Hash added to blockchain.");
 }
 
-export async function checkHashOnChain(hash: string): Promise<boolean> {
-  // console.log("🔍 Checking hash via table:", hash);
-
-  const key = String(hash); // Use same hash key derivation logic
+export async function checkHashOnChain(
+  apiClient: APIClient,
+  hash: string,
+  contractAccount: string
+): Promise<boolean> {
   const result: API.v1.GetTableRowsResponse = await apiClient.call({
     path: "/v1/chain/get_table_rows",
     params: {
@@ -103,50 +81,36 @@ export async function checkHashOnChain(hash: string): Promise<boolean> {
       table: "hashmap",
       scope: contractAccount,
       json: true,
-      limit: 1000, // or more if needed
+      limit: 1000,
     },
   });
-  console.log("\nHash Map Table:\n", JSON.stringify(result.rows, null, 2));
+  console.log("hash table Result:", result);
 
-  const match = result.rows.find((row: any) => row.hash === hash && row.exists);
-  const found = !!match;
-  if (found) console.log("✅ Hash found onchain:");
-  else console.log("❌ Hash not found onchain:");
-  return found;
-  // const tmp =
-  //   "dc5119d13d0ad787cc2eeec7a264ca80e753a7d1f60a117019e2b3f94f3ab6b2";
-  // return tmp == hash;
+  return result.rows.some((row: any) => row.hash === hash && row.exists);
 }
 
-async function readHashTable() {
-  const tableResult: API.v1.GetTableRowsResponse = await apiClient.call({
-    path: "/v1/chain/get_table_rows",
-    params: {
-      code: contractAccount,
-      table: "hashmap",
-      scope: contractAccount,
-      json: true,
-    },
-  });
-
-  console.log("\nHash Map Table:\n", JSON.stringify(tableResult.rows, null, 2));
-}
-
-export const pushOnchainReturnHash = async (
-  content: string
-): Promise<string> => {
+export async function verifyHashIntegrity(
+  apiClient: APIClient,
+  content: string,
+  contractAccount: string
+): Promise<boolean> {
   const canonical = await markdownToCanonicalText(content);
   const hash = sha256(canonical);
-  await pushHashToChain(hash);
+  console.log("Verifying hash:", hash);
+  return checkHashOnChain(apiClient, hash, contractAccount);
+}
+
+export async function pushOnchainReturnHash(
+  apiClient: APIClient,
+  content: string,
+  contractAccount: string,
+  actor: string,
+  privateKey: string
+): Promise<string> {
+  const canonical = await markdownToCanonicalText(content);
+  const hash = sha256(canonical);
+  console.log("Pushing hash to chain:", hash);
+  await pushHashToChain(apiClient, hash, contractAccount, actor, privateKey);
+  console.log("Hash pushed successfully:");
   return hash;
-};
-
-export const verifyHashIntegrity = async (
-  content: string
-): Promise<boolean> => {
-  console.log("reading hash table...");
-  const canonical = await markdownToCanonicalText(content);
-  const hash = sha256(canonical);
-  // console.log("verifying hash onchain:", hash);
-  return await checkHashOnChain(hash);
-};
+}
