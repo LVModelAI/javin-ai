@@ -13,10 +13,9 @@ import {
   PackedTransaction,
 } from "@wireio/core";
 
-const privateKey = "5JM4GLAKLx6E2Xw1s96ZdrejNZm3a36qPF7zThW6o9x658E7hqx";
 const endpoint = "http://localhost:8888";
-const contractAccount = "hashstore2";
-const actor = "hashstore2";
+const contractAccount = "contract3fa5";
+const actor = "contract3fa5";
 
 const apiClient = new APIClient({ provider: new FetchProvider(endpoint) });
 
@@ -33,20 +32,18 @@ const stripToImportantCharacters = (input: string): string => {
 
 const plainTextToCanonicalText = (plainText: string): string => {
   console.log("📄 Converting Plaintext to Canonical...");
-  console.log("📄 Plain Text Content:", plainText);
+  // console.log("📄 Plain Text Content:", plainText);
   const canonicalText = plainText.replace(/\r\n/g, "\n").trim();
-  console.log("📄 Canonical Text:", canonicalText);
+  // console.log("📄 Canonical Text:", canonicalText);
   return canonicalText;
 };
 
-const markdownToCanonicalText = async (
-  markdown: string
-): Promise<string> => {
+const markdownToCanonicalText = async (markdown: string): Promise<string> => {
   console.log("📄 Converting Markdown to HTML...");
-  console.log("📄 Markdown Content:", markdown);
+  // console.log("📄 Markdown Content:", markdown);
   const decoded = markdown.replace(/\\n/g, "\n"); // Convert escaped newlines to real ones
   const html = await marked(decoded);
-  console.log("📄 HTML Content:", html);
+  // console.log("📄 HTML Content:", html);
   const plainText = htmlToText(html);
   const canonicalText = plainTextToCanonicalText(plainText);
   return canonicalText;
@@ -96,7 +93,7 @@ export async function pushHashToChain(hash: string): Promise<void> {
 }
 
 export async function checkHashOnChain(hash: string): Promise<boolean> {
-  console.log("🔍 Checking hash via table:", hash);
+  // console.log("🔍 Checking hash via table:", hash);
 
   const key = String(hash); // Use same hash key derivation logic
   const result: API.v1.GetTableRowsResponse = await apiClient.call({
@@ -113,7 +110,8 @@ export async function checkHashOnChain(hash: string): Promise<boolean> {
 
   const match = result.rows.find((row: any) => row.hash === hash && row.exists);
   const found = !!match;
-  console.log("✅ Hash found in table:", found);
+  if (found) console.log("✅ Hash found onchain:");
+  else console.log("❌ Hash not found onchain:");
   return found;
   // const tmp =
   //   "dc5119d13d0ad787cc2eeec7a264ca80e753a7d1f60a117019e2b3f94f3ab6b2";
@@ -147,9 +145,8 @@ export const verifyHashIntegrity = async (
   content: string
 ): Promise<boolean> => {
   console.log("reading hash table...");
-  await readHashTable();
   const canonical = await markdownToCanonicalText(content);
   const hash = sha256(canonical);
-  console.log("verifying hash onchain:", hash);
+  // console.log("verifying hash onchain:", hash);
   return await checkHashOnChain(hash);
 };
