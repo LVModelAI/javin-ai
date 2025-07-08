@@ -1,6 +1,4 @@
 import crypto from "crypto";
-import { marked } from "marked";
-import { htmlToText } from "html-to-text";
 import {
   API,
   APIClient,
@@ -15,24 +13,14 @@ import removeMd from "remove-markdown";
 
 // stateless helper functions
 const plainTextToCanonicalText = (plainText: string): string =>
-  plainText.replace(/\r\n/g, "\n").trim();
-
-// const markdownToCanonicalText = async (markdown: string): Promise<string> => {
-//   // console.log("Converting markdown to canonical text:", markdown);
-//   const decoded = markdown.replace(/\\n/g, "\n");
-//   const html = await marked(decoded);
-//   const plainText = htmlToText(html);
-//   const a = plainText.replace(/\*/g, "");
-//   const canonical = plainTextToCanonicalText(a);
-//   console.log("Canonical text:", canonical);
-//   return canonical;
-// };
+  plainText
+    .replace(/\\n/g, "") // remove escaped newlines (e.g., \\n)
+    .replace(/\s+/g, "") // remove all whitespace: spaces, tabs, newlines
+    .trim(); // remove any leftover leading/trailing invisible characters
 
 const markdownToCanonicalText = async (markdown: string): Promise<string> => {
-  // console.log("Converting markdown to canonical text:", markdown);
-  const decoded = markdown.replace(/\\n/g, "\n");
+  const decoded = markdown.replace(/\\n/g, "\n"); // decode escaped newlines
   const plainText = removeMd(decoded);
-  // const a = plainText.replace(/\*/g, "");
   const canonical = plainTextToCanonicalText(plainText);
   console.log("Canonical text:", canonical);
   return canonical;
@@ -116,19 +104,7 @@ export async function verifyHashIntegrity(
   const hashFromMarkdown = sha256(canonicalFromMarkdown);
   console.log("Verifying hash from markdown:", hashFromMarkdown);
 
-  const foundMarkdown = await checkHashOnChain(
-    apiClient,
-    hashFromMarkdown,
-    contractAccount
-  );
-  if (foundMarkdown) return true;
-
-  // If not found, try direct plain text canonicalization
-  const canonicalFromPlain = plainTextToCanonicalText(content);
-  const hashFromPlain = sha256(canonicalFromPlain);
-  console.log("Verifying hash from plain text:", hashFromPlain);
-
-  return checkHashOnChain(apiClient, hashFromPlain, contractAccount);
+  return checkHashOnChain(apiClient, hashFromMarkdown, contractAccount);
 }
 
 export async function pushOnchainReturnHash(
@@ -138,6 +114,8 @@ export async function pushOnchainReturnHash(
   actor: string,
   privateKey: string
 ): Promise<string> {
+  try {
+  } catch (error) {}
   const canonical = await markdownToCanonicalText(content);
   const hash = sha256(canonical);
   console.log("Pushing hash to chain:", hash);
