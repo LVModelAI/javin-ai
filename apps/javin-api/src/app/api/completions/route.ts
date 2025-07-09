@@ -170,13 +170,19 @@ export async function POST(request: Request) {
 
       const finalResultText = result.text + trailingText;
 
-      const hash = await pushOnchainReturnHash(
-        apiClient,
-        finalResultText,
-        contractAccount,
-        actor,
-        privateKey
-      );
+      let hash = "";
+      try {
+        hash = await pushOnchainReturnHash(
+          apiClient,
+          finalResultText,
+          contractAccount,
+          actor,
+          privateKey
+        );
+      } catch (err) {
+        console.error("Failed to push hash on-chain (stream):", err);
+        Sentry.captureException(err);
+      }
 
       await saveMessages({
         consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
@@ -278,13 +284,19 @@ export async function POST(request: Request) {
 
               const finalResultText = text + trailingText;
 
-              const hash = await pushOnchainReturnHash(
-                apiClient,
-                finalResultText,
-                contractAccount,
-                actor,
-                privateKey
-              );
+              let hash = "";
+              try {
+                hash = await pushOnchainReturnHash(
+                  apiClient,
+                  finalResultText,
+                  contractAccount,
+                  actor,
+                  privateKey
+                );
+              } catch (err) {
+                console.error("Failed to push hash on-chain (stream):", err);
+                Sentry.captureException(err);
+              }
               await saveMessages({
                 consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
                 messages: [
