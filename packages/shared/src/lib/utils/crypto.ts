@@ -11,6 +11,42 @@ import {
 } from "@wireio/core";
 import removeMd from "remove-markdown";
 
+export type CheckHashTxResult = {
+  transaction_id: string;
+  processed: {
+    id: string;
+    block_num: number;
+    block_time: string;
+    receipt: {
+      status: string;
+      cpu_usage_us: number;
+      net_usage_words: number;
+    };
+    elapsed: number;
+    net_usage: number;
+    scheduled: boolean;
+    action_traces: [
+      {
+        action_ordinal: number;
+        receipt: {
+          receiver: string;
+        };
+        act: {
+          name: string;
+          data: {
+            input: string;
+          };
+        };
+        console: string;
+        return_value_data?: {
+          exists: 0 | 1;
+        };
+        return_value_hex_data?: string;
+      }
+    ];
+  };
+};
+
 // stateless helper functions
 const plainTextToCanonicalText = (plainText: string): string =>
   plainText
@@ -75,27 +111,60 @@ export async function pushHashToChain(
 export async function checkHashOnChain(
   apiClient: APIClient,
   hash: string,
-  contractAccount: string
+  contractAccount: string,
+  actor: string,
+  privateKey: string
 ): Promise<boolean> {
-  const result: API.v1.GetTableRowsResponse = await apiClient.call({
-    path: "/v1/chain/get_table_rows",
-    params: {
-      code: contractAccount,
-      table: "hashmap",
-      scope: contractAccount,
-      json: true,
-      limit: 5,
-    },
+  const info = await apiClient.v1.chain.get_info();
+  // console.log("Chain info:", info);
+  const abiRes = await apiClient.call({
+    path: "/v1/chain/get_abi",
+    params: { account_name: contractAccount },
   });
-  console.log("hash table Result:", result);
 
-  return result.rows.some((row: any) => row.hash === hash && row.exists);
+  const { abi } = abiRes as any;
+  // console.log("Contract ABI:", abi);
+  const untypedAction: AnyAction = {
+    account: contractAccount,
+    name: "checkhash",
+    authorization: [{ actor, permission: "active" }],
+    data: { input: hash }, // ✅ match the ABI — input, not hash
+  };
+
+  const action = Action.from(untypedAction, abi);
+  const trx = Transaction.from({
+    ...info.getTransactionHeader(),
+    actions: [action],
+  });
+
+  const digest = trx.signingDigest(info.chain_id);
+  const privKey = PrivateKey.from(privateKey);
+  const signature = privKey.signDigest(digest).toString();
+
+  const signedTrx = SignedTransaction.from({ ...trx, signatures: [signature] });
+  const packed = PackedTransaction.fromSigned(signedTrx);
+
+  const txResult: CheckHashTxResult = await apiClient.call({
+    path: "/v1/chain/push_transaction",
+    params: packed,
+  });
+  try {
+    const trace = txResult?.processed?.action_traces?.[0];
+    const exists = trace?.return_value_data?.exists;
+    console.log("Hash exists on chain:", exists);
+    return exists === 1;
+  } catch (err) {
+    console.error("Error parsing transaction result:", err);
+    return false;
+  }
 }
 
 export async function verifyHashIntegrity(
   apiClient: APIClient,
   content: string,
-  contractAccount: string
+  contractAccount: string,
+  actor: string,
+  private_key: string
 ): Promise<boolean> {
   // console.log(
   //   "###########################################################################################"
@@ -104,7 +173,13 @@ export async function verifyHashIntegrity(
   const hashFromMarkdown = sha256(canonicalFromMarkdown);
   console.log("Verifying hash from markdown:", hashFromMarkdown);
 
-  return checkHashOnChain(apiClient, hashFromMarkdown, contractAccount);
+  return checkHashOnChain(
+    apiClient,
+    hashFromMarkdown,
+    contractAccount,
+    actor,
+    private_key
+  );
 }
 
 export async function pushOnchainReturnHash(

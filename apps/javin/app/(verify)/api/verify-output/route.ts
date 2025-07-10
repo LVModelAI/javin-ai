@@ -31,7 +31,9 @@ export async function POST(req: NextRequest) {
     const hashResult = await verifyHashIntegrity(
       apiClient,
       output,
-      contractAccount
+      contractAccount,
+      actor,
+      privateKey
     );
 
     return NextResponse.json({ success: hashResult });
