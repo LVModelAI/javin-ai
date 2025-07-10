@@ -22,7 +22,7 @@ const markdownToCanonicalText = async (markdown: string): Promise<string> => {
   const decoded = markdown.replace(/\\n/g, "\n"); // decode escaped newlines
   const plainText = removeMd(decoded);
   const canonical = plainTextToCanonicalText(plainText);
-  console.log("Canonical text:", canonical);
+  // console.log("Canonical text:", canonical);
   return canonical;
 };
 
@@ -45,12 +45,12 @@ export async function pushHashToChain(
   });
 
   const { abi } = abiRes as any;
-
+  // console.log("Contract ABI:", abi);
   const untypedAction: AnyAction = {
     account: contractAccount,
     name: "addhash",
     authorization: [{ actor, permission: "active" }],
-    data: { hash },
+    data: { input: hash }, // ✅ match the ABI — input, not hash
   };
 
   const action = Action.from(untypedAction, abi);
@@ -84,10 +84,10 @@ export async function checkHashOnChain(
       table: "hashmap",
       scope: contractAccount,
       json: true,
-      limit: 1000,
+      limit: 5,
     },
   });
-  // console.log("hash table Result:", result);
+  console.log("hash table Result:", result);
 
   return result.rows.some((row: any) => row.hash === hash && row.exists);
 }
@@ -97,9 +97,9 @@ export async function verifyHashIntegrity(
   content: string,
   contractAccount: string
 ): Promise<boolean> {
-  console.log(
-    "###########################################################################################"
-  );
+  // console.log(
+  //   "###########################################################################################"
+  // );
   const canonicalFromMarkdown = await markdownToCanonicalText(content);
   const hashFromMarkdown = sha256(canonicalFromMarkdown);
   console.log("Verifying hash from markdown:", hashFromMarkdown);
