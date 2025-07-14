@@ -184,7 +184,7 @@ export async function POST(request: Request) {
           console.error("Transaction data is undefined");
           return;
         }
-        saveTxnData({
+        await saveTxnData({
           hash: txnData.input,
           transactionId: txnData.transaction_id,
         });
@@ -305,7 +305,7 @@ export async function POST(request: Request) {
                   console.error("Transaction data is undefined");
                   return;
                 }
-                saveTxnData({
+                await saveTxnData({
                   hash: txnData.input,
                   transactionId: txnData.transaction_id,
                 });

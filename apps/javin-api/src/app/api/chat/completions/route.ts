@@ -15,6 +15,7 @@ import {
   getConsumerUsingApiKey,
   saveMessages,
   saveToolTracking,
+  saveTxnData,
 } from "@/src/lib/db/queries";
 import { v4 as uuidv4 } from "uuid";
 import { ConsumerEnumType } from "@/src/lib/db/schema";
@@ -175,12 +176,17 @@ export async function POST(request: Request) {
           actor,
           privateKey
         );
+        if (!txnData) {
+          console.error("Transaction data is undefined");
+          return;
+        }
+        await saveTxnData({
+          hash: txnData.input,
+          transactionId: txnData.transaction_id,
+        });
       } catch (err) {
         console.error("Failed to push hash on-chain (stream):", err);
         Sentry.captureException(err);
-      }
-      if (!txnData) {
-        console.error("Transaction data is undefined");
       }
 
       await saveMessages({
@@ -195,8 +201,6 @@ export async function POST(request: Request) {
             stream: StreamingTrue,
             createdAt: dateOfMessageCreation,
             nonce: outputId,
-            hash: txnData?.input || "",
-            transactionId: txnData?.transaction_id || "",
           },
         ],
       });
@@ -319,13 +323,19 @@ export async function POST(request: Request) {
                   actor,
                   privateKey
                 );
+                if (!txnData) {
+                  console.error("Transaction data is undefined");
+                  return;
+                }
+                await saveTxnData({
+                  hash: txnData.input,
+                  transactionId: txnData.transaction_id,
+                });
               } catch (err) {
                 console.error("Failed to push hash on-chain (stream):", err);
                 Sentry.captureException(err);
               }
-              if (!txnData) {
-                console.error("Transaction data is undefined");
-              }
+
               await saveMessages({
                 consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
                 messages: [
@@ -338,8 +348,6 @@ export async function POST(request: Request) {
                     stream: StreamingTrue,
                     createdAt: dateOfMessageCreation,
                     nonce: outputId,
-                    hash: txnData?.input || "",
-                    transactionId: txnData?.transaction_id || "",
                   },
                 ],
               });
