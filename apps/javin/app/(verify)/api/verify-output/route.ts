@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyHashIntegrity } from "@javin/shared/lib/utils/crypto";
+import {
+  markdownToCanonicalText,
+  sha256,
+  verifyHashIntegrity,
+} from "@javin/shared/lib/utils/crypto";
 import { APIClient, FetchProvider } from "@wireio/core";
+import { findHashAndReturnTxnId } from "@/lib/javin-api-db/javin-api-db";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,15 +33,31 @@ export async function POST(req: NextRequest) {
       provider: new FetchProvider(endpoint),
     });
 
-    const hashResult = await verifyHashIntegrity(
+    // create hash from the output
+    const canonicalFromMarkdown = await markdownToCanonicalText(output);
+    const hashFromMarkdown = sha256(canonicalFromMarkdown);
+    console.log("Verifying hash from markdown:", hashFromMarkdown);
+
+    //check if hash exists in db and get txn id
+    const txnId = await findHashAndReturnTxnId({
+      hash: "5a6697709af20b933d3124038821b0439b6dba505d35f84fe7f2fbdef447676e",
+    });
+    if (!txnId) {
+      return NextResponse.json({
+        success: false,
+        error: "Hash not found in database.",
+      });
+    }
+    // find the txn on chain and verify the hash
+    const isVerified: boolean = await verifyHashIntegrity(
       apiClient,
-      output,
       contractAccount,
       actor,
-      privateKey
+      privateKey,
+      txnId
     );
 
-    return NextResponse.json({ success: hashResult });
+    return NextResponse.json({ success: isVerified });
   } catch (error) {
     console.error("Verification error:", error);
     return NextResponse.json(
