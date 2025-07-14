@@ -11,41 +11,55 @@ import {
 } from "@wireio/core";
 import removeMd from "remove-markdown";
 
-export type CheckHashTxResult = {
-  transaction_id: string;
-  processed: {
-    id: string;
-    block_num: number;
-    block_time: string;
-    receipt: {
-      status: string;
-      cpu_usage_us: number;
-      net_usage_words: number;
+export interface WireTransactionResponse {
+  query_time_ms: number;
+  executed: boolean;
+  trx_id: string;
+  lib: number;
+  cached_lib: boolean;
+  actions: WireAction[];
+  last_indexed_block: number;
+  last_indexed_block_time: string;
+}
+
+export interface WireAction {
+  action_ordinal: number;
+  creator_action_ordinal: number;
+  act: {
+    account: string;
+    name: string;
+    authorization: {
+      actor: string;
+      permission: string;
+    }[];
+    data: {
+      hash: string;
+      [key: string]: any;
     };
-    elapsed: number;
-    net_usage: number;
-    scheduled: boolean;
-    action_traces: [
-      {
-        action_ordinal: number;
-        receipt: {
-          receiver: string;
-        };
-        act: {
-          name: string;
-          data: {
-            input: string;
-          };
-        };
-        console: string;
-        return_value_data?: {
-          exists: 0 | 1;
-        };
-        return_value_hex_data?: string;
-      }
-    ];
   };
-};
+  "@timestamp": string;
+  block_num: number;
+  block_id: string;
+  producer: string;
+  trx_id: string;
+  global_sequence: number;
+  cpu_usage_us: number;
+  net_usage_words: number;
+  signatures: string[];
+  code_sequence: number;
+  abi_sequence: number;
+  act_digest: string;
+  receipts: {
+    receiver: string;
+    global_sequence: string;
+    recv_sequence: string;
+    auth_sequence: {
+      account: string;
+      sequence: string;
+    }[];
+  }[];
+  timestamp: string;
+}
 
 type TxnData = {
   transaction_id: string;
@@ -85,13 +99,15 @@ type TxnData = {
 };
 
 // stateless helper functions
-const plainTextToCanonicalText = (plainText: string): string =>
+export const plainTextToCanonicalText = (plainText: string): string =>
   plainText
     .replace(/\\n/g, "") // remove escaped newlines (e.g., \\n)
     .replace(/\s+/g, "") // remove all whitespace: spaces, tabs, newlines
     .trim(); // remove any leftover leading/trailing invisible characters
 
-const markdownToCanonicalText = async (markdown: string): Promise<string> => {
+export const markdownToCanonicalText = async (
+  markdown: string
+): Promise<string> => {
   const decoded = markdown.replace(/\\n/g, "\n"); // decode escaped newlines
   const plainText = removeMd(decoded);
   const canonical = plainTextToCanonicalText(plainText);
@@ -186,63 +202,40 @@ export async function pushOnchainReturnTxnId(
   return txnData;
 }
 
-export async function checkHashOnChain(
-  apiClient: APIClient,
+export async function verifyHashIntegrity(
   hash: string,
-  contractAccount: string,
-  actor: string,
-  privateKey: string
+  txnId: string
 ): Promise<boolean> {
-  const info = await apiClient.v1.chain.get_info();
-  // console.log("Chain info:", info);
-  const abiRes = await apiClient.call({
-    path: "/v1/chain/get_abi",
-    params: { account_name: contractAccount },
-  });
+  console.log("Verifying hash integrity for transaction ID:", txnId);
 
-  const { abi } = abiRes as any;
-  // console.log("Contract ABI:", abi);
-  const untypedAction: AnyAction = {
-    account: contractAccount,
-    name: "checkhash",
-    authorization: [{ actor, permission: "active" }],
-    data: { input: hash }, // ✅ match the ABI — input, not hash
-  };
-
-  const action = Action.from(untypedAction, abi);
-  const trx = Transaction.from({
-    ...info.getTransactionHeader(),
-    actions: [action],
-  });
-
-  const digest = trx.signingDigest(info.chain_id);
-  const privKey = PrivateKey.from(privateKey);
-  const signature = privKey.signDigest(digest).toString();
-
-  const signedTrx = SignedTransaction.from({ ...trx, signatures: [signature] });
-  const packed = PackedTransaction.fromSigned(signedTrx);
-
-  const txResult: CheckHashTxResult = await apiClient.call({
-    path: "/v1/chain/push_transaction",
-    params: packed,
-  });
   try {
-    const trace = txResult?.processed?.action_traces?.[0];
-    const exists = trace?.return_value_data?.exists;
-    console.log("Hash exists on chain:", exists);
-    return exists === 1;
+    console.log("Fetching transaction data for ID:", txnId);
+    const res = await fetch(
+      `https://testnet-hyperion.wire.foundation/v2/history/get_transaction?id=${txnId}`
+    );
+    if (!res.ok) {
+      console.error("Failed to fetch transaction:", res.statusText);
+      return false;
+    }
+
+    const data: WireTransactionResponse = await res.json();
+    if (!data.executed || !data.actions || data.actions.length === 0) {
+      console.error("Transaction not executed or missing actions.");
+      return false;
+    }
+
+    // console.log("Transaction data:", data.actions[0]);
+    const hashInTxn = data.actions[0].act.data.hash;
+    console.log("Hash in transaction:", hashInTxn);
+    if (hashInTxn == hash) {
+      console.log("✅ Hash verified on-chain.");
+      return true;
+    } else {
+      console.warn("❌ Hash not found or does not match.");
+      return false;
+    }
   } catch (err) {
-    console.error("Error parsing transaction result:", err);
+    console.error("Error verifying hash:", err);
     return false;
   }
-}
-
-export async function verifyHashIntegrity(
-  apiClient: APIClient,
-  content: string,
-  contractAccount: string,
-  actor: string,
-  private_key: string
-): Promise<boolean> {
-  return true; // TODO: Implement actual verification logic
 }
