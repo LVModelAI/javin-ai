@@ -224,8 +224,8 @@ export async function verifyHashIntegrity(
       return false;
     }
 
-    // console.log("Transaction data:", data.actions[0]);
-    const hashInTxn = data.actions[0].act.data.hash;
+    console.log("Transaction data:", data.actions[0].act);
+    const hashInTxn = data.actions[0].act.data.input;
     console.log("Hash in transaction:", hashInTxn);
     if (hashInTxn == hash) {
       console.log("✅ Hash verified on-chain.");
