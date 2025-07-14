@@ -1,6 +1,7 @@
 import {
   ConsumerEnumType,
   consumerTable,
+  hashTable,
   message,
   Message,
   nexusMessage,
@@ -44,6 +45,22 @@ export async function saveMessages({
     return await db.insert(targetTable).values(messages);
   } catch (error) {
     console.error("Failed to save messages in database", error);
+    Sentry.captureException(error);
+    throw error;
+  }
+}
+
+export async function saveTxnData({
+  hash,
+  transactionId,
+}: {
+  hash: string;
+  transactionId: string;
+}) {
+  try {
+    return await db.insert(hashTable).values({ hash, transactionId });
+  } catch (error) {
+    console.error("Failed to save transaction data in database", error);
     Sentry.captureException(error);
     throw error;
   }

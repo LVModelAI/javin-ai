@@ -15,6 +15,20 @@
       "when": 1751726870600,
       "tag": "0001_sloppy_husk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752478621767,
+      "tag": "0002_clear_stryfe",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1752479084051,
+      "tag": "0003_misty_ravenous",
+      "breakpoints": true
     }
   ]
 }

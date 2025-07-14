@@ -22,7 +22,6 @@ const normalMessageDbObject = {
   stream: boolean("stream").notNull(),
   createdAt: timestamp("createdAt").notNull(),
   nonce: varchar("nonce"),
-  hash: varchar("hash"),
 };
 
 export const message = pgTable("Message", normalMessageDbObject);
@@ -68,3 +67,10 @@ export const consumerTable = pgTable("ConsumerTable", {
 export type ConsumerTable = InferSelectModel<typeof consumerTable>;
 
 export type ConsumerEnumType = "SENTIENT" | "NEXUS" | "SOLANA_HACKATHON";
+
+export const hashTable = pgTable("HashTable", {
+  hash: varchar("hash").primaryKey().notNull(),
+  transactionId: varchar("transactionId").notNull(),
+});
+
+export type HashTable = InferSelectModel<typeof hashTable>;
