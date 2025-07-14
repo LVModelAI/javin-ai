@@ -40,9 +40,10 @@ export async function POST(req: NextRequest) {
 
     //check if hash exists in db and get txn id
     const txnId = await findHashAndReturnTxnId({
-      hash: "5a6697709af20b933d3124038821b0439b6dba505d35f84fe7f2fbdef447676e",
+      hash: hashFromMarkdown,
     });
     if (!txnId) {
+      console.error("Hash not found in database");
       return NextResponse.json({
         success: false,
         error: "Hash not found in database.",
@@ -50,10 +51,7 @@ export async function POST(req: NextRequest) {
     }
     // find the txn on chain and verify the hash
     const isVerified: boolean = await verifyHashIntegrity(
-      apiClient,
-      contractAccount,
-      actor,
-      privateKey,
+      hashFromMarkdown,
       txnId
     );
 
