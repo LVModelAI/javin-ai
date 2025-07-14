@@ -25,7 +25,7 @@ import {
   getModelByConsumerMode,
   myProvider,
 } from "@javin/shared/lib/ai/models";
-import { pushOnchainReturnHash } from "@javin/shared/lib/utils/crypto";
+import { pushOnchainReturnTxnId } from "@javin/shared/lib/utils/crypto";
 import { APIClient, FetchProvider } from "@wireio/core";
 
 export async function POST(request: Request) {
@@ -166,9 +166,9 @@ export async function POST(request: Request) {
 
       const finalResultText = result.text + trailingText;
 
-      let hash = "";
+      let txnData;
       try {
-        hash = await pushOnchainReturnHash(
+        txnData = await pushOnchainReturnTxnId(
           apiClient,
           finalResultText,
           contractAccount,
@@ -176,8 +176,11 @@ export async function POST(request: Request) {
           privateKey
         );
       } catch (err) {
-        console.error("Failed to push hash on-chain:", err);
+        console.error("Failed to push hash on-chain (stream):", err);
         Sentry.captureException(err);
+      }
+      if (!txnData) {
+        console.error("Transaction data is undefined");
       }
 
       await saveMessages({
@@ -192,7 +195,8 @@ export async function POST(request: Request) {
             stream: StreamingTrue,
             createdAt: dateOfMessageCreation,
             nonce: outputId,
-            hash: hash,
+            hash: txnData?.input || "",
+            transactionId: txnData?.transaction_id || "",
           },
         ],
       });
@@ -306,9 +310,9 @@ export async function POST(request: Request) {
 
               const finalResultText = text + trailingText;
 
-              let hash = "";
+              let txnData;
               try {
-                hash = await pushOnchainReturnHash(
+                txnData = await pushOnchainReturnTxnId(
                   apiClient,
                   finalResultText,
                   contractAccount,
@@ -319,7 +323,9 @@ export async function POST(request: Request) {
                 console.error("Failed to push hash on-chain (stream):", err);
                 Sentry.captureException(err);
               }
-
+              if (!txnData) {
+                console.error("Transaction data is undefined");
+              }
               await saveMessages({
                 consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
                 messages: [
@@ -332,7 +338,8 @@ export async function POST(request: Request) {
                     stream: StreamingTrue,
                     createdAt: dateOfMessageCreation,
                     nonce: outputId,
-                    hash: hash,
+                    hash: txnData?.input || "",
+                    transactionId: txnData?.transaction_id || "",
                   },
                 ],
               });

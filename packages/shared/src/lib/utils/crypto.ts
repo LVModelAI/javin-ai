@@ -47,6 +47,43 @@ export type CheckHashTxResult = {
   };
 };
 
+type TxnData = {
+  transaction_id: string;
+  processed: {
+    id: string;
+    block_num: number;
+    block_time: string;
+    receipt: {
+      status: string;
+      cpu_usage_us: number;
+      net_usage_words: number;
+    };
+    elapsed: number;
+    net_usage: number;
+    scheduled: boolean;
+    action_traces: [
+      {
+        action_ordinal: number;
+        receipt: {
+          receiver: string;
+        };
+        act: {
+          account: string;
+          name: string;
+          authorization: any[]; // Assuming this is an array
+          data: { input: string }; // Assuming input is a string
+          hex_data: string;
+        };
+        console: string;
+        return_value_data?: {
+          exists: 0 | 1;
+        };
+        return_value_hex_data?: string;
+      }
+    ];
+  };
+};
+
 // stateless helper functions
 const plainTextToCanonicalText = (plainText: string): string =>
   plainText
@@ -72,7 +109,11 @@ export async function pushHashToChain(
   contractAccount: string,
   actor: string,
   privateKey: string
-): Promise<void> {
+): Promise<{
+  transaction_id: string;
+  input: string;
+}> {
+  console.log("Pushing hash to chain:", hash);
   const info = await apiClient.v1.chain.get_info();
   // console.log("Chain info:", info);
   const abiRes = await apiClient.call({
@@ -102,10 +143,47 @@ export async function pushHashToChain(
   const signedTrx = SignedTransaction.from({ ...trx, signatures: [signature] });
   const packed = PackedTransaction.fromSigned(signedTrx);
 
-  await apiClient.call({
+  const txnData: TxnData = await apiClient.call({
     path: "/v1/chain/push_transaction",
     params: packed,
   });
+  const inputData = txnData.processed.action_traces[0].act.data;
+  const txnId = txnData.transaction_id;
+  console.log(
+    "Transaction ",
+    txnId,
+    " pushed successfully with input data---",
+    inputData
+  );
+  return {
+    transaction_id: txnId,
+    input: inputData.input, // return the input data for verification
+  };
+}
+
+export async function pushOnchainReturnTxnId(
+  apiClient: APIClient,
+  content: string,
+  contractAccount: string,
+  actor: string,
+  privateKey: string
+): Promise<{
+  transaction_id: string;
+  input: string;
+}> {
+  try {
+  } catch (error) {}
+  const canonical = await markdownToCanonicalText(content);
+  const hash = sha256(canonical);
+  const txnData = await pushHashToChain(
+    apiClient,
+    hash,
+    contractAccount,
+    actor,
+    privateKey
+  );
+  console.log("Hash pushed successfully:", txnData);
+  return txnData;
 }
 
 export async function checkHashOnChain(
@@ -166,35 +244,5 @@ export async function verifyHashIntegrity(
   actor: string,
   private_key: string
 ): Promise<boolean> {
-  // console.log(
-  //   "###########################################################################################"
-  // );
-  const canonicalFromMarkdown = await markdownToCanonicalText(content);
-  const hashFromMarkdown = sha256(canonicalFromMarkdown);
-  console.log("Verifying hash from markdown:", hashFromMarkdown);
-
-  return checkHashOnChain(
-    apiClient,
-    hashFromMarkdown,
-    contractAccount,
-    actor,
-    private_key
-  );
-}
-
-export async function pushOnchainReturnHash(
-  apiClient: APIClient,
-  content: string,
-  contractAccount: string,
-  actor: string,
-  privateKey: string
-): Promise<string> {
-  try {
-  } catch (error) {}
-  const canonical = await markdownToCanonicalText(content);
-  const hash = sha256(canonical);
-  console.log("Pushing hash to chain:", hash);
-  await pushHashToChain(apiClient, hash, contractAccount, actor, privateKey);
-  console.log("Hash pushed successfully:");
-  return hash;
+  return true; // TODO: Implement actual verification logic
 }

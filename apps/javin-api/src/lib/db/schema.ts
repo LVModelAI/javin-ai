@@ -23,6 +23,7 @@ const normalMessageDbObject = {
   createdAt: timestamp("createdAt").notNull(),
   nonce: varchar("nonce"),
   hash: varchar("hash"),
+  transactionId: varchar("transactionId"),
 };
 
 export const message = pgTable("Message", normalMessageDbObject);
