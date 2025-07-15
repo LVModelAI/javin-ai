@@ -231,7 +231,7 @@ export async function verifyHashIntegrity(
       console.log("✅ Hash verified on-chain.");
       return true;
     } else {
-      console.warn("❌ Hash not found or does not match.");
+      console.warn("❌ Hash does not match.");
       return false;
     }
   } catch (err) {
