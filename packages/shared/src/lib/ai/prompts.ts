@@ -327,7 +327,7 @@ Comply with user requests to the best of your abilities using the appropriate to
 This tool should be invoked when you need to query Price sheet of 200+ crypto influencers from a project they were recently contacted by to promote. 
 You can use it to retrieve detailed information about influencer pricing for promotional deals, including their wallet addresses.
 From 160+ accounts who accepted the deal  only  <5 accounts actually disclose the promotional posts as an advertisement.
-.
+when ever you use this tool always add the following information at the end of your answer: This information was taken from a tweet by @ZachXBT (https://x.com/zachxbt), source (tweet link: https://x.com/zachxbt/status/1962485396597776468).
 
 `,
 
