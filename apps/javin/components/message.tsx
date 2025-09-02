@@ -144,6 +144,11 @@ const PurePreviewMessage = ({
                             loadingMessage="Exploring the protocol"
                             isFinished
                           />
+                        ) : toolName === "getCryptoInfluencersData" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting relevant data"
+                            isFinished
+                          />
                         ) : (
                           <ToolCallLoader
                             loadingMessage="Finding info"
@@ -182,6 +187,8 @@ const PurePreviewMessage = ({
                         <ToolCallLoader loadingMessage="Summarizing transactions..." />
                       ) : toolName === "getSiteContent" ? (
                         <ToolCallLoader loadingMessage="Exploring the protocol..." />
+                      ) : toolName === "getCryptoInfluencersData" ? (
+                        <ToolCallLoader loadingMessage="Getting relevant data..." />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}

@@ -31,6 +31,7 @@ import { getNexusApiData } from "./tools/nexus/get-nexus-api-data";
 import { getNexusStats } from "./tools/nexus/get-stats";
 import { snsToAddress } from "./tools/solana/sns-to-address";
 import { supportedChainsAndId } from "@javin/shared/lib/ai/tools/onchain/constant";
+import { getCryptoInfluencersData } from "@javin/shared/lib/ai/tools/misc/getCryptoInfluencersData";
 
 export const codePrompt = ``;
 
@@ -97,6 +98,8 @@ const groupTools = {
     "translateTransactions",
     //defi llama
     "defiLlama",
+    // for fun
+    "getCryptoInfluencersData",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -150,7 +153,10 @@ type getAllToolsWithConfigsParams = {
   mode?: SearchGroupId;
 };
 
-export const getAllToolsWithConfigs = ({ modelName, mode }: getAllToolsWithConfigsParams) => {
+export const getAllToolsWithConfigs = ({
+  modelName,
+  mode,
+}: getAllToolsWithConfigsParams) => {
   return {
     webSearch: webSearch({ mode: mode }),
     ensToAddress,
@@ -189,6 +195,8 @@ export const getAllToolsWithConfigs = ({ modelName, mode }: getAllToolsWithConfi
     getAptosScanApiData,
     getAptosPortfolio,
     getAptosGraphqlData,
+    // for fun
+    getCryptoInfluencersData,
   };
 };
 
@@ -314,6 +322,13 @@ Comply with user requests to the best of your abilities using the appropriate to
   - Data of fees and revenue of all protocol and chains
 
   # If the topic is not related to Blockchain in general. Tell the user that you cant assist with the request no matter what.
+
+  ## getCryptoInfluencersData
+This tool should be invoked when you need to query Price sheet of 200+ crypto influencers from a project they were recently contacted by to promote. 
+You can use it to retrieve detailed information about influencer pricing for promotional deals, including their wallet addresses.
+From 160+ accounts who accepted the deal  only  <5 accounts actually disclose the promotional posts as an advertisement.
+.
+
 `,
 
   solana: `
@@ -677,6 +692,7 @@ Various information this tool can provide are :
 - Data from the yields/APY dashboard
 - Data from the volumes dashboards
 - Data of fees and revenue of all protocol and chains
+
 `,
 };
 
