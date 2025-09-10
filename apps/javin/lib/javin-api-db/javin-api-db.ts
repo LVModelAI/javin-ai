@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { hashTable } from "./schema";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -26,4 +26,15 @@ export async function findHashAndReturnTxnId({
     return null;
   }
   return result[0].transactionId;
+}
+
+// New function to get the total number of hashes in the table
+export async function getTotalHashes(): Promise<number> {
+  const result = await db.select({ count: count() }).from(hashTable);
+  console.log("result --- ", result);
+  // result ---  [ { count: 18 } ]
+  // Return the count of rows
+
+  return result[0].count;
+  // return 10;
 }
