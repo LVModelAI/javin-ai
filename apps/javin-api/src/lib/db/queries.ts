@@ -27,6 +27,7 @@ export async function saveMessages({
   consumerName: ConsumerEnumType;
   messages: Array<Message>;
 }) {
+  console.log("saving messages ...");
   try {
     let targetTable: PgTableWithColumns<any>;
     switch (consumerName) {
