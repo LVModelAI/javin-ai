@@ -118,8 +118,16 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
                       `API call failed with status ${response.status}`
                     );
                   const json = await response.json();
-                  console.log("Fetched API response:", json);
-                  return json;
+
+                  // console.log("Fetched API response:", json);
+                  // Remove the input field from all elements of the result array
+                  const cleanedResults = json.result.map((item: any) => {
+                    const { input, ...cleanedItem } = item;
+                    return cleanedItem;
+                  });
+
+                  console.log("Cleaned API response:", cleanedResults);
+                  return cleanedResults;
                 } catch (error) {
                   console.error("Error fetching API data:", error);
                   Sentry.captureException(error);
