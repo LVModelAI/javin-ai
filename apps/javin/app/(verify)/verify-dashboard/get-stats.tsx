@@ -4,7 +4,7 @@ import VerifyPageHeader from "@/app/(verify)/verify/verify-header";
 import { InstallPrompt } from "@/components/install-prompt";
 import React, { useEffect, useState } from "react";
 import { User } from "next-auth";
-import { CheckCheckIcon } from "lucide-react";
+import { CheckCheckIcon, RefreshCcw } from "lucide-react";
 import { CheckCircleFillIcon } from "@/components/icons";
 
 export default function GetStats({ user }: { user?: User }) {
@@ -67,12 +67,12 @@ export default function GetStats({ user }: { user?: User }) {
         <button
           onClick={handleGetCount}
           disabled={loading} // Disable button while loading
-          className="relative flex items-center justify-center p-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+          className="relative flex items-center justify-center p-2 border text-white rounded-lg disabled:opacity-50"
         >
           {loading ? (
-            <div className="animate-spin rounded-full border-4 border-t-4 border-white w-6 h-6"></div>
+            <RefreshCcw className="animate-spin w-6 h-6 text-white" />
           ) : (
-            "Refresh"
+            <RefreshCcw className="w-6 h-6 text-white" />
           )}
         </button>
       </div>
