@@ -171,28 +171,7 @@ export async function POST(request: Request) {
 
       const finalResultText = result.text + trailingText;
 
-      let txnData;
-      try {
-        txnData = await pushOnchainReturnTxnId(
-          apiClient,
-          finalResultText,
-          contractAccount,
-          actor,
-          privateKey
-        );
-        if (!txnData) {
-          console.error("Transaction data is undefined");
-          return;
-        }
-        await saveTxnData({
-          hash: txnData.input,
-          transactionId: txnData.transaction_id,
-        });
-      } catch (err) {
-        console.error("Failed to push hash on-chain (stream):", err);
-        Sentry.captureException(err);
-      }
-
+      //save messages to db
       await saveMessages({
         consumerName: consumerInfo.apiConsumerName as ConsumerEnumType,
         messages: [
@@ -208,6 +187,32 @@ export async function POST(request: Request) {
           },
         ],
       });
+
+      // pushing hash on wire network
+      // Call pushOnchainReturnTxnId asynchronously
+      (async () => {
+        console.log("pushing onchain...");
+        try {
+          const txnData = await pushOnchainReturnTxnId(
+            apiClient,
+            finalResultText,
+            contractAccount,
+            actor,
+            privateKey
+          );
+          if (!txnData) {
+            console.error("Transaction data is undefined");
+            return;
+          }
+          await saveTxnData({
+            hash: txnData.input,
+            transactionId: txnData.transaction_id,
+          });
+        } catch (err) {
+          console.error("Failed to push hash on-chain (stream):", err);
+          Sentry.captureException(err);
+        }
+      })(); // Immediately invoking async function
 
       const responseMessage: TextCompletion = {
         id: generateUUID(),
