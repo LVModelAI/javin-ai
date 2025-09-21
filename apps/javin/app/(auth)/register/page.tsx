@@ -80,7 +80,7 @@ export default function Page() {
         </p>
       </div>
 
-      <div className="w-fit overflow-hidden rounded-2xl gap-5 flex flex-col border m-2 p-5">
+      <div className="w-fit overflow-hidden rounded-2xl gap-3 flex flex-col border  p-5 overflow-y-auto">
         <h3 className="text-xl font-semibold dark:text-zinc-50 text-center">
           Sign Up
         </h3>
@@ -105,6 +105,7 @@ export default function Page() {
           action={handleSubmit}
           defaultEmail={email}
           fieldErrors={state.fieldErrors}
+          showPasswordCriteria
           forgotPasswordNeeded={false}
         >
           <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
