@@ -113,20 +113,20 @@ export async function POST(request: Request) {
     if (!StreamingTrue) {
       // NON STREAMING
       const result = await generateText({
-        model: myProvider.languageModel(model),
+        model: myProvider.languageModel(model) as any,
         system: systemPrompt,
         prompt: prompt,
         maxRetries: 0,
         maxSteps: 10,
-        experimental_activeTools: [...activeTools],
+        experimental_activeTools: [...(activeTools as any)],
         tools: getAllToolsWithConfigs({
           modelName: model,
           mode: consumerInfo.mode as SearchGroupId,
-        }),
+        }) as any,
         maxTokens: max_tokens,
         temperature: temperature,
         experimental_generateMessageId: generateUUID,
-      });
+      } as any);
 
       const dateOfMessageCreation = new Date();
       const sanitizedResponseMessages = sanitizeResponseMessages({
@@ -242,18 +242,18 @@ export async function POST(request: Request) {
       async start(controller) {
         try {
           const result = streamText({
-            model: myProvider.languageModel(model),
+            model: myProvider.languageModel(model) as any,
             system: systemPrompt,
             prompt: prompt,
             maxSteps: 10,
             maxRetries: 0,
-            experimental_activeTools: [...activeTools],
-            onChunk: async ({ chunk }) => {
+            experimental_activeTools: [...(activeTools as any)],
+            onChunk: async ({ chunk }: any) => {
               // MAKE THIS INTO OPENAI API STANDARD MESSAGE AND PUSH IN CONTROLLER
               // IF YOU WANT TO SEND TOOL INFORMATION
-              // console.log("onChunk = ", chunk);
+              console.log("onChunk = ", chunk);
             },
-            onFinish: async ({ text, response, reasoning }) => {
+            onFinish: async ({ text, response, reasoning }: any) => {
               const dateOfMessageCreation = new Date();
               const sanitizedResponseMessages = sanitizeResponseMessages({
                 messages: response.messages,
@@ -342,12 +342,12 @@ export async function POST(request: Request) {
             tools: getAllToolsWithConfigs({
               modelName: model,
               mode: consumerInfo.mode as SearchGroupId,
-            }),
+            }) as any,
             maxTokens: max_tokens,
             temperature: temperature,
             experimental_transform: smoothStream({ chunking: "word" }),
             experimental_generateMessageId: generateUUID,
-          });
+          } as any);
 
           const streamId = generateUUID(); // Keep a consistent ID for the stream
 
