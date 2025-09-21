@@ -190,7 +190,7 @@ export async function POST(request: Request) {
 
       // pushing hash on wire network
       // Call pushOnchainReturnTxnId asynchronously
-      (async () => {
+      
         console.log("pushing onchain...");
         try {
           const txnData = await pushOnchainReturnTxnId(
@@ -212,7 +212,6 @@ export async function POST(request: Request) {
           console.error("Failed to push hash on-chain (stream):", err);
           Sentry.captureException(err);
         }
-      })(); // Immediately invoking async function
 
       const responseMessage: TextCompletion = {
         id: generateUUID(),
