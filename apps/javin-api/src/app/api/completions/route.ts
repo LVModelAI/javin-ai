@@ -315,29 +315,28 @@ export async function POST(request: Request) {
 
               // pushing hash on wire network
               // Call pushOnchainReturnTxnId asynchronously
-              (async () => {
-                console.log("pushing onchain...");
-                try {
-                  const txnData = await pushOnchainReturnTxnId(
-                    apiClient,
-                    finalResultText,
-                    contractAccount,
-                    actor,
-                    privateKey
-                  );
-                  if (!txnData) {
-                    console.error("Transaction data is undefined");
-                    return;
-                  }
-                  await saveTxnData({
-                    hash: txnData.input,
-                    transactionId: txnData.transaction_id,
-                  });
-                } catch (err) {
-                  console.error("Failed to push hash on-chain (stream):", err);
-                  Sentry.captureException(err);
+
+              console.log("pushing onchain...");
+              try {
+                const txnData = await pushOnchainReturnTxnId(
+                  apiClient,
+                  finalResultText,
+                  contractAccount,
+                  actor,
+                  privateKey
+                );
+                if (!txnData) {
+                  console.error("Transaction data is undefined");
+                  return;
                 }
-              })(); // Immediately invoking async function
+                await saveTxnData({
+                  hash: txnData.input,
+                  transactionId: txnData.transaction_id,
+                });
+              } catch (err) {
+                console.error("Failed to push hash on-chain (stream):", err);
+                Sentry.captureException(err);
+              }
             },
             tools: getAllToolsWithConfigs({
               modelName: model,
