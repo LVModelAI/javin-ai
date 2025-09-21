@@ -74,6 +74,7 @@ export default function ResetPassword() {
           emailNeeded={false}
           forgotPasswordNeeded={false}
           passwordNeeded={true}
+          showPasswordCriteria
           fieldErrors={state.fieldErrors}
         >
           <SubmitButton isSuccessful={isSuccessful}>Reset</SubmitButton>
