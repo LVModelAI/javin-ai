@@ -39,8 +39,8 @@ export async function sendResetEmail(email: string, resetUrl: string) {
           <h2 style="color:#EA580C;">Password Reset Request</h2>
           <p>We received a request to reset your password. Click the button below:</p>
           <a href="${resetUrl}" style="display:inline-block; padding:12px 20px; background-color:#EA580C; color:white; text-decoration:none; border-radius:6px;">Reset Password</a>
-          <p>If you didn’t request this, you can safely ignore it.</p>
-          <p style="margin-top: 30px;">– Team Javin</p>
+          <p>If you didn't request this, you can safely ignore it.</p>
+          <p style="margin-top: 30px;">- Team Javin</p>
         </div>
       `,
     };
