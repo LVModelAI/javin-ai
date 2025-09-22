@@ -125,57 +125,82 @@ export async function pushHashToChain(
   contractAccount: string,
   actor: string,
   privateKey: string
-): Promise<{
-  transaction_id: string;
-  input: string;
-}> {
-  console.log("Pushing hash to chain:", hash);
-  const info = await apiClient.v1.chain.get_info();
-  // console.log("Chain info:", info);
-  const abiRes = await apiClient.call({
-    path: "/v1/chain/get_abi",
-    params: { account_name: contractAccount },
-  });
+): Promise<{ transaction_id: string; input: string }> {
+  async function buildPackAndPush() {
+    const info = await apiClient.v1.chain.get_info();
 
-  const { abi } = abiRes as any;
-  // console.log("Contract ABI:", abi);
-  const untypedAction: AnyAction = {
-    account: contractAccount,
-    name: "addhash",
-    authorization: [{ actor, permission: "active" }],
-    data: { input: hash }, // ✅ match the ABI — input, not hash
-  };
+    // pick a recent block for TAPOS
+    const taposBlockNum =
+      Math.max(1, (info.head_block_num as any as number) - 3);
 
-  const action = Action.from(untypedAction, abi);
-  const trx = Transaction.from({
-    ...info.getTransactionHeader(),
-    actions: [action],
-  });
+    const block = await apiClient.call({
+      path: "/v1/chain/get_block",
+      params: { block_num_or_id: taposBlockNum },
+    }) as any;
 
-  const digest = trx.signingDigest(info.chain_id);
-  const privKey = PrivateKey.from(privateKey);
-  const signature = privKey.signDigest(digest).toString();
+    // make expiration a little in the future
+    const headTime = new Date((info.head_block_time as any as string) + "Z").getTime();
+    const expiration = new Date(headTime + 120 * 1000) // 120 sec
+      .toISOString()
+      .replace("Z", ""); // nodeos expects no trailing Z
 
-  const signedTrx = SignedTransaction.from({ ...trx, signatures: [signature] });
-  const packed = PackedTransaction.fromSigned(signedTrx);
+    // fetch ABI and build the typed action
+    const { abi } = (await apiClient.call({
+      path: "/v1/chain/get_abi",
+      params: { account_name: contractAccount },
+    })) as any;
 
-  const txnData: TxnData = await apiClient.call({
-    path: "/v1/chain/push_transaction",
-    params: packed,
-  });
-  const inputData = txnData.processed.action_traces[0].act.data;
-  const txnId = txnData.transaction_id;
-  console.log(
-    "Transaction ",
-    txnId,
-    " pushed successfully with input data---",
-    inputData
-  );
-  return {
-    transaction_id: txnId,
-    input: inputData.input, // return the input data for verification
-  };
+    const untypedAction: AnyAction = {
+      account: contractAccount,
+      name: "addhash",
+      authorization: [{ actor, permission: "active" }],
+      data: { input: hash },
+    };
+    const action = Action.from(untypedAction, abi);
+
+    // assemble the transaction with explicit TAPOS
+    const trx = Transaction.from({
+      expiration,
+      ref_block_num: (block.block_num as number) & 0xffff,
+      ref_block_prefix: block.ref_block_prefix as number,
+      max_net_usage_words: 0,
+      max_cpu_usage_ms: 0,
+      delay_sec: 0,
+      context_free_actions: [],
+      actions: [action],
+      transaction_extensions: [],
+    });
+
+    // sign for this exact chain_id
+    const digest = trx.signingDigest(info.chain_id as any as string);
+    const privKey = PrivateKey.from(privateKey);
+    const signature = privKey.signDigest(digest).toString();
+    const signedTrx = SignedTransaction.from({ ...trx, signatures: [signature] });
+    const packed = PackedTransaction.fromSigned(signedTrx);
+
+    const txnData: TxnData = await apiClient.call({
+      path: "/v1/chain/push_transaction",
+      params: packed,
+    });
+
+    const inputData = txnData.processed.action_traces[0].act.data;
+    return { transaction_id: txnData.transaction_id, input: inputData.input };
+  }
+
+  // try once, and if reference block error occurs, refresh TAPOS and try again
+  try {
+    return await buildPackAndPush();
+  } catch (e: any) {
+    const msg = String(e?.message || e);
+    if (msg.includes("invalid_ref_block_exception")) {
+      // small backoff, rebuild TAPOS, push again
+      await new Promise(r => setTimeout(r, 250));
+      return await buildPackAndPush();
+    }
+    throw e;
+  }
 }
+
 
 export async function pushOnchainReturnTxnId(
   apiClient: APIClient,
