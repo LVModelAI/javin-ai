@@ -12,7 +12,15 @@
         "SENTRY_AUTH_TOKEN",
         "UPSTASH_REDIS_REST_URL",
         "UPSTASH_REDIS_REST_TOKEN",
-        "POSTGRES_JAVIN_API_URL"
+        "POSTGRES_JAVIN_API_URL",
+        "NOVES_API_KEY",
+        "SENTIENT_EXTERNAL_APIKEY",
+        "SOLANA_QUICKNODE_RPC_ENDPOINT",
+        "FIREWORKS_API_KEY",
+        "PRIVATE_KEY",
+        "API_ENDPOINT",
+        "CONTRACT_ACCOUNT",
+        "ACTOR"
       ]
     },
     "lint": {},
