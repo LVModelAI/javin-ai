@@ -36,7 +36,15 @@
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "AUTH_SECRET",
-        "THE_GRAPH_API_KEY"
+        "THE_GRAPH_API_KEY",
+        "NODE_ENV ",
+        "GUEST_USER_MESSAGE_LIMIT",
+        "FREE_USER_MESSAGE_LIMIT",
+        "PRO_USER_MESSAGE_LIMIT",
+        "BLOCKSCOUT_API_KEY",
+        "BIRDEYE_API_KEY",
+        "ZERION_DEV_API_KEY",
+        "ETHERSCAN_API_KEY"
       ]
     },
     "lint": {},
