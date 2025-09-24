@@ -28,7 +28,15 @@
         "PINECONE_API_KEY",
         "PINECONE_INDEX_NAME",
         "PINECONE_INDEX_HOST",
-        "GOOGLE_GENERATIVE_AI_API_KEY"
+        "GOOGLE_GENERATIVE_AI_API_KEY",
+        "BLOCKVISION_API_KEY",
+        "XAI_API_KEY",
+        "TAVILY_API_KEY",
+        "CRON_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "AUTH_SECRET",
+        "THE_GRAPH_API_KEY"
       ]
     },
     "lint": {},
