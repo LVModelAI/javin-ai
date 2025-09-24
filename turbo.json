@@ -20,7 +20,15 @@
         "PRIVATE_KEY",
         "API_ENDPOINT",
         "CONTRACT_ACCOUNT",
-        "ACTOR"
+        "ACTOR",
+        "EMAIL_REFRESH_TOKEN",
+        "EMAIL_REDIRECT_URI",
+        "EMAIL_USER",
+        "GROQ_API_KEY",
+        "PINECONE_API_KEY",
+        "PINECONE_INDEX_NAME",
+        "PINECONE_INDEX_HOST",
+        "GOOGLE_GENERATIVE_AI_API_KEY"
       ]
     },
     "lint": {},
