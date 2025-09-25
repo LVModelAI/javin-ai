@@ -6,7 +6,7 @@ import {
   getPathDetails,
   loadOpenAPI,
 } from "../../../utils/openapi";
-import { etherscanBaseURL, supportedChainsAndId } from "./constant";
+import { chains, etherscanBaseURL } from "./constant";
 import { ensToAddress } from "../ens-to-address";
 import * as Sentry from "@sentry/nextjs";
 
@@ -100,34 +100,55 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
               }),
               execute: async ({ path }) => {
                 try {
-                  const options = {
-                    method: "GET",
-                    headers: {
-                      accept: "application/json",
-                    },
+                  let etherscanApiChains = [...new Set([chainId, 1, ...chains])];
+                  
+
+                  const fetchForChain = async (specificChainId: number) => {
+                    const options = {
+                      method: "GET",
+                      headers: {
+                        accept: "application/json",
+                      },
+                    };
+                    const cleanPath = path.startsWith("/?")
+                      ? path.slice(2)
+                      : path;
+                    const fullUrl = `${etherscanBaseURL}?chainid=${specificChainId}&${cleanPath}&apikey=${apiKey}`;
+
+                    console.log("fetching --- ", fullUrl);
+                    const response = await fetch(fullUrl, options);
+                    if (!response.ok)
+                      throw new Error(
+                        `API call failed with status ${response.status}`
+                      );
+                    const json = await response.json();
+                    return json;
                   };
-                  const cleanPath = path.startsWith("/?")
-                    ? path.slice(2)
-                    : path;
-                  const fullUrl = `${etherscanBaseURL}?chainid=${chainId}&${cleanPath}&apikey=${apiKey}`;
 
-                  console.log("fetching --- ", fullUrl);
-                  const response = await fetch(fullUrl, options);
-                  if (!response.ok)
-                    throw new Error(
-                      `API call failed with status ${response.status}`
-                    );
-                  const json = await response.json();
+                  // Loop through chainIds sequentially and await each fetch
+                  for (const chainId of etherscanApiChains) {
+                    try {
+                      console.log("fetching for chainId:", chainId);
+                      const result = await fetchForChain(chainId);
 
-                  // console.log("Fetched API response:", json);
-                  // Remove the input field from all elements of the result array
-                  const cleanedResults = json.result.map((item: any) => {
-                    const { input, ...cleanedItem } = item;
-                    return cleanedItem;
-                  });
+                      if (result.result != null) {
+                        console.log(
+                          "Results found for chain in etherscan API:",
+                          chainId
+                        );
+                        return result.result; // Return the first valid result
+                      }
+                    } catch (error) {
+                      console.log(
+                        `Error fetching data for chainId ${chainId}:`,
+                        error
+                      );
+                      continue; // Continue to the next chainId if there's an error
+                    }
+                  }
 
-                  console.log("Cleaned API response:", cleanedResults);
-                  return cleanedResults;
+                  // If no valid results are found after all chains, return this:
+                  return "No results found.";
                 } catch (error) {
                   console.error("Error fetching API data:", error);
                   Sentry.captureException(error);
