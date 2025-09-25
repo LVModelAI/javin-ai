@@ -326,6 +326,7 @@ Comply with user requests to the best of your abilities using the appropriate to
     null,
     2
   )}. if the user has not specified the chain id, then use 1 as default.
+  if you dont get any data, ask the user to specify the chain on which the he is asking about.
 
   ## Ens lookup:
   If user enters a ENS name, like somename.eth or someName.someChain.eth then use the ensToAddress tool to get the corresponding address. Use this address for further queries. Use this tools to get the actual address so that you can pass it to other tools.
