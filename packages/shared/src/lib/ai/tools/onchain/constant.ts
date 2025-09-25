@@ -1,6 +1,6 @@
 export const etherscanBaseURL = "https://api.etherscan.io/v2/api";
 export const zerionBaseURL = "https://api.zerion.io";
-export const chains = [42161, 8453, 10];
+export const chains = [8453, 10, 42161];
 export const supportedChainsAndId: Record<string, number> = {
   ethereumMainnet: 1,
   sepoliaTestnet: 11155111,
