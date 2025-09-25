@@ -62,7 +62,7 @@ const WalletPositionsTable: React.FC<Props> = ({ result }) => {
               {p.app?.icon_url || p.icon_url ? (
                 <Image
                   src={p.app?.icon_url || p.icon_url || ""}
-                  alt={p.symbol || p.name || "token"}
+                  alt={p.app?.name || "App logo"}
                   width={28}
                   height={28}
                   className="rounded"

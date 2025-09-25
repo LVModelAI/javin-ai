@@ -204,11 +204,11 @@ export const getEvmWalletPositionsUsingZerion = tool({
         return "No complex positions above 1 USD found for this wallet.";
       }
 
-      logObjects(
-        "positions summary from getEvmWalletPositionsUsingZerion of wallet " +
-          wallet_address,
-        summaries
-      );
+      // logObjects(
+      //   "positions summary from getEvmWalletPositionsUsingZerion of wallet " +
+      //     wallet_address,
+      //   summaries
+      // );
 
       return summaries;
     } catch (error) {
