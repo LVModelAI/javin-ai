@@ -65,6 +65,8 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
               - Always provide a **clear, structured, human-readable answer** to the user.  
               - Do **not** return raw JSON unless explicitly requested.  
               - If no relevant data is found, respond appropriately instead of returning an empty result.  
+
+              if user is asking about a transaction, and the transaction is not found on this chain, ask the user to specify the chain on which the he is asking about.
               `,
           prompt: JSON.stringify(
             `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}?chainid=${chainId}`
@@ -119,8 +121,15 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
                     );
                   const json = await response.json();
 
-                  // console.log("Fetched API response:", json);
+                  console.log("Fetched API response:", json);
                   // Remove the input field from all elements of the result array
+
+                  if (json.result == null) {
+                    console.log(
+                      "Transaction not found on this chain, try a different chain"
+                    );
+                    return "Transaction not found on this chain, try a different chain";
+                  }
                   const cleanedResults = json.result.map((item: any) => {
                     const { input, ...cleanedItem } = item;
                     return cleanedItem;
