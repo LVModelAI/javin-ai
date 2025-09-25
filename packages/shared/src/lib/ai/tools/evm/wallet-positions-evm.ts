@@ -74,6 +74,7 @@ type ZerionPositionsResponse = {
 
 export type WalletPositionSummary = {
   id: string;
+  currencySymbol?: string;
   chain_id?: string;
   protocol?: string;
   dapp_id?: string;
@@ -140,9 +141,27 @@ export const getEvmWalletPositionsUsingZerion = tool({
       if (json.data.length === 0) {
         return "No complex positions found for this wallet.";
       }
+      // Remove trash positions and any positions valued at 1 USD or less
+      const MIN_POSITION_VALUE = 1;
+
+      /*
+       "links": {
+    "self": "https://api.zerion.io/v1/wallets/0x59387e6869a12d76f321ea609de4e073284f734f/positions/?currency=inr&filter%5Bchain_ids%5D=abstract%2Cape%2Carbitrum%2Caurora%2Cavalanche%2Cbase%2Cberachain%2Cbinance-smart-chain%2Cblast%2Ccelo%2Cdegen%2Cethereum%2Cfantom%2Cgravity-alpha%2Chyperevm%2Cink%2Ckatana%2Clens%2Clinea%2Cmantle%2Coptimism%2Cplasma%2Cpolygon-zkevm%2Cpolygon%2Cscroll%2Csomnia%2Csoneium%2Csonic%2Cunichain%2Cwonder%2Cworld%2Cxdai%2Cxinfin-xdc%2Czero%2Czkcandy%2Czksync-era%2Czora&filter%5Bpositions%5D=only_simple&filter%5Btrash%5D=only_non_trash&sort=value"
+  },
+  */
+
+      // Extract currency from query params
+      let currencySymbol: string | null = null;
+      if (json.links?.self) {
+        const url = new URL(json.links.self);
+        currencySymbol = url.searchParams.get("currency");
+      }
+
+      console.log(currencySymbol); // "usd"
 
       const summaries: WalletPositionSummary[] = json.data
         .filter((p) => p?.attributes?.flags?.is_trash !== true)
+        .filter((p) => (p?.attributes?.value ?? 0) > MIN_POSITION_VALUE)
         .map((p) => {
           const a = p.attributes || {};
           const r = p.relationships || {};
@@ -154,6 +173,7 @@ export const getEvmWalletPositionsUsingZerion = tool({
 
           return {
             id: p.id,
+            currencySymbol: currencySymbol,
             chain_id: chainId,
             protocol: a.protocol,
             dapp_id: dappId,
@@ -179,6 +199,10 @@ export const getEvmWalletPositionsUsingZerion = tool({
             },
           } as WalletPositionSummary;
         });
+
+      if (summaries.length === 0) {
+        return "No complex positions above 1 USD found for this wallet.";
+      }
 
       logObjects(
         "positions summary from getEvmWalletPositionsUsingZerion of wallet " +

@@ -21,6 +21,7 @@ import TokenInfoTable from "./birdeye/TokenInfoTable";
 import { Check } from "lucide-react";
 import AptosPortfolioTable from "@/components/aptos/AptosPortfolioTable";
 import ToolCallLoader from "@/components/ui/tool-call-loader";
+import WalletPositionsTable from "@/components/evm/WalletPositionsTable";
 
 const PurePreviewMessage = ({
   chatId,
@@ -123,10 +124,7 @@ const PurePreviewMessage = ({
                             isFinished
                           />
                         ) : toolName === "getEvmWalletPositionsUsingZerion" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting your wallet positions..."
-                            isFinished
-                          />
+                          <WalletPositionsTable result={result} />
                         ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
                           <ToolCallLoader
                             loadingMessage="Exploring ethereum"
