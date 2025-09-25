@@ -9,6 +9,7 @@ import { searchEvmTokenMarketData } from "./tools/evm/search-token-evm";
 import { getEvmMultiChainWalletPortfolio } from "./tools/evm/wallet-portfolio-evm";
 import { getEvmOnchainDataUsingEtherscan } from "./tools/onchain/get_evm_onchain_data_using_etherscan";
 import { getEvmOnchainDataUsingZerion } from "./tools/onchain/get_evm_onchain_data_using_zerion";
+import { getEvmWalletPositionsUsingZerion } from "./tools/evm/wallet-positions-evm";
 import { getSiteContent } from "./tools/scrap-site";
 import { searchSolanaTokenMarketData } from "./tools/solana/search-token-solana";
 import { getSolanaChainWalletPortfolio } from "./tools/solana/wallet-portfolio-solana";
@@ -93,6 +94,7 @@ const groupTools = {
     "getEvmMultiChainWalletPortfolio",
     "searchEvmTokenMarketData",
     "getEvmOnchainDataUsingZerion",
+    "getEvmWalletPositionsUsingZerion",
     "getEvmOnchainDataUsingEtherscan",
     "ensToAddress",
     "translateTransactions",
@@ -163,6 +165,7 @@ export const getAllToolsWithConfigs = ({
     getSiteContent,
     // on_chain evm
     getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion("gpt-4o-mini"),
+    getEvmWalletPositionsUsingZerion,
     getEvmOnchainDataUsingEtherscan:
       getEvmOnchainDataUsingEtherscan("gpt-4o-mini"),
     getEvmMultiChainWalletPortfolio,
@@ -266,6 +269,7 @@ Comply with user requests to the best of your abilities using the appropriate to
   If the user provides an solana address, NOT starting with "0x", Use getSolanaChainWalletPortfolio tool to retrieve a solana wallet's balances, tokens, and other portfolio details.
   If a wallet address is not provided, ask the user for it.
   If the tool returns no data, assume the input is a token address and proceed to get the token data using searchTokenMarketData tool.
+
   
   ## Get realtime user Data using getEvmOnchainDataUsingZerion:
   Use the getEvmOnchainDataUsingZerion tool to get all the information about on chain apis if user asks for any onchain data related to wallets, last tranactions history, fungibles, chains, swaps, gas, nfts. Pass the user query with the blockchain addresses if any. Modify the query to be more meaningful and grammatically correct and pass it to the tool. Break the query into parts if necessary and pass it one by one to the tool. Use the translateTransactions tool to summarize the output results. Convert wei to ether for showing balances or gas fees.
@@ -293,6 +297,27 @@ Comply with user requests to the best of your abilities using the appropriate to
   #### nfts
   - Get list of NFTs
   - Get single NFT by ID
+
+  ## Get wallet positions using getEvmWalletPositionsUsingZerion:
+  - When to use: User asks for staked assets, liquidity pools, vaults, yield farming, restaking, validator delegations, or other "complex" positions on EVM chains.
+  - Inputs:
+    - wallet_address: EVM address starting with "0x" (required). If user provides ENS, resolve it first via ensToAddress and then pass the resolved address.
+    - currency: One of the supported currencies (defaults to "usd").
+  - Behavior:
+    - Call this tool once with the provided wallet address and currency.
+    - If the result is empty or unavailable, retry exactly once, then stop.
+    - Never call the tool twice with identical parameters beyond a single retry.
+  - Output handling:
+    - Summarize each returned position with: name, protocol, position_type, chain_id, symbol, quantity, value, price, 24h change, pool_address (if any), token_address, and app name/url when available.
+    - Group results by protocol and sort positions by value (descending).
+    - If there are many positions, display the top 10 by value and note how many more are hidden.
+  - Notes:
+    - Exclude positions flagged as trash.
+    - Do not expose underlying API details to the user.
+    - Format large numbers in a human-readable way (2-4 decimals where appropriate).
+    - If the wallet address is missing or invalid, ask the user for a valid EVM address.
+  
+
   
   ## Get realtime user Data using getEvmOnchainDataUsingEtherscan:
   Use the getEvmOnchainDataUsingEtherscan tool to get various info about on chain data like Accounts, Contracts, Transactions, Blocks, Logs, Geth/Parity Proxy, Tokens, Gas Tracker, Stats, Chain Specific, Usage. Pass the user query and also include the blockchain address. pass the user query and the chain id of the chain the user is asking about. The chains and their ids are as follows:
