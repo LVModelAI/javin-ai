@@ -48,7 +48,7 @@ export const searchEvmTokenMarketData = tool({
   execute: async ({
     currency,
     search_query,
-    sort_by,
+    sort_by = "-market_data.market_cap",
     token_chain_id,
     token_address,
   }): Promise<TokenSearchData[] | string> => {

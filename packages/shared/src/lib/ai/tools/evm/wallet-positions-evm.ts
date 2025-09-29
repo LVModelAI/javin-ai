@@ -108,7 +108,7 @@ export const getEvmWalletPositionsUsingZerion = tool({
   }),
   execute: async ({
     wallet_address,
-    currency,
+    currency = "usd",
   }: {
     wallet_address: string;
     currency: string;
