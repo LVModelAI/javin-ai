@@ -102,6 +102,7 @@ const groupTools = {
     "defiLlama",
     // for fun
     "getCryptoInfluencersData",
+    // nansen smart money
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -170,7 +171,7 @@ export const getAllToolsWithConfigs = ({
       getEvmOnchainDataUsingEtherscan("gpt-4o-mini"),
     getEvmMultiChainWalletPortfolio,
     searchEvmTokenMarketData,
-    translateTransactions: translateTransactions("gpt-4o-mini"),
+    translateTransactions: translateTransactions("gpt-4o"),
     defiLlama: defiLlama("gpt-4o-mini"),
     // solana
     snsToAddress,
