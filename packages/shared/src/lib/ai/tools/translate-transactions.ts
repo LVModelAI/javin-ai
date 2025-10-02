@@ -80,84 +80,88 @@ export const novesSupportedChains = [
   "zora",
 ] as const;
 
-export const translateTransactions = (modelName: string) => tool({
-  description:
-    "Translate raw blockchain transactions into human-friendly, enriched form.",
-  parameters: z.object({
-    transactionDetails: z.string().describe("Details of the transaction."),
-    chain: z
-      .enum(novesSupportedChains)
-      .describe("Evm chain name")
-      .default("eth"),
-    userQuery: z.string().describe("query of the user"),
-  }),
-  execute: async ({ transactionDetails, chain, userQuery }) => {
-    const novesApiKey = process.env.NOVES_API_KEY;
-    if (!novesApiKey) {
-      console.log(" NOVES_API_KEY not found!!");
-      return "failed to summarize transaction";
-    }
-    try {
-      console.log("getting txn summary...");
-      const openapidata = await loadOpenAPI(
-        "https://translate.noves.fi/swagger/v1/swagger.json"
-      );
-      const novesOpenapidata = await loadOpenAPIFromJson(openapidata);
-      const novesAllPathsAndDesc = await getAllPathsAndDesc(novesOpenapidata);
+export const translateTransactions = (modelName: string) =>
+  tool({
+    description:
+      "Translate raw blockchain transactions into human-friendly, enriched form.",
+    parameters: z.object({
+      transactionDetails: z.string().describe("Details of the transaction."),
+      chain: z
+        .enum(novesSupportedChains)
+        .describe("Evm chain name")
+        .default("eth"),
+      userQuery: z.string().describe("query of the user"),
+    }),
+    execute: async ({ transactionDetails, chain, userQuery }) => {
+      const novesApiKey = process.env.NOVES_API_KEY;
+      if (!novesApiKey) {
+        console.log(" NOVES_API_KEY not found!!");
+        return "failed to summarize transaction";
+      }
+      try {
+        console.log("getting txn summary...", transactionDetails);
+        const openapidata = await loadOpenAPI(
+          "https://translate.noves.fi/swagger/v1/swagger.json"
+        );
+        const novesOpenapidata = await loadOpenAPIFromJson(openapidata);
+        const novesAllPathsAndDesc = await getAllPathsAndDesc(novesOpenapidata);
 
-      // console.log("transaction data is  ----------- ", transactionDetails);
+        // console.log("transaction data is  ----------- ", transactionDetails);
 
-      const { object: apiEndpointsArray } = await generateObject({
-        model: myProvider.languageModel(modelName),
-        output: "array",
-        schema: z.string().describe("the api endpoint"),
-        system: `\n
+        const { object: apiEndpointsArray } = await generateObject({
+          model: myProvider.languageModel(modelName),
+          output: "array",
+          schema: z.string().describe("the api endpoint"),
+          system: `\n
         You are provided the list of Translate APIs endpoints. The Translate APIs categorize transactions, standardizing them across chains and across protocols to produce a rich set of data that allows you to translate the transactions in to human readable format. They readily support accounting and finance scenarios, along with any system that benefits from structured and tagged data.supported chains are ${novesSupportedChains}. use these chain names in the query url.`,
-        prompt: JSON.stringify(
-          `The list of api endpoints and their descriptions are ${novesAllPathsAndDesc} and user Query is ${userQuery} and the chain is ${chain} and the transaction details are ${transactionDetails}`
-        ),
-      });
+          prompt: JSON.stringify(
+            `The list of api endpoints and their descriptions are ${novesAllPathsAndDesc} and user Query is ${userQuery} and the chain is ${chain} and the transaction details are ${transactionDetails}`
+          ),
+        });
 
-      // only take 3 endpoints to avoid rate limiting
-      const limitedApiEndpointsArray = apiEndpointsArray.slice(0, 3);
+        // only take 3 endpoints to avoid rate limiting
+        const limitedApiEndpointsArray = apiEndpointsArray.slice(0, 3);
 
-      console.log(
-        `AI selected the api endpoints as `,
-        limitedApiEndpointsArray
-      );
+        console.log(
+          `AI selected the api endpoints as `,
+          limitedApiEndpointsArray
+        );
 
-      const options = {
-        method: "GET",
-        headers: { accept: "application/json", apiKey: novesApiKey! },
-      };
+        const options = {
+          method: "GET",
+          headers: { accept: "application/json", apiKey: novesApiKey! },
+        };
 
-      // make the api calls
-      const requests = limitedApiEndpointsArray.map((endpoint) => {
-        const fullUrl = `https://translate.noves.fi${endpoint}`;
-        return fetch(fullUrl, options); // Return the promise
-      });
+        // make the api calls
+        const requests = limitedApiEndpointsArray.map((endpoint) => {
+          const fullUrl = `https://translate.noves.fi${endpoint}`;
+          return fetch(fullUrl, options); // Return the promise
+        });
 
-      const results = await Promise.all(
-        requests.map(async (request) => {
-          try {
-            const response = await request;
-            const json = await response.json();
-            logObjects("API Response from translate transaciton:", json);
-            return json;
-          } catch (error) {
-            console.error("Error parsing API response in translate transaction:", error);
-            Sentry.captureException(error);
-            return null;
-          }
-        })
-      );
+        const results = await Promise.all(
+          requests.map(async (request) => {
+            try {
+              const response = await request;
+              const json = await response.json();
+              logObjects("API Response from translate transaciton:", json);
+              return json;
+            } catch (error) {
+              console.error(
+                "Error parsing API response in translate transaction:",
+                error
+              );
+              Sentry.captureException(error);
+              return null;
+            }
+          })
+        );
 
-      console.log("Final parsed results:", results);
-      return results;
-    } catch (error) {
-      console.error("Error in summarizing transactions:", error);
-      Sentry.captureException(error);
-      return error; // Re-throw to allow handling by the caller
-    }
-  },
-});
+        logObjects("Final parsed results:", results);
+        return results;
+      } catch (error) {
+        console.error("Error in summarizing transactions:", error);
+        Sentry.captureException(error);
+        return error; // Re-throw to allow handling by the caller
+      }
+    },
+  });

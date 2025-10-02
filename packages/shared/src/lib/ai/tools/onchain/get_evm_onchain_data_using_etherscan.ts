@@ -130,8 +130,9 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
                     );
                     return "Transaction not found on this chain, try a different chain";
                   }
-                  console.log("json.result", json.result);
-                  if(Array.isArray(json.result) && json.result[0]?.input){
+                  // console.log("json.result", json.result);
+
+                  if (Array.isArray(json.result) && json.result[0]?.input) {
                     const cleanedResults = json.result.map((item: any) => {
                       const { input, ...cleanedItem } = item;
                       return cleanedItem;
@@ -139,12 +140,25 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
                     console.log("Cleaned API response:", cleanedResults);
                     return cleanedResults;
                   }
-                  if(path.includes("action=eth_blockNumber")){
+
+                  // handle single object with input
+                  if (
+                    json.result &&
+                    typeof json.result === "object" &&
+                    json.result.input
+                  ) {
+                    const { input, ...cleanedItem } = json.result;
+                    console.log("Cleaned single API response:", cleanedItem);
+                    return cleanedItem;
+                  }
+
+                  if (path.includes("action=eth_blockNumber")) {
                     const hexBlockNumber = json.result;
                     const blockNumber = parseInt(hexBlockNumber, 16);
                     console.log("Block number:", blockNumber);
                     return blockNumber;
                   }
+
                   return json.result;
                 } catch (error) {
                   console.error("Error fetching API data:", error);
