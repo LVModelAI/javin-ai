@@ -710,6 +710,123 @@ Your summary should contain:
      "perPage": 20
    }
 
+---------------------------------- getSmartMoneyDCAs ----------------------------------
+
+## getSmartMoneyDCAs
+
+### Purpose:
+Use the getSmartMoneyDCAs tool whenever the user asks for **Smart Money DCA (Dollar Cost Averaging) activity** or **systematic accumulation strategies** used by Smart Money on Solana via Jupiter DCA.
+
+This endpoint provides insight into how professional traders and funds are gradually accumulating tokens using DCA strategies. It helps detect accumulation trends and long-term buying behavior among Smart Money wallets.
+
+---
+
+### When to Use:
+
+Call this tool when the user asks about:
+- “Which tokens are Smart Money DCA'ing into?”
+- “Show me Smart Money DCA activity on Solana.”
+- “Which Smart Money wallets are using Jupiter DCA?”
+- “What tokens are Smart Money accumulating slowly?”
+- “Which tokens have the largest Smart Money DCA deposits?”
+- “Show me systematic buying patterns by Smart Money.”
+- “Which Smart Money funds are doing DCA into SOL or BONK?”
+
+---
+
+### Input Parameters (to pass automatically):
+
+- **includeSmartMoneyLabels** → Default: ["Fund", "Smart Trader"].  
+- **excludeSmartMoneyLabels** → Include only if user specifies (e.g., “exclude 30D traders”).  
+- **dca_created_at** →  
+  - If user asks for recent activity (“recent”, “this week”, “past month”), set date range accordingly.  
+  - Otherwise, leave unset (default fetches all).  
+- **input_token_symbol / output_token_symbol** →  
+  - Extract from query if user mentions a token.  
+  - Example: “Show Smart Money DCA into SOL” → output_token_symbol = ["SOL"].  
+- **deposit_token_amount**, **token_spent_amount**, **output_token_redeemed_amount** →  
+  - Use when user specifies size thresholds (e.g., “large DCA orders”, “over $100k deposits”).  
+- **orderBy** →  
+  - Default: [{ field: "deposit_value_usd", direction: "DESC" }]  
+  - If user says “latest DCAs” or “newest DCAs,” use [{ field: "dca_created_at", direction: "DESC" }].  
+- **pagination** → Default: page = 1, perPage = 20.
+
+---
+
+### How to Summarize Results for the User:
+
+After calling getSmartMoneyDCAs, summarize the findings clearly and insightfully.  
+The summary should show **which tokens Smart Money is systematically buying**, **how much**, and **who** is doing it.
+
+Your summary should include:
+
+1. **Top Tokens Being DCA'd Into**
+   - List the top tokens with highest deposit_value_usd or output_token_symbol totals.
+   - Example:  
+     “Smart Money wallets are DCA'ing into SOL, JTO, and BONK, with SOL seeing over $3.4M in deposits through Jupiter DCA.”
+
+2. **Top Smart Money Participants**
+   - Use trader_address_label where available.  
+   - Example:  
+     “Funds like Wintermute, Amber Group, and SmartFund_01 are the most active participants.”
+
+3. **Recent DCA Activity**
+   - Highlight new or active DCA setups from dca_created_at and dca_status.
+   - Example:  
+     “Over 60% of Smart Money DCA orders were created in the past week, indicating growing accumulation interest.”
+
+4. **Deposit and Redemption Trends**
+   - Compare deposit and redemption volumes to gauge activity.
+   - Example:  
+     “Average deposit per DCA vault is around $150k, with redemption activity increasing in BONK.”
+
+5. **Interpretation (Market Sentiment)**
+   - End with a one-line insight:  
+     - “Smart Money continues steady accumulation of SOL.”  
+     - “Funds are dollar-cost averaging into meme coins like BONK and WIF.”  
+     - “Consistent inflows suggest long-term bullish sentiment on Solana.”
+
+---
+
+### Example Summary Output:
+
+> **Smart Money DCA Activity (Solana / Jupiter DCA)**  
+>
+> • Top Accumulated Tokens: SOL ($3.8M), BONK ($1.2M), JTO ($900K)  
+> • Largest Participants: Wintermute, Alameda Research, SmartFund_03  
+> • Most DCAs Created: Last 7 days  
+> • Active DCAs: 72% are still open  
+>
+> Smart Money is systematically buying SOL and BONK using Jupiter DCA vaults, signaling strong conviction in Solana ecosystem assets.
+
+---
+
+### Important Notes for AI Behavior:
+
+- Always respond with **summarized insights**, not raw data.  
+- Do **not** show the JSON output or API fields.  
+- Always interpret trends — describe what Smart Money's DCA behavior *means* (e.g., “gradual accumulation,” “increasing confidence”).  
+- If the user doesn't specify any filters:
+  - Default to showing **the most recent DCA activity** (orderBy: [{ field: "dca_created_at", direction: "DESC" }]).
+  - Assume **Solana** (since Jupiter DCAs are Solana-native).  
+- If the response is empty:  
+  “No active Smart Money DCA strategies found for the given filters.”
+
+---
+
+### Example AI Flow:
+
+**User Query:**  
+> “Which tokens are Smart Money accumulating through DCA?”
+
+**AI Steps:**  
+1. Call getSmartMoneyDCAs with:
+   json
+   {
+     "orderBy": [{ "field": "deposit_value_usd", "direction": "DESC" }],
+     "perPage": 20
+   }
+
 
 `,
 
