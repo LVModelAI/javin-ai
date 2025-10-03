@@ -157,6 +157,11 @@ const PurePreviewMessage = ({
                             loadingMessage="Getting smart money netflow data"
                             isFinished
                           />
+                        ) : toolName === "getSmartMoneyHoldings" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting smart money holdings data"
+                            isFinished
+                          />
                         ) : (
                           <ToolCallLoader
                             loadingMessage="Finding info"
@@ -201,6 +206,8 @@ const PurePreviewMessage = ({
                         <ToolCallLoader loadingMessage="Getting relevant data..." />
                       ) : toolName === "getSmartMoneyNetflow" ? (
                         <ToolCallLoader loadingMessage="Getting smart money netflow data..." />
+                      ) : toolName === "getSmartMoneyHoldings" ? (
+                        <ToolCallLoader loadingMessage="Getting smart money holdings data..." />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}

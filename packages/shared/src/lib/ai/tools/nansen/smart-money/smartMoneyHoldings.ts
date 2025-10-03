@@ -1,11 +1,11 @@
 import { tool } from "ai";
 import z from "zod";
 
-export const getSmartMoneyNetflow = tool({
+export const getSmartMoneyHoldings = tool({
   description:
-    "Analyze net capital flows (inflows vs outflows) from smart traders and funds across different time periods. This tool helps identify which tokens are experiencing net accumulation or distribution by smart money.",
+    "Retrieve aggregated token balances held by smart traders and funds across multiple blockchains. This tool provides insights into what tokens are being accumulated by sophisticated market participants, excluding whales, large holders, and influencers to focus specifically on trading expertise.",
   parameters: z.object({
-    // Core parameters
+    // Chains to analyze
     chains: z
       .array(
         z.enum([
@@ -35,7 +35,7 @@ export const getSmartMoneyNetflow = tool({
       )
       .describe("Chains to include in the analysis."),
 
-    // Smart money filters
+    // Filters
     includeSmartMoneyLabels: z
       .array(
         z.enum([
@@ -47,7 +47,7 @@ export const getSmartMoneyNetflow = tool({
         ])
       )
       .optional()
-      .describe("Smart money categories to include."),
+      .describe("Smart Money categories to include."),
     excludeSmartMoneyLabels: z
       .array(
         z.enum([
@@ -59,42 +59,38 @@ export const getSmartMoneyNetflow = tool({
         ])
       )
       .optional()
-      .describe("Smart money categories to exclude."),
+      .describe("Smart Money categories to exclude."),
 
-    // Token filters
-    tokenAddress: z
-      .union([z.string(), z.array(z.string()), z.null()])
-      .optional()
-      .describe("Token address or symbol filter."),
     includeStablecoins: z.boolean().optional().default(false),
     includeNativeTokens: z.boolean().optional().default(false),
-    tokenSector: z
-      .array(z.string())
-      .optional()
-      .describe("Token sector filter."),
 
-    // Numeric range filters
-    traderCount: z
-      .object({
-        min: z.number().optional(),
-        max: z.number().optional(),
-      })
-      .optional()
-      .describe("Trader count range filter."),
+    tokenAddress: z
+      .union([z.string(), z.array(z.string()), z.null()])
+      .optional(),
+    tokenSymbol: z
+      .union([z.string(), z.array(z.string()), z.null()])
+      .optional(),
+    tokenSectors: z.array(z.string()).optional(),
+
+    // Numeric and integer filters
+    valueUsd: z
+      .object({ min: z.number().optional(), max: z.number().optional() })
+      .optional(),
+    balance24hPercentChange: z
+      .object({ min: z.number().optional(), max: z.number().optional() })
+      .optional(),
+    holdersCount: z
+      .object({ min: z.number().optional(), max: z.number().optional() })
+      .optional(),
+    shareOfHoldingsPercent: z
+      .object({ min: z.number().optional(), max: z.number().optional() })
+      .optional(),
     tokenAgeDays: z
-      .object({
-        min: z.number().optional(),
-        max: z.number().optional(),
-      })
-      .optional()
-      .describe("Token age range filter in days."),
+      .object({ min: z.number().optional(), max: z.number().optional() })
+      .optional(),
     marketCapUsd: z
-      .object({
-        min: z.number().optional(),
-        max: z.number().optional(),
-      })
-      .optional()
-      .describe("Market cap range filter in USD."),
+      .object({ min: z.number().optional(), max: z.number().optional() })
+      .optional(),
 
     // Sorting and pagination
     orderBy: z
@@ -104,11 +100,10 @@ export const getSmartMoneyNetflow = tool({
             "chain",
             "token_address",
             "token_symbol",
-            "net_flow_24h_usd",
-            "net_flow_7d_usd",
-            "net_flow_30d_usd",
-            "token_sectors",
-            "trader_count",
+            "value_usd",
+            "balance_24h_percent_change",
+            "holders_count",
+            "share_of_holdings_percent",
             "token_age_days",
             "market_cap_usd",
           ]),
@@ -124,26 +119,34 @@ export const getSmartMoneyNetflow = tool({
     chains,
     includeSmartMoneyLabels,
     excludeSmartMoneyLabels,
-    tokenAddress,
     includeStablecoins,
     includeNativeTokens,
-    tokenSector,
-    traderCount,
+    tokenAddress,
+    tokenSymbol,
+    tokenSectors,
+    valueUsd,
+    balance24hPercentChange,
+    holdersCount,
+    shareOfHoldingsPercent,
     tokenAgeDays,
     marketCapUsd,
     orderBy,
     page,
     perPage,
   }) => {
-    console.log("Executing getSmartMoneyNetflow with params:", {
+    console.log("Executing getSmartMoneyHoldings with params:", {
       chains,
       includeSmartMoneyLabels,
       excludeSmartMoneyLabels,
-      tokenAddress,
       includeStablecoins,
       includeNativeTokens,
-      tokenSector,
-      traderCount,
+      tokenAddress,
+      tokenSymbol,
+      tokenSectors,
+      valueUsd,
+      balance24hPercentChange,
+      holdersCount,
+      shareOfHoldingsPercent,
       tokenAgeDays,
       marketCapUsd,
       orderBy,
@@ -162,11 +165,15 @@ export const getSmartMoneyNetflow = tool({
       filters: {
         include_smart_money_labels: includeSmartMoneyLabels,
         exclude_smart_money_labels: excludeSmartMoneyLabels,
-        token_address: tokenAddress,
         include_stablecoins: includeStablecoins,
         include_native_tokens: includeNativeTokens,
-        token_sector: tokenSector,
-        trader_count: traderCount,
+        token_address: tokenAddress,
+        token_symbol: tokenSymbol,
+        token_sectors: tokenSectors,
+        value_usd: valueUsd,
+        balance_24h_percent_change: balance24hPercentChange,
+        holders_count: holdersCount,
+        share_of_holdings_percent: shareOfHoldingsPercent,
         token_age_days: tokenAgeDays,
         market_cap_usd: marketCapUsd,
       },
@@ -175,7 +182,7 @@ export const getSmartMoneyNetflow = tool({
     };
 
     const response = await fetch(
-      "https://api.nansen.ai/api/v1/smart-money/netflow",
+      "https://api.nansen.ai/api/v1/smart-money/holdings",
       {
         method: "POST",
         headers: {
@@ -188,8 +195,8 @@ export const getSmartMoneyNetflow = tool({
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.log("Failed to fetch Smart Money netflow data:", errorText);
-      return `Failed to fetch Smart Money netflow data: ${response.status} ${errorText}`;
+      console.log("Failed to fetch Smart Money holdings data:", errorText);
+      return `Failed to fetch Smart Money holdings data: ${response.status} ${errorText}`;
     }
 
     const data = await response.json();
