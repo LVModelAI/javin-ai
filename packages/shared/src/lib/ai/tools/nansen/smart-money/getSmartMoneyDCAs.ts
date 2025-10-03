@@ -129,7 +129,7 @@ export const getSmartMoneyDCAs = tool({
       return data;
     } catch (error) {
       console.log("Error fetching Smart Money DCA data:", error);
-      return `Error fetching Smart Money DCA data: ${error}`;
+      return `Error fetching Smart Money DCA data : ${error}`;
     }
   },
 });
