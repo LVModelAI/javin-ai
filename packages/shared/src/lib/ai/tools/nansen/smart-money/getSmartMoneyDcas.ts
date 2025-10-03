@@ -124,6 +124,7 @@ export const getSmartMoneyDcas = tool({
       }
 
       const data = await response.json();
+      console.log("Smart Money DCA data:", data);
       return data;
     } catch (error) {
       console.log("Error fetching Smart Money DCA data:", error);
