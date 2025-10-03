@@ -36,6 +36,7 @@ import { getCryptoInfluencersData } from "@javin/shared/lib/ai/tools/misc/getCry
 import { getSmartMoneyNetflow } from "./tools/nansen/smart-money/getSmartMoneyNetflows";
 import { getSmartMoneyHoldings } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyHoldings";
 import { getSmartMoneyDexTrades } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDexTrades";
+import { getSmartMoneyDcas } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDcas";
 
 export const codePrompt = ``;
 
@@ -109,6 +110,7 @@ const groupTools = {
     "getSmartMoneyNetflow",
     "getSmartMoneyHoldings",
     "getSmartMoneyDexTrades",
+    "getSmartMoneyDcas",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -211,6 +213,7 @@ export const getAllToolsWithConfigs = ({
     getSmartMoneyNetflow,
     getSmartMoneyHoldings,
     getSmartMoneyDexTrades,
+    getSmartMoneyDcas,
   };
 };
 
