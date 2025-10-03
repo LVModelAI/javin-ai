@@ -152,6 +152,26 @@ const PurePreviewMessage = ({
                             loadingMessage="Getting relevant data"
                             isFinished
                           />
+                        ) : toolName === "getSmartMoneyNetflow" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting smart money netflow data"
+                            isFinished
+                          />
+                        ) : toolName === "getSmartMoneyHoldings" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting smart money holdings data"
+                            isFinished
+                          />
+                        ) : toolName === "getSmartMoneyDexTrades" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting smart money dex trades data"
+                            isFinished
+                          />
+                        ) : toolName === "getSmartMoneyDCAs" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting smart money DCAs data"
+                            isFinished
+                          />
                         ) : (
                           <ToolCallLoader
                             loadingMessage="Finding info"
@@ -194,6 +214,14 @@ const PurePreviewMessage = ({
                         <ToolCallLoader loadingMessage="Exploring the protocol..." />
                       ) : toolName === "getCryptoInfluencersData" ? (
                         <ToolCallLoader loadingMessage="Getting relevant data..." />
+                      ) : toolName === "getSmartMoneyNetflow" ? (
+                        <ToolCallLoader loadingMessage="Getting smart money netflow data..." />
+                      ) : toolName === "getSmartMoneyHoldings" ? (
+                        <ToolCallLoader loadingMessage="Getting smart money holdings data..." />
+                      ) : toolName === "getSmartMoneyDexTrades" ? (
+                        <ToolCallLoader loadingMessage="Getting smart money dex trades data..." />
+                      ) : toolName === "getSmartMoneyDCAs" ? (
+                        <ToolCallLoader loadingMessage="Getting smart money DCAs data..." />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}

@@ -33,6 +33,10 @@ import { getNexusStats } from "./tools/nexus/get-stats";
 import { snsToAddress } from "./tools/solana/sns-to-address";
 import { supportedChainsAndId } from "@javin/shared/lib/ai/tools/onchain/constant";
 import { getCryptoInfluencersData } from "@javin/shared/lib/ai/tools/misc/getCryptoInfluencersData";
+import { getSmartMoneyNetflow } from "./tools/nansen/smart-money/getSmartMoneyNetflows";
+import { getSmartMoneyHoldings } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyHoldings";
+import { getSmartMoneyDexTrades } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDexTrades";
+import { getSmartMoneyDCAs } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDCAs";
 
 export const codePrompt = ``;
 
@@ -103,6 +107,10 @@ const groupTools = {
     // for fun
     "getCryptoInfluencersData",
     // nansen smart money
+    "getSmartMoneyNetflow",
+    "getSmartMoneyHoldings",
+    "getSmartMoneyDexTrades",
+    "getSmartMoneyDCAs",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -201,6 +209,11 @@ export const getAllToolsWithConfigs = ({
     getAptosGraphqlData,
     // for fun
     getCryptoInfluencersData,
+    // nansen smart money
+    getSmartMoneyNetflow,
+    getSmartMoneyHoldings,
+    getSmartMoneyDexTrades,
+    getSmartMoneyDCAs,
   };
 };
 
@@ -355,6 +368,468 @@ This tool should be invoked when you need to query Price sheet of 200+ crypto in
 You can use it to retrieve detailed information about influencer pricing for promotional deals, including their wallet addresses.
 From 160+ accounts who accepted the deal  only  <5 accounts actually disclose the promotional posts as an advertisement.
 when ever you use this tool always add the following information at the end of your answer: This information was taken from a tweet by @ZachXBT (https://x.com/zachxbt), source (tweet link: https://x.com/zachxbt/status/1962485396597776468).
+
+--------------------------- nansen ----------------------------------
+
+--------------------------- getSmartMoneyNetflow ----------------------------------
+## getSmartMoneyNetflow
+### Purpose:
+Use the getSmartMoneyNetflow tool whenever the user asks for information related to **Smart Money activity**, **net inflows/outflows**, or **accumulation/distribution trends** of tokens across chains.
+
+The tool analyzes capital movements of smart traders and funds across both DEX and CEX activity to show which tokens are being accumulated or sold by Smart Money wallets.  
+It returns aggregated inflow/outflow data for multiple time periods (24h, 7d, 30d).
+
+---
+
+### When to Use:
+
+Call this tool when the user asks any of the following:
+- “Which tokens are Smart Money buying/selling?”
+- “Top Smart Money inflows or outflows today”
+- “Which tokens are being accumulated or distributed by Smart Money?”
+- “Smart Money activity on Ethereum/Base/Arbitrum/etc.”
+- “Show net flows for the last 7 days or 30 days”
+- “Which sectors are seeing Smart Money inflows?”
+- “Smart Money positions by trader count or market cap”
+- “Compare inflows between stablecoins and DeFi tokens”
+
+---
+
+### Input Parameters (to be passed automatically):
+
+- **chains** → Extract from user query (examples: ["ethereum"], ["base", "arbitrum"], or "all" if unspecified).
+- **includeSmartMoneyLabels** → Use when user specifies filters like “funds only” or “smart traders only”. Defaults to ["Fund", "Smart Trader"].
+- **excludeSmartMoneyLabels** → Use if user says “exclude 30D traders” or similar.
+- **includeStablecoins**, **includeNativeTokens** → Infer from context. Default: both false unless user explicitly asks.
+- **tokenSector** → If user mentions sectors (DeFi, Gaming, Meme, Infrastructure, etc.), pass them.
+- **traderCount**, **tokenAgeDays**, **marketCapUsd** → Use if the user specifies conditions like “new tokens”, “low-cap”, “high market cap”, or “top tokens with most traders”.
+- **orderBy** → Default sort: [{ field: "net_flow_24h_usd", direction: "DESC" }]  
+  If user asks for 7-day or 30-day data, use that respective field instead.
+
+---
+
+### How to Summarize Results for the User:
+
+After fetching data from getSmartMoneyNetflow, **analyze and summarize the key insights**.
+
+Your summary should include:
+1. **Top Accumulated Tokens (Positive Net Flow)**  
+   List top 5 tokens with highest net_flow_24h_usd, net_flow_7d_usd, or net_flow_30d_usd based on user request.  
+   Example:  
+   “Smart Money is accumulating ETH, AAVE, and PEPE, with ETH seeing the highest inflow of $15.2M in the last 24h.”
+
+2. **Top Distributed Tokens (Negative Net Flow)**  
+   List top 5 tokens with lowest (negative) net flow values.  
+   Example:  
+   “On the other hand, USDC, LINK, and DOGE are being sold off, with USDC showing a net outflow of $10.4M.”
+
+3. **Summary Metrics**  
+   Include insights like:
+   - Total number of tokens tracked
+   - Chains with most Smart Money activity
+   - Most popular sectors (if token_sector data is available)
+   - Average or median trader count for top tokens
+
+4. **Interpretation Guidance (Optional)**  
+   End with a one-line market interpretation:  
+   - “Overall, Smart Money is rotating into DeFi tokens.”  
+   - “There's strong accumulation on Base chain across mid-cap tokens.”  
+   - “Funds are offloading stablecoins, signaling higher market risk appetite.”
+
+---
+
+### Example Summary Output:
+
+> **Smart Money Netflow (Last 24h)**
+>
+> • Top Accumulations: ETH (+$14.8M), AAVE (+$6.2M), PEPE (+$3.9M)  
+> • Top Distributions: USDC (-$10.1M), LINK (-$7.2M), DOGE (-$4.5M)  
+> • Active Chains: Ethereum, Base  
+> • Dominant Sector: DeFi  
+>
+> Smart Money appears to be rotating out of stablecoins into DeFi tokens, signaling growing market confidence.
+
+---
+
+### Important Notes for AI Behavior:
+- Always use **natural language summarization**, not JSON.
+- Do **not** show the raw API response to the user.
+- If user specifies a time period (24h, 7d, 30d), choose that key from the data.
+- If user gives vague input like “show Smart Money activity,” default to:
+  - chains = ["all"]
+  - orderBy = [{ field: "net_flow_24h_usd", direction: "DESC" }]
+  - perPage = 20
+- Never make up values or tokens. Only summarize what's in the response.
+
+---
+
+### Example AI Flow:
+
+**User Query:** “Which tokens are Smart Money accumulating on Base this week?”
+
+**AI Steps:**
+1. Call getSmartMoneyNetflow with:
+   json
+   {
+     "chains": ["base"],
+     "orderBy": [{ "field": "net_flow_7d_usd", "direction": "DESC" }],
+     "perPage": 20
+   }
+
+
+--------------------------- getSmartMoneyHoldings ----------------------------------
+
+  ## getSmartMoneyHoldings
+  ## smartMoneyHoldings
+
+### Purpose:
+Use the smartMoneyHoldings tool whenever the user asks for information related to **Smart Money portfolio holdings**, **what Smart Money is holding**, or **which tokens Smart Money owns the most**.
+
+This tool retrieves aggregated token balances held by smart traders and funds across multiple blockchains.  
+It helps identify which tokens Smart Money is currently holding, how much exposure they have, and how holdings have changed in the last 24 hours.
+
+---
+
+### When to Use:
+
+Call this tool when the user asks questions such as:
+- “What tokens are Smart Money holding right now?”
+- “Which tokens do Smart Money wallets have the largest positions in?”
+- “Top holdings of Smart Money on Ethereum/Base/etc.”
+- “Which tokens saw the biggest increase in Smart Money holdings?”
+- “Smart Money portfolio composition by sector.”
+- “What sectors Smart Money is most exposed to?”
+- “Show me Smart Money holdings with high 24h balance increase.”
+- “List the most held DeFi tokens by Smart Money.”
+
+---
+
+### Input Parameters (to pass automatically):
+
+- **chains** → Extract from user query (e.g. ["ethereum"], ["base"], or "all" if not specified).  
+- **includeSmartMoneyLabels** → Defaults to ["Fund", "Smart Trader"] unless the user specifies a subset.  
+- **excludeSmartMoneyLabels** → Use if the user requests exclusion (e.g. “exclude 30D Smart Traders”).  
+- **includeStablecoins**, **includeNativeTokens** → Infer based on query context. Default: both false.  
+- **tokenSectors** → Use if the user specifies sectors like “DeFi”, “Meme”, “Infrastructure”, or “Gaming”.  
+- **valueUsd**, **balance24hPercentChange**, **holdersCount**, **shareOfHoldingsPercent**, **marketCapUsd**, **tokenAgeDays** → Apply numeric filters if the user mentions phrases like:
+  - “Top tokens by value” → orderBy: [{ field: "value_usd", direction: "DESC" }]
+  - “Biggest gainers in holdings” → orderBy: [{ field: "balance_24h_percent_change", direction: "DESC" }]
+  - “New tokens” → tokenAgeDays: { max: 30 }
+  - “High holder count” → holdersCount: { min: 100 }
+
+- **orderBy** → Always include sorting logic based on the user's focus.  
+  Default: [{ field: "value_usd", direction: "DESC" }]
+- **pagination** → Default page = 1, perPage = 20.
+
+---
+
+### How to Summarize Results for the User:
+
+After fetching data from smartMoneyHoldings, **analyze and summarize the key portfolio insights**.
+
+Your summary must include:
+
+1. **Top Tokens by Smart Money Holdings**  
+   List top 5 tokens ranked by value_usd.  
+   Example:  
+   “Smart Money currently holds the largest positions in ETH ($220M), WBTC ($85M), AAVE ($32M), UNI ($25M), and PEPE ($14M).”
+
+2. **24h Changes in Holdings**  
+   Identify tokens with the highest balance_24h_percent_change.  
+   Example:  
+   “Holdings of ARB increased by +8.4% in the last 24 hours, while USDT decreased by -3.1%.”
+
+3. **Sector-Level Insights (if available)**  
+   Aggregate or highlight trends in token_sectors.  
+   Example:  
+   “DeFi tokens make up the majority of Smart Money portfolios, followed by AI and Meme sectors.”
+
+4. **Additional Stats (if available)**  
+   - Most common chains (e.g., “Ethereum and Base dominate Smart Money holdings.”)  
+   - Average market cap range of top holdings  
+   - Typical number of Smart Money holders per token
+
+5. **Interpretation Guidance (Optional)**  
+   End with a concise market interpretation:  
+   - “Smart Money remains heavily exposed to DeFi blue chips.”  
+   - “Funds are rotating toward newer tokens with high 24h balance increases.”  
+   - “Stablecoin exposure is declining while risk appetite rises.”
+
+---
+
+### Example Summary Output:
+
+> **Smart Money Holdings Overview**
+>
+> • Top Holdings: ETH ($210M), WBTC ($88M), AAVE ($31M), UNI ($25M), PEPE ($15M)  
+> • Biggest 24h Gainers: ARB (+9.2%), OP (+6.4%), and LINK (+4.8%)  
+> • Most Held Sectors: DeFi (45%), Infrastructure (25%), and AI (10%)  
+> • Active Chains: Ethereum, Base  
+>
+> Smart Money is maintaining strong exposure to DeFi tokens while gradually increasing positions in AI-related assets.
+
+---
+
+### Important Notes for AI Behavior:
+
+- Always respond in **natural language summaries**, not JSON or API response format.  
+- Do **not** expose internal API field names or the raw response.  
+- Use clean formatting and highlight key tokens, sectors, and percentage changes.  
+- If the user query does not specify a chain or sector, default to:
+  - chains = ["all"]
+  - includeSmartMoneyLabels = ["Fund", "Smart Trader"]
+  - orderBy = [{ field: "value_usd", direction: "DESC" }]
+- Never make up data; only summarize what is actually returned.  
+- If data is empty, respond gracefully with a message like:  
+  “No Smart Money holdings found for the given filters.”
+
+---
+
+### Example AI Flow:
+
+**User Query:** “What tokens do Smart Money hold the most on Ethereum?”  
+
+**AI Steps:**
+1. Call smartMoneyHoldings with:
+   json
+   {
+     "chains": ["ethereum"],
+     "orderBy": [{ "field": "value_usd", "direction": "DESC" }],
+     "perPage": 20
+   }
+
+
+--------------------------- getSmartMoneyDexTrades ----------------------------------
+## getSmartMoneyDexTrades
+
+### Purpose:
+Use the getSmartMoneyDexTrades tool whenever the user asks for **Smart Money DEX trading activity**, **recent buys or sells**, or **tokens that Smart Money is trading**.
+
+This endpoint provides **real-time decentralized exchange trading activity** from Smart Money wallets (funds, experienced traders, etc.) over the **last 24 hours**.  
+It reveals what tokens Smart Money is buying and selling, their trade sizes, and which chains have the most trading activity.
+
+---
+
+### When to Use:
+
+Call this tool when the user asks questions such as:
+- “What are Smart Money wallets buying right now?”
+- “Show me Smart Money DEX trades from the past 24 hours.”
+- “Which tokens are Smart Money selling the most?”
+- “Top Smart Money trades on Ethereum/Base.”
+- “Which DEX trades had the highest value today?”
+- “What tokens are Smart Money accumulating on-chain?”
+- “Smart Money activity for a specific token” (e.g., “Show Smart Money trades of PEPE or ARB.”)
+- “Which chains have the most Smart Money trading activity?”
+
+---
+
+### Input Parameters (to pass automatically):
+
+- **chains** → Extract from the user query (e.g. ["ethereum"], ["base"], ["all"] if unspecified).  
+- **includeSmartMoneyLabels** → Default: ["Fund", "Smart Trader"].  
+- **excludeSmartMoneyLabels** → Use only if the user explicitly requests exclusions (e.g. “exclude 30D Smart Traders”).  
+- **tokenBoughtSymbol / tokenSoldSymbol** → Use if the user mentions specific tokens (e.g. “Show trades for PEPE or ARB”).  
+- **tradeValueUsd** → Use if the user mentions trade size conditions like “over $100k trades”.  
+- **orderBy** →  
+  - Default: [{ field: "trade_value_usd", direction: "DESC" }] (to rank trades by value).  
+  - If user says “latest trades”, order by: [{ field: "block_timestamp", direction: "DESC" }].  
+- **pagination** → Default page = 1, perPage = 20.
+
+---
+
+### How to Summarize Results for the User:
+
+After fetching data from getSmartMoneyDexTrades, **summarize what Smart Money is doing** — focusing on **buy/sell trends, tokens, trade size, and chain activity**.
+
+Your summary should contain:
+
+1. **Top Trades / Most Bought Tokens**
+   - Identify the top bought tokens (token_bought_symbol) with the highest trade_value_usd.
+   - Example:  
+     “Smart Money is heavily buying ARB, PEPE, and WETH, with ARB trades totaling over $8.3M in the past 24 hours.”
+
+2. **Most Sold Tokens**
+   - Identify the top sold tokens (token_sold_symbol) with large trade values.
+   - Example:  
+     “The largest Smart Money outflows are from USDT, WBTC, and LINK, suggesting profit-taking activity.”
+
+3. **Chain Activity**
+   - Mention which chains have the most active trading (based on chain field).
+   - Example:  
+     “Most trades occurred on Ethereum and Base, with noticeable activity on Arbitrum.”
+
+4. **Trader Highlights (if available)**
+   - Include notable trader labels from trader_address_label.
+   - Example:  
+     “Funds like Wintermute and Amber Group were among the most active traders.”
+
+5. **Overall Market Insight**
+   - Provide a short interpretation of the behavior:
+     - “Smart Money is rotating from stablecoins to DeFi tokens.”
+     - “Funds are accumulating mid-cap tokens aggressively.”
+     - “Most trades are concentrated in meme tokens and ETH.”
+
+---
+
+### Example Summary Output:
+
+> **Smart Money DEX Trades (Last 24h)**  
+>
+> • Top Buys: ARB ($9.4M), PEPE ($5.2M), WETH ($4.7M)  
+> • Top Sells: USDT ($6.1M), LINK ($3.8M), WBTC ($2.5M)  
+> • Most Active Chains: Ethereum, Base  
+> • Notable Traders: Wintermute, Alameda, SmartFund_02  
+>
+> Smart Money is showing strong buying interest in mid-cap DeFi and meme tokens, particularly ARB and PEPE, while selling stablecoins and BTC.
+
+---
+
+### Important Notes for AI Behavior:
+
+- Always summarize **in natural language**, never show JSON or raw API responses.  
+- Keep focus on **token-level insights**, **trade trends**, and **chain activity**.  
+- If the user does not specify time, always assume **last 24 hours** (the default for this endpoint).  
+- If the user does not specify a chain, default to:  
+  - chains = ["all"]  
+  - includeSmartMoneyLabels = ["Fund", "Smart Trader"]  
+  - orderBy = [{ field: "trade_value_usd", direction: "DESC" }]
+- If the response is empty, say:  
+  “No Smart Money DEX trades found for the given filters.”
+
+---
+
+### Example AI Flow:
+
+**User Query:**  
+> “What are Smart Money wallets buying right now on Ethereum?”
+
+**AI Steps:**  
+1. Call getSmartMoneyDexTrades with:
+   json
+   {
+     "chains": ["ethereum"],
+     "orderBy": [{ "field": "trade_value_usd", "direction": "DESC" }],
+     "perPage": 20
+   }
+
+---------------------------------- getSmartMoneyDCAs ----------------------------------
+
+## getSmartMoneyDCAs
+
+### Purpose:
+Use the getSmartMoneyDCAs tool whenever the user asks for **Smart Money DCA (Dollar Cost Averaging) activity** or **systematic accumulation strategies** used by Smart Money on Solana via Jupiter DCA.
+
+This endpoint provides insight into how professional traders and funds are gradually accumulating tokens using DCA strategies. It helps detect accumulation trends and long-term buying behavior among Smart Money wallets.
+
+---
+
+### When to Use:
+
+Call this tool when the user asks about:
+- “Which tokens are Smart Money DCA'ing into?”
+- “Show me Smart Money DCA activity on Solana.”
+- “Which Smart Money wallets are using Jupiter DCA?”
+- “What tokens are Smart Money accumulating slowly?”
+- “Which tokens have the largest Smart Money DCA deposits?”
+- “Show me systematic buying patterns by Smart Money.”
+- “Which Smart Money funds are doing DCA into SOL or BONK?”
+
+---
+
+### Input Parameters (to pass automatically):
+
+- **includeSmartMoneyLabels** → Default: ["Fund", "Smart Trader"].  
+- **excludeSmartMoneyLabels** → Include only if user specifies (e.g., “exclude 30D traders”).  
+- **dca_created_at** →  
+  - If user asks for recent activity (“recent”, “this week”, “past month”), set date range accordingly.  
+  - Otherwise, leave unset (default fetches all).  
+- **input_token_symbol / output_token_symbol** →  
+  - Extract from query if user mentions a token.  
+  - Example: “Show Smart Money DCA into SOL” → output_token_symbol = ["SOL"].  
+- **deposit_token_amount**, **token_spent_amount**, **output_token_redeemed_amount** →  
+  - Use when user specifies size thresholds (e.g., “large DCA orders”, “over $100k deposits”).  
+- **orderBy** →  
+  - Default: [{ field: "deposit_value_usd", direction: "DESC" }]  
+  - If user says “latest DCAs” or “newest DCAs,” use [{ field: "dca_created_at", direction: "DESC" }].  
+- **pagination** → Default: page = 1, perPage = 20.
+
+---
+
+### How to Summarize Results for the User:
+
+After calling getSmartMoneyDCAs, summarize the findings clearly and insightfully.  
+The summary should show **which tokens Smart Money is systematically buying**, **how much**, and **who** is doing it.
+
+Your summary should include:
+
+1. **Top Tokens Being DCA'd Into**
+   - List the top tokens with highest deposit_value_usd or output_token_symbol totals.
+   - Example:  
+     “Smart Money wallets are DCA'ing into SOL, JTO, and BONK, with SOL seeing over $3.4M in deposits through Jupiter DCA.”
+
+2. **Top Smart Money Participants**
+   - Use trader_address_label where available.  
+   - Example:  
+     “Funds like Wintermute, Amber Group, and SmartFund_01 are the most active participants.”
+
+3. **Recent DCA Activity**
+   - Highlight new or active DCA setups from dca_created_at and dca_status.
+   - Example:  
+     “Over 60% of Smart Money DCA orders were created in the past week, indicating growing accumulation interest.”
+
+4. **Deposit and Redemption Trends**
+   - Compare deposit and redemption volumes to gauge activity.
+   - Example:  
+     “Average deposit per DCA vault is around $150k, with redemption activity increasing in BONK.”
+
+5. **Interpretation (Market Sentiment)**
+   - End with a one-line insight:  
+     - “Smart Money continues steady accumulation of SOL.”  
+     - “Funds are dollar-cost averaging into meme coins like BONK and WIF.”  
+     - “Consistent inflows suggest long-term bullish sentiment on Solana.”
+
+---
+
+### Example Summary Output:
+
+> **Smart Money DCA Activity (Solana / Jupiter DCA)**  
+>
+> • Top Accumulated Tokens: SOL ($3.8M), BONK ($1.2M), JTO ($900K)  
+> • Largest Participants: Wintermute, Alameda Research, SmartFund_03  
+> • Most DCAs Created: Last 7 days  
+> • Active DCAs: 72% are still open  
+>
+> Smart Money is systematically buying SOL and BONK using Jupiter DCA vaults, signaling strong conviction in Solana ecosystem assets.
+
+---
+
+### Important Notes for AI Behavior:
+
+- Always respond with **summarized insights**, not raw data.  
+- Do **not** show the JSON output or API fields.  
+- Always interpret trends — describe what Smart Money's DCA behavior *means* (e.g., “gradual accumulation,” “increasing confidence”).  
+- If the user doesn't specify any filters:
+  - Default to showing **the most recent DCA activity** (orderBy: [{ field: "dca_created_at", direction: "DESC" }]).
+  - Assume **Solana** (since Jupiter DCAs are Solana-native).  
+- If the response is empty:  
+  “No active Smart Money DCA strategies found for the given filters.”
+
+---
+
+### Example AI Flow:
+
+**User Query:**  
+> “Which tokens are Smart Money accumulating through DCA?”
+
+**AI Steps:**  
+1. Call getSmartMoneyDCAs with:
+   json
+   {
+     "orderBy": [{ "field": "deposit_value_usd", "direction": "DESC" }],
+     "perPage": 20
+   }
+
 
 `,
 
