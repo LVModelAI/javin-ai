@@ -33,6 +33,7 @@ import { getNexusStats } from "./tools/nexus/get-stats";
 import { snsToAddress } from "./tools/solana/sns-to-address";
 import { supportedChainsAndId } from "@javin/shared/lib/ai/tools/onchain/constant";
 import { getCryptoInfluencersData } from "@javin/shared/lib/ai/tools/misc/getCryptoInfluencersData";
+import { getSmartMoneyNetflow } from "./tools/nansen/smart-money/smartMoneyNetflows";
 
 export const codePrompt = ``;
 
@@ -103,6 +104,7 @@ const groupTools = {
     // for fun
     "getCryptoInfluencersData",
     // nansen smart money
+    "getSmartMoneyNetflow",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -201,6 +203,8 @@ export const getAllToolsWithConfigs = ({
     getAptosGraphqlData,
     // for fun
     getCryptoInfluencersData,
+    // nansen smart money
+    getSmartMoneyNetflow,
   };
 };
 
@@ -355,6 +359,111 @@ This tool should be invoked when you need to query Price sheet of 200+ crypto in
 You can use it to retrieve detailed information about influencer pricing for promotional deals, including their wallet addresses.
 From 160+ accounts who accepted the deal  only  <5 accounts actually disclose the promotional posts as an advertisement.
 when ever you use this tool always add the following information at the end of your answer: This information was taken from a tweet by @ZachXBT (https://x.com/zachxbt), source (tweet link: https://x.com/zachxbt/status/1962485396597776468).
+
+## getSmartMoneyNetflow
+
+### Purpose:
+Use the getSmartMoneyNetflow tool whenever the user asks for information related to **Smart Money activity**, **net inflows/outflows**, or **accumulation/distribution trends** of tokens across chains.
+
+The endpoint analyzes capital movements of smart traders and funds across both DEX and CEX activity to show which tokens are being accumulated or sold by Smart Money wallets.  
+It returns aggregated inflow/outflow data for multiple time periods (24h, 7d, 30d).
+
+---
+
+### When to Use:
+
+Call this tool when the user asks any of the following:
+- “Which tokens are Smart Money buying/selling?”
+- “Top Smart Money inflows or outflows today”
+- “Which tokens are being accumulated or distributed by Smart Money?”
+- “Smart Money activity on Ethereum/Base/Arbitrum/etc.”
+- “Show net flows for the last 7 days or 30 days”
+- “Which sectors are seeing Smart Money inflows?”
+- “Smart Money positions by trader count or market cap”
+- “Compare inflows between stablecoins and DeFi tokens”
+
+---
+
+### Input Parameters (to be passed automatically):
+
+- **chains** → Extract from user query (examples: ["ethereum"], ["base", "arbitrum"], or "all" if unspecified).
+- **includeSmartMoneyLabels** → Use when user specifies filters like “funds only” or “smart traders only”. Defaults to ["Fund", "Smart Trader"].
+- **excludeSmartMoneyLabels** → Use if user says “exclude 30D traders” or similar.
+- **includeStablecoins**, **includeNativeTokens** → Infer from context. Default: both false unless user explicitly asks.
+- **tokenSector** → If user mentions sectors (DeFi, Gaming, Meme, Infrastructure, etc.), pass them.
+- **traderCount**, **tokenAgeDays**, **marketCapUsd** → Use if the user specifies conditions like “new tokens”, “low-cap”, “high market cap”, or “top tokens with most traders”.
+- **orderBy** → Default sort: [{ field: "net_flow_24h_usd", direction: "DESC" }]  
+  If user asks for 7-day or 30-day data, use that respective field instead.
+
+---
+
+### How to Summarize Results for the User:
+
+After fetching data from getSmartMoneyNetflow, **analyze and summarize the key insights**.
+
+Your summary should include:
+1. **Top Accumulated Tokens (Positive Net Flow)**  
+   List top 5 tokens with highest net_flow_24h_usd, net_flow_7d_usd, or net_flow_30d_usd based on user request.  
+   Example:  
+   “Smart Money is accumulating ETH, AAVE, and PEPE, with ETH seeing the highest inflow of $15.2M in the last 24h.”
+
+2. **Top Distributed Tokens (Negative Net Flow)**  
+   List top 5 tokens with lowest (negative) net flow values.  
+   Example:  
+   “On the other hand, USDC, LINK, and DOGE are being sold off, with USDC showing a net outflow of $10.4M.”
+
+3. **Summary Metrics**  
+   Include insights like:
+   - Total number of tokens tracked
+   - Chains with most Smart Money activity
+   - Most popular sectors (if token_sector data is available)
+   - Average or median trader count for top tokens
+
+4. **Interpretation Guidance (Optional)**  
+   End with a one-line market interpretation:  
+   - “Overall, Smart Money is rotating into DeFi tokens.”  
+   - “There's strong accumulation on Base chain across mid-cap tokens.”  
+   - “Funds are offloading stablecoins, signaling higher market risk appetite.”
+
+---
+
+### Example Summary Output:
+
+> **Smart Money Netflow (Last 24h)**
+>
+> • Top Accumulations: ETH (+$14.8M), AAVE (+$6.2M), PEPE (+$3.9M)  
+> • Top Distributions: USDC (-$10.1M), LINK (-$7.2M), DOGE (-$4.5M)  
+> • Active Chains: Ethereum, Base  
+> • Dominant Sector: DeFi  
+>
+> Smart Money appears to be rotating out of stablecoins into DeFi tokens, signaling growing market confidence.
+
+---
+
+### Important Notes for AI Behavior:
+- Always use **natural language summarization**, not JSON.
+- Do **not** show the raw API response to the user.
+- If user specifies a time period (24h, 7d, 30d), choose that key from the data.
+- If user gives vague input like “show Smart Money activity,” default to:
+  - chains = ["all"]
+  - orderBy = [{ field: "net_flow_24h_usd", direction: "DESC" }]
+  - perPage = 20
+- Never make up values or tokens. Only summarize what's in the response.
+
+---
+
+### Example AI Flow:
+
+**User Query:** “Which tokens are Smart Money accumulating on Base this week?”
+
+**AI Steps:**
+1. Call getSmartMoneyNetflow with:
+   json
+   {
+     "chains": ["base"],
+     "orderBy": [{ "field": "net_flow_7d_usd", "direction": "DESC" }],
+     "perPage": 20
+   }
 
 `,
 
