@@ -33,8 +33,9 @@ import { getNexusStats } from "./tools/nexus/get-stats";
 import { snsToAddress } from "./tools/solana/sns-to-address";
 import { supportedChainsAndId } from "@javin/shared/lib/ai/tools/onchain/constant";
 import { getCryptoInfluencersData } from "@javin/shared/lib/ai/tools/misc/getCryptoInfluencersData";
-import { getSmartMoneyNetflow } from "./tools/nansen/smart-money/smartMoneyNetflows";
-import { getSmartMoneyHoldings } from "@javin/shared/lib/ai/tools/nansen/smart-money/smartMoneyHoldings";
+import { getSmartMoneyNetflow } from "./tools/nansen/smart-money/getSmartMoneyNetflows";
+import { getSmartMoneyHoldings } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyHoldings";
+import { getSmartMoneyDexTrades } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDexTrades";
 
 export const codePrompt = ``;
 
@@ -107,6 +108,7 @@ const groupTools = {
     // nansen smart money
     "getSmartMoneyNetflow",
     "getSmartMoneyHoldings",
+    "getSmartMoneyDexTrades",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -208,6 +210,7 @@ export const getAllToolsWithConfigs = ({
     // nansen smart money
     getSmartMoneyNetflow,
     getSmartMoneyHoldings,
+    getSmartMoneyDexTrades,
   };
 };
 
@@ -591,6 +594,123 @@ Your summary must include:
      "orderBy": [{ "field": "value_usd", "direction": "DESC" }],
      "perPage": 20
    }
+
+
+--------------------------- getSmartMoneyDexTrades ----------------------------------
+## getSmartMoneyDexTrades
+
+### Purpose:
+Use the getSmartMoneyDexTrades tool whenever the user asks for **Smart Money DEX trading activity**, **recent buys or sells**, or **tokens that Smart Money is trading**.
+
+This endpoint provides **real-time decentralized exchange trading activity** from Smart Money wallets (funds, experienced traders, etc.) over the **last 24 hours**.  
+It reveals what tokens Smart Money is buying and selling, their trade sizes, and which chains have the most trading activity.
+
+---
+
+### When to Use:
+
+Call this tool when the user asks questions such as:
+- “What are Smart Money wallets buying right now?”
+- “Show me Smart Money DEX trades from the past 24 hours.”
+- “Which tokens are Smart Money selling the most?”
+- “Top Smart Money trades on Ethereum/Base.”
+- “Which DEX trades had the highest value today?”
+- “What tokens are Smart Money accumulating on-chain?”
+- “Smart Money activity for a specific token” (e.g., “Show Smart Money trades of PEPE or ARB.”)
+- “Which chains have the most Smart Money trading activity?”
+
+---
+
+### Input Parameters (to pass automatically):
+
+- **chains** → Extract from the user query (e.g. ["ethereum"], ["base"], ["all"] if unspecified).  
+- **includeSmartMoneyLabels** → Default: ["Fund", "Smart Trader"].  
+- **excludeSmartMoneyLabels** → Use only if the user explicitly requests exclusions (e.g. “exclude 30D Smart Traders”).  
+- **tokenBoughtSymbol / tokenSoldSymbol** → Use if the user mentions specific tokens (e.g. “Show trades for PEPE or ARB”).  
+- **tradeValueUsd** → Use if the user mentions trade size conditions like “over $100k trades”.  
+- **orderBy** →  
+  - Default: [{ field: "trade_value_usd", direction: "DESC" }] (to rank trades by value).  
+  - If user says “latest trades”, order by: [{ field: "block_timestamp", direction: "DESC" }].  
+- **pagination** → Default page = 1, perPage = 20.
+
+---
+
+### How to Summarize Results for the User:
+
+After fetching data from getSmartMoneyDexTrades, **summarize what Smart Money is doing** — focusing on **buy/sell trends, tokens, trade size, and chain activity**.
+
+Your summary should contain:
+
+1. **Top Trades / Most Bought Tokens**
+   - Identify the top bought tokens (token_bought_symbol) with the highest trade_value_usd.
+   - Example:  
+     “Smart Money is heavily buying ARB, PEPE, and WETH, with ARB trades totaling over $8.3M in the past 24 hours.”
+
+2. **Most Sold Tokens**
+   - Identify the top sold tokens (token_sold_symbol) with large trade values.
+   - Example:  
+     “The largest Smart Money outflows are from USDT, WBTC, and LINK, suggesting profit-taking activity.”
+
+3. **Chain Activity**
+   - Mention which chains have the most active trading (based on chain field).
+   - Example:  
+     “Most trades occurred on Ethereum and Base, with noticeable activity on Arbitrum.”
+
+4. **Trader Highlights (if available)**
+   - Include notable trader labels from trader_address_label.
+   - Example:  
+     “Funds like Wintermute and Amber Group were among the most active traders.”
+
+5. **Overall Market Insight**
+   - Provide a short interpretation of the behavior:
+     - “Smart Money is rotating from stablecoins to DeFi tokens.”
+     - “Funds are accumulating mid-cap tokens aggressively.”
+     - “Most trades are concentrated in meme tokens and ETH.”
+
+---
+
+### Example Summary Output:
+
+> **Smart Money DEX Trades (Last 24h)**  
+>
+> • Top Buys: ARB ($9.4M), PEPE ($5.2M), WETH ($4.7M)  
+> • Top Sells: USDT ($6.1M), LINK ($3.8M), WBTC ($2.5M)  
+> • Most Active Chains: Ethereum, Base  
+> • Notable Traders: Wintermute, Alameda, SmartFund_02  
+>
+> Smart Money is showing strong buying interest in mid-cap DeFi and meme tokens, particularly ARB and PEPE, while selling stablecoins and BTC.
+
+---
+
+### Important Notes for AI Behavior:
+
+- Always summarize **in natural language**, never show JSON or raw API responses.  
+- Keep focus on **token-level insights**, **trade trends**, and **chain activity**.  
+- If the user does not specify time, always assume **last 24 hours** (the default for this endpoint).  
+- If the user does not specify a chain, default to:  
+  - chains = ["all"]  
+  - includeSmartMoneyLabels = ["Fund", "Smart Trader"]  
+  - orderBy = [{ field: "trade_value_usd", direction: "DESC" }]
+- If the response is empty, say:  
+  “No Smart Money DEX trades found for the given filters.”
+
+---
+
+### Example AI Flow:
+
+**User Query:**  
+> “What are Smart Money wallets buying right now on Ethereum?”
+
+**AI Steps:**  
+1. Call getSmartMoneyDexTrades with:
+   json
+   {
+     "chains": ["ethereum"],
+     "orderBy": [{ "field": "trade_value_usd", "direction": "DESC" }],
+     "perPage": 20
+   }
+
+
 `,
 
   solana: `
