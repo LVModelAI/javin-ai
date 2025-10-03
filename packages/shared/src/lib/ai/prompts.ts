@@ -37,7 +37,8 @@ import { getSmartMoneyNetflow } from "./tools/nansen/smart-money/getSmartMoneyNe
 import { getSmartMoneyHoldings } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyHoldings";
 import { getSmartMoneyDexTrades } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDexTrades";
 import { getSmartMoneyDCAs } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDCAs";
-
+import { whoBoughtSold } from "@javin/shared/lib/ai/tools/nansen/token-god/whoBoughtSold";
+import { tokenScreener } from "@javin/shared/lib/ai/tools/nansen/token-god/tokenScreener";
 export const codePrompt = ``;
 
 export const sheetPrompt = ``;
@@ -106,11 +107,15 @@ const groupTools = {
     "defiLlama",
     // for fun
     "getCryptoInfluencersData",
-    // nansen smart money
+    // nansen
+    //smart money
     "getSmartMoneyNetflow",
     "getSmartMoneyHoldings",
     "getSmartMoneyDexTrades",
     "getSmartMoneyDCAs",
+    // token god mode
+    "whoBoughtSold",
+    "tokenScreener",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -209,11 +214,15 @@ export const getAllToolsWithConfigs = ({
     getAptosGraphqlData,
     // for fun
     getCryptoInfluencersData,
-    // nansen smart money
+    // nansen
+    //smart money
     getSmartMoneyNetflow,
     getSmartMoneyHoldings,
     getSmartMoneyDexTrades,
     getSmartMoneyDCAs,
+    // token god mode
+    whoBoughtSold,
+    tokenScreener,
   };
 };
 
@@ -829,6 +838,131 @@ Your summary should include:
      "orderBy": [{ "field": "deposit_value_usd", "direction": "DESC" }],
      "perPage": 20
    }
+
+---------------------------------- whoBoughtSold ----------------------------------
+## whoBoughtSold
+
+### Purpose
+Use the whoBoughtSold tool to analyze which wallets (addresses) have **bought** or **sold** a specific token within a chosen time range.  
+The tool provides an aggregated summary of trade volumes in USD, helping identify large buyers, sellers, or Smart Money movements for a given token.
+
+---
+
+### When to Use
+
+Call this tool if the user asks questions like:
+- “Who bought PEPE in the last 24 hours?”
+- “Who sold WIF this week?”
+- “Show Smart Money wallets buying BONK.”
+- “List top sellers of AERO on Base.”
+- “Which funds are accumulating DEGEN?”
+- “Show whales who dumped JUP yesterday.”
+
+---
+
+### Input Rules
+
+**Required Parameters**
+- chain: infer from token context or user input (e.g. “on Base” → "base")
+- token_address: always required; if the user gives a token name, resolve its address first
+- buy_or_sell:  
+  - "BUY" → use for “who bought”, “accumulating”, or “inflows”  
+  - "SELL" → use for “who sold”, “dumped”, or “outflows”
+- date:  
+  - Determine timeframe from query (“today”, “this week”, “past 7 days”, etc.)
+  - Always include both from and to (ISO 8601 format)
+
+**Optional**
+- filters.include_smart_money_labels:  
+  Add if the user asks for Smart Money or Funds specifically (e.g., “Smart Traders”, “Funds”)
+- filters.exclude_smart_money_labels:  
+  Use when user wants to exclude a group (e.g., “exclude exchanges”)
+- filters.bought_volume_usd / filters.sold_volume_usd:  
+  Use to limit by trade size (e.g., “buyers with over $100k volume”)
+- order_by:  
+  - Use [{"field": "bought_volume_usd", "direction": "DESC"}] for buyers  
+  - Use [{"field": "sold_volume_usd", "direction": "DESC"}] for sellers
+
+---
+
+### How to Summarize the Response
+
+When the tool returns data, generate a clear, data-driven summary:
+
+**If buy_or_sell = BUY**
+- Start with: “Top buyers of [TOKEN] in the last [period]”
+- List top addresses with label (if available), and their bought_volume_usd
+- Example:  
+  “Smart Trader 0x4f1a... bought $2.3M worth of PEPE”  
+  “Fund Wallet (0xa9...) accumulated $1.1M in JUP”
+
+**If buy_or_sell = SELL**
+- Start with: “Top sellers of [TOKEN] in the last [period]”
+- List top addresses with label and sold_volume_usd
+- Example:  
+  “Whale 0x39b... sold $4.5M worth of DEGEN”  
+  “Smart Trader 0xfa... offloaded $1.2M of WIF”
+
+**Then add:**
+- Total trade volume if visible (sum of all buyers/sellers)
+- Label trends (“Most active were Funds and Smart Traders”)
+- Optional interpretation:
+  - “Accumulation trend suggests strong Smart Money interest”
+  - “High sell activity implies profit-taking or rotation”
+
+---
+
+### Example Summaries
+
+**Example 1:**
+> Top buyers of PEPE in the last 24 hours were mainly Smart Traders and Funds.  
+> Address 0x12a... bought $2.8M, and Fund Wallet 0x4ef... accumulated $1.6M.  
+> Total Smart Money inflow exceeded $10M, showing continued accumulation.
+
+**Example 2:**
+> Major sellers of WIF on Solana this week include Whale 0xa77... ($3.2M) and Smart Trader 0xb13... ($1.1M).  
+> Overall sell volume was $15M, suggesting a cooling phase after the recent price spike.
+
+**Example 3:**
+> Smart Money wallets are accumulating JUP again — top buyers like Fund 0x3f2... and Early MAGIC Miner 0x8dd... added over $5M combined.  
+> Buying activity rose 40% from the previous day.
+
+
+
+--------------------------------- tokenScreener ---------------------------------
+## getTokenScreener
+
+If the user asks to **screen or discover tokens**, use the tokenScreener tool.
+
+This tool retrieves trending, newly launched, or fundamentally strong tokens across multiple blockchains. It can identify smart money accumulation, price performance, and liquidity strength.  
+You can also **get the token address by providing its symbol and chain name.**
+
+### When to Use:
+- User asks: *“Show me trending tokens on Base this week”*
+- User asks: *“Find new DeFi tokens with high liquidity”*
+- User asks: *“Which tokens have the most smart money inflow on Ethereum?”*
+- User asks: *“What are the best-performing tokens by netflow or volume?”*
+
+### Behavior:
+- Always provide a **summary of the results**, not raw JSON.
+- Focus on token name, chain, price, liquidity, market cap, and netflow trends.
+- Highlight **Smart Money metrics** when available.
+- Use filters intelligently based on user intent (e.g., age < 7 for new tokens, high liquidity for established ones).
+
+### Notes:
+- Use chains to select which networks to screen.
+- Use date to restrict the time period.
+- Use filters to narrow tokens by liquidity, volume, market cap, or smart money.
+- Use order_by to sort results (e.g., by liquidity or price_change).
+
+### Example Queries:
+1. “Show me trending tokens launched this week on Base and Ethereum.”
+2. “Find top tokens with high buy volume and smart money activity on Arbitrum.”
+3. “Which DeFi tokens have gained the most liquidity this month?”
+4. “List the top 10 tokens by net inflow across all chains.”
+
+
+---
 
 
 `,
