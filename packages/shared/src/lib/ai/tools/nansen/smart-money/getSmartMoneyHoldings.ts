@@ -200,6 +200,7 @@ export const getSmartMoneyHoldings = tool({
     }
 
     const data = await response.json();
+    console.log("Smart Money holdings data:", data);
     return data;
   },
 });

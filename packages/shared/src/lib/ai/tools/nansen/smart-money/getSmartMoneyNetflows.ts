@@ -193,6 +193,7 @@ export const getSmartMoneyNetflow = tool({
     }
 
     const data = await response.json();
+    console.log("Smart Money netflow data:", data);
     return data;
   },
 });

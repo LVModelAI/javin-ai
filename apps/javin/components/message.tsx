@@ -169,7 +169,7 @@ const PurePreviewMessage = ({
                           />
                         ) : toolName === "getSmartMoneyDCAs" ? (
                           <ToolCallLoader
-                            loadingMessage="Getting smart money dcas data"
+                            loadingMessage="Getting smart money DCAs data"
                             isFinished
                           />
                         ) : (
@@ -221,7 +221,7 @@ const PurePreviewMessage = ({
                       ) : toolName === "getSmartMoneyDexTrades" ? (
                         <ToolCallLoader loadingMessage="Getting smart money dex trades data..." />
                       ) : toolName === "getSmartMoneyDCAs" ? (
-                        <ToolCallLoader loadingMessage="Getting smart money dcas data..." />
+                        <ToolCallLoader loadingMessage="Getting smart money DCAs data..." />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}

@@ -1,8 +1,9 @@
-// getSmartMoneyDcas.ts
+// getSmartMoneyDCAs.ts
+import { logObjects } from "@javin/shared/lib/utils/logging";
 import { tool } from "ai";
 import z from "zod";
 
-export const getSmartMoneyDcas = tool({
+export const getSmartMoneyDCAs = tool({
   description:
     "Fetch Smart Money DCA (Dollar Cost Averaging) strategies on Solana through Jupiter DCA. Reveals systematic accumulation strategies used by Smart Money.",
   parameters: z.object({
@@ -88,7 +89,7 @@ export const getSmartMoneyDcas = tool({
   }),
 
   execute: async ({ filters, pagination, order_by }) => {
-    console.log("Executing getSmartMoneyDcas with params:", {
+    console.log("Executing getSmartMoneyDCAs with params:", {
       filters,
       pagination,
       order_by,

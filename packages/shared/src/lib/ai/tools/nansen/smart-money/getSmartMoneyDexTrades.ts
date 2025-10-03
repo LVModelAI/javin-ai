@@ -235,6 +235,7 @@ export const getSmartMoneyDexTrades = tool({
     }
 
     const data = await response.json();
+    console.log("Smart Money DEX trades data:", data);
     return data;
   },
 });
