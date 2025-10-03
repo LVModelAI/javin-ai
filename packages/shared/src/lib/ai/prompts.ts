@@ -97,7 +97,7 @@ const groupTools = {
     "searchSolanaTokenMarketData",
     //evm
     "getEvmMultiChainWalletPortfolio",
-    "searchEvmTokenMarketData",
+    // "searchEvmTokenMarketData",
     "getEvmOnchainDataUsingZerion",
     "getEvmWalletPositionsUsingZerion",
     "getEvmOnchainDataUsingEtherscan",
@@ -183,7 +183,7 @@ export const getAllToolsWithConfigs = ({
     getEvmOnchainDataUsingEtherscan:
       getEvmOnchainDataUsingEtherscan("gpt-4o-mini"),
     getEvmMultiChainWalletPortfolio,
-    searchEvmTokenMarketData,
+    // searchEvmTokenMarketData,
     translateTransactions: translateTransactions("gpt-4o"),
     defiLlama: defiLlama("gpt-4o-mini"),
     // solana
@@ -250,11 +250,6 @@ Comply with user requests to the best of your abilities using the appropriate to
   Specify the year or "latest" in queries to fetch recent information.
   Prioritize crypto and blockchain-related responses by default. Only discuss other topics if explicitly requested by the user
 
-## Search token or market data:
-  If the user provides an evm address, starting with "0x", run searchEvmTokenMarketData tool.
-  If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
-  Always run these tools first if user had not metioned what to do with the address provided.
-  if no token data is found, then proceed to get the portfolio of the address
 
 ## Get multi chain wallet portfolio:
   If the user provides an evm address, starting with "0x", Use getEvmMultiChainWalletPortfolio tool to retrieve a evm wallet's balances, tokens, and other portfolio details. If no data is found then retry it once more.
