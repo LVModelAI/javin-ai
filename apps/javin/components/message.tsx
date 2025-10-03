@@ -172,6 +172,16 @@ const PurePreviewMessage = ({
                             loadingMessage="Getting smart money DCAs data"
                             isFinished
                           />
+                        ) : toolName === "whoBoughtSold" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting who bought/sold data"
+                            isFinished
+                          />
+                        ) : toolName === "tokenScreener" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting token screener data"
+                            isFinished
+                          />
                         ) : (
                           <ToolCallLoader
                             loadingMessage="Finding info"
@@ -222,6 +232,10 @@ const PurePreviewMessage = ({
                         <ToolCallLoader loadingMessage="Getting smart money dex trades data..." />
                       ) : toolName === "getSmartMoneyDCAs" ? (
                         <ToolCallLoader loadingMessage="Getting smart money DCAs data..." />
+                      ) : toolName === "whoBoughtSold" ? (
+                        <ToolCallLoader loadingMessage="Getting who bought/sold data..." />
+                      ) : toolName === "tokenScreener" ? (
+                        <ToolCallLoader loadingMessage="Getting token screener data..." />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}

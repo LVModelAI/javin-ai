@@ -14,11 +14,11 @@ const TokenInfoTable: React.FC<{
     );
   // console.log("result ", result[0].attributes.external_links);
   return (
-    <div className="flex flex-col gap-5 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-white rounded-lg p-4 w-full max-w-4xl overflow-x-auto custom-scrollbar">
+    <div className="flex flex-col gap-5 ">
       {result.map((token, index) => (
         <div
           key={index}
-          className={`border-b border-dashed ${
+          className={`border-b border-dashed bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-white rounded-lg p-4 w-full max-w-4xl overflow-x-auto custom-scrollbar ${
             index === result.length - 1 ? "border-none" : "border-gray-500 pb-5"
           }`}
         >
