@@ -36,7 +36,8 @@
         "ZERION_DEV_API_KEY",
         "TAVILY_API_KEY",
         "ETHERSCAN_API_KEY",
-        "NANSEN_API_KEY"
+        "NANSEN_API_KEY",
+        "NANSEN_BASE_URL"
       ]
     },
     "lint": {},
