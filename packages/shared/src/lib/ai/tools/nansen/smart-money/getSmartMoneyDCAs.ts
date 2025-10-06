@@ -96,27 +96,31 @@ export const getSmartMoneyDCAs = tool({
     });
 
     const apiKey = process.env.NANSEN_API_KEY;
+
     if (!apiKey) {
       console.log("Nansen API key not found");
       return "Nansen API key not found";
     }
 
+    const baseUrl = process.env.NANSEN_BASE_URL;
+    if (!baseUrl) {
+      console.log("Nansen base URL not found");
+      return "Nansen base URL not found";
+    }
+
     try {
-      const response = await fetch(
-        "https://api.nansen.ai/api/v1/smart-money/dcas",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apiKey,
-          },
-          body: JSON.stringify({
-            filters,
-            pagination,
-            order_by,
-          }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/smart-money/dcas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apiKey,
+        },
+        body: JSON.stringify({
+          filters,
+          pagination,
+          order_by,
+        }),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();

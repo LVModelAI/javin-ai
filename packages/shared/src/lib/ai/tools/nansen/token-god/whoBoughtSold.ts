@@ -152,27 +152,28 @@ export const whoBoughtSold = tool({
       console.log("Nansen API key not found");
       return "Nansen API key not found";
     }
-
+    const baseUrl = process.env.NANSEN_BASE_URL;
+    if (!baseUrl) {
+      console.log("Nansen base URL not found");
+      return "Nansen base URL not found";
+    }
     try {
-      const response = await fetch(
-        "https://api.nansen.ai/api/v1/tgm/who-bought-sold",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apiKey,
-          },
-          body: JSON.stringify({
-            chain,
-            token_address,
-            buy_or_sell,
-            date,
-            pagination,
-            filters,
-            order_by,
-          }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/tgm/who-bought-sold`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apiKey,
+        },
+        body: JSON.stringify({
+          chain,
+          token_address,
+          buy_or_sell,
+          date,
+          pagination,
+          filters,
+          order_by,
+        }),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();

@@ -178,11 +178,15 @@ export const getAllToolsWithConfigs = ({
     ensToAddress,
     getSiteContent,
     // on_chain evm
+    // use zerions apis for any evm onchain data
     getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion("gpt-4o-mini"),
-    getEvmWalletPositionsUsingZerion,
+    // use etherscan apis for any evm onchain data
     getEvmOnchainDataUsingEtherscan:
       getEvmOnchainDataUsingEtherscan("gpt-4o-mini"),
+    // get portfolio using zerion
     getEvmMultiChainWalletPortfolio,
+    // get wallet positions accoross protocols
+    getEvmWalletPositionsUsingZerion,
     // searchEvmTokenMarketData,
     translateTransactions: translateTransactions("gpt-4o"),
     defiLlama: defiLlama("gpt-4o-mini"),
@@ -214,7 +218,7 @@ export const getAllToolsWithConfigs = ({
     getAptosGraphqlData,
     // for fun
     getCryptoInfluencersData,
-    // nansen
+    // --------------- nansen ---------------
     //smart money
     getSmartMoneyNetflow,
     getSmartMoneyHoldings,
