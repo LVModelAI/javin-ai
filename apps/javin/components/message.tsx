@@ -182,6 +182,11 @@ const PurePreviewMessage = ({
                             loadingMessage="Getting token screener data"
                             isFinished
                           />
+                        ) : toolName === "dexTrades" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting DEX trades data"
+                            isFinished
+                          />
                         ) : (
                           <ToolCallLoader
                             loadingMessage="Finding info"
@@ -236,6 +241,8 @@ const PurePreviewMessage = ({
                         <ToolCallLoader loadingMessage="Getting who bought/sold data..." />
                       ) : toolName === "tokenScreener" ? (
                         <ToolCallLoader loadingMessage="Getting token screener data..." />
+                      ) : toolName === "dexTrades" ? (
+                        <ToolCallLoader loadingMessage="Getting DEX trades data..." />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}

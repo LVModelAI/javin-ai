@@ -39,6 +39,8 @@ import { getSmartMoneyDexTrades } from "@javin/shared/lib/ai/tools/nansen/smart-
 import { getSmartMoneyDCAs } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDCAs";
 import { whoBoughtSold } from "@javin/shared/lib/ai/tools/nansen/token-god/whoBoughtSold";
 import { tokenScreener } from "@javin/shared/lib/ai/tools/nansen/token-god/tokenScreener";
+import { dexTrades } from "@javin/shared/lib/ai/tools/nansen/token-god/dexTrades";
+
 export const codePrompt = ``;
 
 export const sheetPrompt = ``;
@@ -116,6 +118,7 @@ const groupTools = {
     // token god mode
     "whoBoughtSold",
     "tokenScreener",
+    "dexTrades",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -227,6 +230,7 @@ export const getAllToolsWithConfigs = ({
     // token god mode
     whoBoughtSold,
     tokenScreener,
+    dexTrades,
   };
 };
 
@@ -962,6 +966,109 @@ You can also **get the token address by providing its symbol and chain name.**
 
 
 ---
+
+---------------------------------- dexTrades ----------------------------------
+dexTrades
+### Purpose
+
+Use the dexTrades tool to analyze individual DEX trading transactions for a specific token.
+It provides trade-by-trade data including trader addresses, Smart Money labels, token amounts, prices, and USD values.
+This helps identify who traded, how much, and at what price, giving precise insight into on-chain market activity.
+
+### When to Use
+Call this tool if the user asks questions like:
+“Show me the recent DEX trades for PEPE.”
+“Who bought over $10k worth of WIF on Solana?”
+
+“List Smart Money swaps for USDC this week.”
+
+“What trades happened for DEGEN in the last 24 hours?”
+
+“Show all large sells of BONK on Base.”
+
+“Which whales are trading JUP right now?”
+
+“Find trades over $1M value for AERO.”
+
+### Input Rules
+**Required Parameters**  
+chain:
+Infer from user context or prompt (e.g., “on Solana”, “on Base”).
+If missing, default to "ethereum".
+
+token_address:
+Required. If the user gives a token symbol (e.g., “PEPE”), resolve its address based on the specified chain.
+
+date:
+Always include both from and to (ISO 8601).
+Parse from user queries like “today”, “last 7 days”, “this month”.
+
+only_smart_money:
+Set to true if user explicitly asks for Smart Money trades.
+Default is false.
+
+**Optional**  
+
+filters.include_smart_money_labels:
+Add when the user specifies Smart Money categories like “Whales”, “Funds”, “Smart Traders”, “Exchanges”, etc.
+
+filters.exclude_smart_money_labels:
+Use when user says “exclude bots” or “ignore exchanges”.
+
+filters.action:
+Use "BUY" or "SELL" to match user queries (e.g., “buys”, “sells”, “accumulations”, “offloads”).
+
+filters.block_timestamp:
+Add when the user specifies intra-day or timestamp-specific analysis (e.g., “trades between 9AM and 3PM”).
+
+filters.transaction_hash:
+Use if user provides a specific transaction hash or refers to a single swap.
+
+filters.trader_address / filters.trader_address_label:
+Add when the user wants trades of a particular wallet or label.
+
+filters.token_amount / filters.traded_token_amount:
+Use for minimum trade sizes (e.g., “trades over 1000 tokens”).
+
+filters.estimated_value_usd:
+Add when user specifies a minimum USD trade size (e.g., “over $50k trades”).
+
+order_by:
+Sort results — typically by "block_timestamp" or "estimated_value_usd".
+Example:
+
+[{"field": "estimated_value_usd", "direction": "DESC"}]
+
+### How to Summarize the Response
+
+When the tool returns data, produce a clean summary of trading activity:
+
+**Start with Context:**
+
+“Recent DEX trades for [TOKEN] on [CHAIN] between [from] and [to].”
+
+**Then Summarize Key Trades:**
+For each major trade (top few entries):
+
+**Mention trader label (if available)**
+
+**Specify action, amount, and USD value**
+
+**Example:**
+“Smart Trader 0x4f1a... bought 12,000 PEPE worth $45k.”
+“Whale 0xa8d... sold 25,000 USDC for 13,000 DAI ($12.5k).”
+**Conclude with Analysis:**
+**Mention trade trends:**
+**“Most trades were buys, showing continued accumulation.”**
+**“Large sells dominate — signs of distribution.”**
+“Activity mostly driven by Whales and Smart Traders.”
+**“Average trade size was around $X.”**
+
+### Example Summaries
+
+**Recent DEX trades for BONK on Solana show strong buy activity.**  
+Whale 0x29c... bought 1.2M BONK for $35k, while Smart Trader 0x4dd... accumulated $20k worth.
+Total trade volume exceeded $200k, indicating early accumulation.
 
 
 `,
