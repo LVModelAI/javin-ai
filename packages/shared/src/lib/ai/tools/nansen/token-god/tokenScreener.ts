@@ -257,18 +257,26 @@ export const tokenScreener = tool({
 
   execute: async (params) => {
     console.log("Executing tokenScreener with params:", params);
+    const apiKey = process.env.NANSEN_API_KEY;
+    if (!apiKey) {
+      console.log("Nansen API key not found");
+      return "Nansen API key not found";
+    }
 
-    const response = await fetch(
-      "https://api.nansen.ai/api/v1/token-screener",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apiKey: process.env.NANSEN_API_KEY || "",
-        },
-        body: JSON.stringify(params),
-      }
-    );
+    const baseUrl = process.env.NANSEN_BASE_URL;
+    if (!baseUrl) {
+      console.log("Nansen base URL not found");
+      return "Nansen base URL not found";
+    }
+
+    const response = await fetch(`${baseUrl}/token-screener`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apiKey: apiKey,
+      },
+      body: JSON.stringify(params),
+    });
 
     if (!response.ok) {
       console.log("Failed to fetch token screener data:", response.statusText);

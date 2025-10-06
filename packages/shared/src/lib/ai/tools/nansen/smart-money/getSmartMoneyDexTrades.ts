@@ -216,17 +216,20 @@ export const getSmartMoneyDexTrades = tool({
       order_by: orderBy,
     };
 
-    const response = await fetch(
-      "https://api.nansen.ai/api/v1/smart-money/dex-trades",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apiKey: apiKey,
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const baseUrl = process.env.NANSEN_BASE_URL;
+    if (!baseUrl) {
+      console.log("Nansen base URL not found");
+      return "Nansen base URL not found";
+    }
+
+    const response = await fetch(`${baseUrl}/smart-money/dex-trades`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apiKey: apiKey,
+      },
+      body: JSON.stringify(body),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
