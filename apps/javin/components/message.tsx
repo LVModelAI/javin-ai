@@ -187,6 +187,11 @@ const PurePreviewMessage = ({
                             loadingMessage="Getting DEX trades data"
                             isFinished
                           />
+                        ) : toolName === "flowIntelligence" ? (
+                          <ToolCallLoader
+                            loadingMessage="Getting flow intelligence data"
+                            isFinished
+                          />
                         ) : (
                           <ToolCallLoader
                             loadingMessage="Finding info"
@@ -203,6 +208,11 @@ const PurePreviewMessage = ({
                       {toolName === "webSearch" ? (
                         <div className="mt-4">
                           <MultiSearch result={null} args={args} />
+                        </div>
+                      ) : toolName === "searchEvmTokenMarketData" ||
+                        toolName === "searchSolanaTokenMarketData" ? (
+                        <div className="mt-4">
+                          <ToolCallLoader loadingMessage="Fetching token data..." />
                         </div>
                       ) : toolName === "getSolanaChainWalletPortfolio" ||
                         toolName === "getEvmMultiChainWalletPortfolio" ||
@@ -243,6 +253,8 @@ const PurePreviewMessage = ({
                         <ToolCallLoader loadingMessage="Getting token screener data..." />
                       ) : toolName === "dexTrades" ? (
                         <ToolCallLoader loadingMessage="Getting DEX trades data..." />
+                      ) : toolName === "flowIntelligence" ? (
+                        <ToolCallLoader loadingMessage="Getting flow intelligence data..." />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}

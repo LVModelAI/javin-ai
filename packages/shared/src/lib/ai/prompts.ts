@@ -40,6 +40,7 @@ import { getSmartMoneyDCAs } from "@javin/shared/lib/ai/tools/nansen/smart-money
 import { whoBoughtSold } from "@javin/shared/lib/ai/tools/nansen/token-god/whoBoughtSold";
 import { tokenScreener } from "@javin/shared/lib/ai/tools/nansen/token-god/tokenScreener";
 import { dexTrades } from "@javin/shared/lib/ai/tools/nansen/token-god/dexTrades";
+import { flowIntelligence } from "@javin/shared/lib/ai/tools/nansen/token-god/flowIntelligence";
 
 export const codePrompt = ``;
 
@@ -99,7 +100,7 @@ const groupTools = {
     "searchSolanaTokenMarketData",
     //evm
     "getEvmMultiChainWalletPortfolio",
-    // "searchEvmTokenMarketData",
+    "searchEvmTokenMarketData",
     "getEvmOnchainDataUsingZerion",
     "getEvmWalletPositionsUsingZerion",
     "getEvmOnchainDataUsingEtherscan",
@@ -119,6 +120,7 @@ const groupTools = {
     "whoBoughtSold",
     "tokenScreener",
     "dexTrades",
+    "flowIntelligence",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -190,7 +192,7 @@ export const getAllToolsWithConfigs = ({
     getEvmMultiChainWalletPortfolio,
     // get wallet positions accoross protocols
     getEvmWalletPositionsUsingZerion,
-    // searchEvmTokenMarketData,
+    searchEvmTokenMarketData,
     translateTransactions: translateTransactions("gpt-4o"),
     defiLlama: defiLlama("gpt-4o-mini"),
     // solana
@@ -231,6 +233,7 @@ export const getAllToolsWithConfigs = ({
     whoBoughtSold,
     tokenScreener,
     dexTrades,
+    flowIntelligence,
   };
 };
 
@@ -284,7 +287,13 @@ Comply with user requests to the best of your abilities using the appropriate to
   Specify the year or "latest" in queries to fetch recent information.
   Stick to evm and blockchain related responses until asked specifically by the user. 
   
-  
+  ## Search token or market data:
+  If the user provides an evm address, starting with "0x", run searchEvmTokenMarketData tool.
+  the searchEvmTokenMarketData tool will return the tokens that match the name of the query token. you should only choose the token that matches most with the token in user query.
+  If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
+  Always run these tools first if user had not mentioned what to do with the address provided.
+  If no token data is found, then proceed to get the portfolio of the address.
+
   ## Get multi chain wallet portfolio:
   If the user provides an evm wallet address, starting with "0x", Use getEvmMultiChainWalletPortfolio tool to retrieve a evm wallet's balances, tokens, and other portfolio details. If no data is found then it can be a transaction, so try fetching info of transaction by treating it as txn hash..
   If the user provides an solana address, NOT starting with "0x", Use getSolanaChainWalletPortfolio tool to retrieve a solana wallet's balances, tokens, and other portfolio details.
@@ -933,56 +942,27 @@ When the tool returns data, generate a clear, data-driven summary:
 If the user asks to **screen or discover tokens**, use the tokenScreener tool.
 
 This tool retrieves trending, newly launched, or fundamentally strong tokens across multiple blockchains. It can identify smart money accumulation, price performance, and liquidity strength.  
-You can also **get the token address by providing its symbol and chain name.**
 
-### When to Use:
-- User asks: *“Show me trending tokens on Base this week”*
-- User asks: *“Find new DeFi tokens with high liquidity”*
-- User asks: *“Which tokens have the most smart money inflow on Ethereum?”*
-- User asks: *“What are the best-performing tokens by netflow or volume?”*
-
-### Behavior:
-- Always provide a **summary of the results**, not raw JSON.
-- Focus on token name, chain, price, liquidity, market cap, and netflow trends.
-- Highlight **Smart Money metrics** when available.
-- Use filters intelligently based on user intent (e.g., age < 7 for new tokens, high liquidity for established ones).
-
-### Notes:
-- Use chains to select which networks to screen.
-- Use date to restrict the time period.
-- Use filters to narrow tokens by liquidity, volume, market cap, or smart money.
-- Use order_by to sort results (e.g., by liquidity or price_change).
-
-### Example Queries:
-1. “Show me trending tokens launched this week on Base and Ethereum.”
-2. “Find top tokens with high buy volume and smart money activity on Arbitrum.”
-3. “Which DeFi tokens have gained the most liquidity this month?”
-4. “List the top 10 tokens by net inflow across all chains.”
-
+### Purpose:
+Use the tokenScreener tool to screen or discover tokens across multiple blockchains. It can identify smart money accumulation, price performance, and liquidity strength.
 
 ---
 
 ---------------------------------- dexTrades ----------------------------------
-dexTrades
+## dexTrades
 ### Purpose
 
 Use the dexTrades tool to analyze individual DEX trading transactions for a specific token.
 It provides trade-by-trade data including trader addresses, Smart Money labels, token amounts, prices, and USD values.
 This helps identify who traded, how much, and at what price, giving precise insight into on-chain market activity.
 
-### When to Use
 Call this tool if the user asks questions like:
 “Show me the recent DEX trades for PEPE.”
 “Who bought over $10k worth of WIF on Solana?”
-
 “List Smart Money swaps for USDC this week.”
-
 “What trades happened for DEGEN in the last 24 hours?”
-
 “Show all large sells of BONK on Base.”
-
 “Which whales are trading JUP right now?”
-
 “Find trades over $1M value for AERO.”
 
 ### Input Rules
@@ -990,65 +970,44 @@ Call this tool if the user asks questions like:
 chain:
 Infer from user context or prompt (e.g., “on Solana”, “on Base”).
 If missing, default to "ethereum".
-
 token_address:
 Required. If the user gives a token symbol (e.g., “PEPE”), resolve its address based on the specified chain.
-
 date:
 Always include both from and to (ISO 8601).
 Parse from user queries like “today”, “last 7 days”, “this month”.
-
 only_smart_money:
 Set to true if user explicitly asks for Smart Money trades.
 Default is false.
-
 **Optional**  
-
 filters.include_smart_money_labels:
 Add when the user specifies Smart Money categories like “Whales”, “Funds”, “Smart Traders”, “Exchanges”, etc.
-
 filters.exclude_smart_money_labels:
 Use when user says “exclude bots” or “ignore exchanges”.
-
 filters.action:
 Use "BUY" or "SELL" to match user queries (e.g., “buys”, “sells”, “accumulations”, “offloads”).
-
 filters.block_timestamp:
 Add when the user specifies intra-day or timestamp-specific analysis (e.g., “trades between 9AM and 3PM”).
-
 filters.transaction_hash:
 Use if user provides a specific transaction hash or refers to a single swap.
-
 filters.trader_address / filters.trader_address_label:
 Add when the user wants trades of a particular wallet or label.
-
 filters.token_amount / filters.traded_token_amount:
 Use for minimum trade sizes (e.g., “trades over 1000 tokens”).
-
 filters.estimated_value_usd:
 Add when user specifies a minimum USD trade size (e.g., “over $50k trades”).
-
 order_by:
 Sort results — typically by "block_timestamp" or "estimated_value_usd".
 Example:
-
 [{"field": "estimated_value_usd", "direction": "DESC"}]
 
 ### How to Summarize the Response
-
 When the tool returns data, produce a clean summary of trading activity:
-
 **Start with Context:**
-
 “Recent DEX trades for [TOKEN] on [CHAIN] between [from] and [to].”
-
 **Then Summarize Key Trades:**
 For each major trade (top few entries):
-
 **Mention trader label (if available)**
-
 **Specify action, amount, and USD value**
-
 **Example:**
 “Smart Trader 0x4f1a... bought 12,000 PEPE worth $45k.”
 “Whale 0xa8d... sold 25,000 USDC for 13,000 DAI ($12.5k).”
@@ -1060,12 +1019,53 @@ For each major trade (top few entries):
 **“Average trade size was around $X.”**
 
 ### Example Summaries
-
 **Recent DEX trades for BONK on Solana show strong buy activity.**  
 Whale 0x29c... bought 1.2M BONK for $35k, while Smart Trader 0x4dd... accumulated $20k worth.
 Total trade volume exceeded $200k, indicating early accumulation.
 
+---------------------------------- flowIntelligence ----------------------------------
+## flowIntelligence
+### Purpose:
+Use the flowIntelligence tool to analyze token inflows, outflows, and net flows across different wallet segments — such as Exchanges, Whales, Smart Traders, Funds (Top PnL), Public Figures, and Fresh Wallets.
+It reveals whether a token is being accumulated or distributed, helping the AI explain Smart Money behavior trends over time.
 
+### When to Use
+Call this tool when the user asks about token flow, inflows, outflows, or accumulation trends.
+Examples:
+“Show Smart Money inflows for JUP in the last 24 hours.”
+“Which tokens are whales accumulating on Base?”
+“Has PEPE seen more exchange outflows or inflows this week?”
+“Give me whale vs Smart Trader activity for BONK today."
+“Whats the net flow of AERO on Optimism in the past 7 days?”
+“Are fresh wallets buying DEGEN or selling it?”
+“Has there been any accumulation trend among funds holding WIF?”
+
+### Input Rules
+Required Parameters
+chain: Infer from context (e.g., “on Base” → base, “on Solana” → solana)
+token_address: Always required.
+If the user provides only a token name or symbol, resolve its address before calling the tool.
+timeframe:
+Infer from natural time expressions:
+“past hour” → 1h
+“today” → 1d
+“this week” → 7d
+“every 6 hours” → 6h
+Default is 1d.
+Optional Parameters (Filters)
+These allow you to focus on specific wallet segments or value thresholds:
+whale_net_flow_usd, smart_trader_net_flow_usd, exchange_net_flow_usd, etc.:
+Add min/max thresholds if the user specifies ranges like “over $1M inflow” or “below $50k outflow.”
+_avg_flow_usd: Use when user asks for average trade sizes or intensity.
+_wallet_count: Use when user mentions number of active wallets or “how many wallets participated.”
+
+### Response Interpretation
+The response returns net flow (USD) and average flow for each wallet category.
+Use this data to infer accumulation or distribution trends.
+
+### 🧠 Logic for Interpretation
+Positive net flow → Accumulation / Buying pressure
+Negative net flow → Distribution / Selling pressure
 `,
 
   solana: `
