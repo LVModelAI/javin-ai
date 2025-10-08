@@ -89,9 +89,10 @@ export const searchEvmTokenMarketData = tool({
       }
 
       // console.log("searchTokenMarketData ", data);
-      return data.data;
+      // only return first 5 tokens
+      return data.data.slice(0, 5);
     } catch (error) {
-      // console.error("Error searchTokenMarketData:", error);
+      console.error("Error searchTokenMarketData:", error);
       Sentry.captureException(error);
       return "Something went wrong. Please try again";
     }

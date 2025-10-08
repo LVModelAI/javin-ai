@@ -209,6 +209,11 @@ const PurePreviewMessage = ({
                         <div className="mt-4">
                           <MultiSearch result={null} args={args} />
                         </div>
+                      ) : toolName === "searchEvmTokenMarketData" ||
+                        toolName === "searchSolanaTokenMarketData" ? (
+                        <div className="mt-4">
+                          <ToolCallLoader loadingMessage="Fetching token data..." />
+                        </div>
                       ) : toolName === "getSolanaChainWalletPortfolio" ||
                         toolName === "getEvmMultiChainWalletPortfolio" ||
                         toolName === "getAptosPortfolio" ? (

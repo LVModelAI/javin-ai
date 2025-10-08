@@ -100,7 +100,7 @@ const groupTools = {
     "searchSolanaTokenMarketData",
     //evm
     "getEvmMultiChainWalletPortfolio",
-    // "searchEvmTokenMarketData",
+    "searchEvmTokenMarketData",
     "getEvmOnchainDataUsingZerion",
     "getEvmWalletPositionsUsingZerion",
     "getEvmOnchainDataUsingEtherscan",
@@ -192,7 +192,7 @@ export const getAllToolsWithConfigs = ({
     getEvmMultiChainWalletPortfolio,
     // get wallet positions accoross protocols
     getEvmWalletPositionsUsingZerion,
-    // searchEvmTokenMarketData,
+    searchEvmTokenMarketData,
     translateTransactions: translateTransactions("gpt-4o"),
     defiLlama: defiLlama("gpt-4o-mini"),
     // solana
@@ -287,7 +287,13 @@ Comply with user requests to the best of your abilities using the appropriate to
   Specify the year or "latest" in queries to fetch recent information.
   Stick to evm and blockchain related responses until asked specifically by the user. 
   
-  
+  ## Search token or market data:
+  If the user provides an evm address, starting with "0x", run searchEvmTokenMarketData tool.
+  the searchEvmTokenMarketData tool will return the tokens that match the name of the query token. you should only choose the token that matches most with the token in user query.
+  If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
+  Always run these tools first if user had not mentioned what to do with the address provided.
+  If no token data is found, then proceed to get the portfolio of the address.
+
   ## Get multi chain wallet portfolio:
   If the user provides an evm wallet address, starting with "0x", Use getEvmMultiChainWalletPortfolio tool to retrieve a evm wallet's balances, tokens, and other portfolio details. If no data is found then it can be a transaction, so try fetching info of transaction by treating it as txn hash..
   If the user provides an solana address, NOT starting with "0x", Use getSolanaChainWalletPortfolio tool to retrieve a solana wallet's balances, tokens, and other portfolio details.
@@ -936,12 +942,9 @@ When the tool returns data, generate a clear, data-driven summary:
 If the user asks to **screen or discover tokens**, use the tokenScreener tool.
 
 This tool retrieves trending, newly launched, or fundamentally strong tokens across multiple blockchains. It can identify smart money accumulation, price performance, and liquidity strength.  
-You can also **get the token address by providing its symbol and chain name.**
 
 ### Purpose:
 Use the tokenScreener tool to screen or discover tokens across multiple blockchains. It can identify smart money accumulation, price performance, and liquidity strength.
-Use this tool to get the token address by providing its symbol and chain name.
-
 
 ---
 
