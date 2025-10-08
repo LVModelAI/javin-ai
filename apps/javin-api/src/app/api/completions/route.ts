@@ -35,7 +35,22 @@ import { APIClient, FetchProvider } from "@wireio/core";
 
 export async function POST(request: Request) {
   try {
+    // --- LOG BASIC REQUEST INFO ---
+    console.log("🟢 [API /completions] Incoming request");
+
+    console.log("Headers:", Object.fromEntries(request.headers));
+    console.log("Method:", request.method);
+
+    // Clone request because .json() can be called only once
+    const requestClone = request.clone();
+    const rawBodyText = await requestClone.text();
+    console.log("Raw Request Body:", rawBodyText);
+
     const authHeader = request.headers.get("Authorization");
+    console.log(
+      "Auth Header:",
+      authHeader ? authHeader.slice(0, 10) + "..." : "None"
+    );
 
     const extractedApiKey = authHeader?.startsWith("Bearer ")
       ? authHeader.split(" ")[1]
@@ -70,6 +85,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const validatedData = PromptRequestSchema.parse(body);
+    console.log("✅ Validated Data:", validatedData);
 
     const {
       prompt,
