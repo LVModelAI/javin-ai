@@ -99,17 +99,23 @@ const groupTools = {
     "getSolanaChainWalletPortfolio",
     "searchSolanaTokenMarketData",
     //evm
+    //portfolio
     "getEvmMultiChainWalletPortfolio",
-    "searchEvmTokenMarketData",
-    "getEvmOnchainDataUsingZerion",
     "getEvmWalletPositionsUsingZerion",
+    //token market data
+    "searchEvmTokenMarketData",
+    //onchain data using zerion
+    "getEvmOnchainDataUsingZerion",
+    //onchain data using etherscan
     "getEvmOnchainDataUsingEtherscan",
+    //ens
     "ensToAddress",
     "translateTransactions",
     //defi llama
     "defiLlama",
     // for fun
     "getCryptoInfluencersData",
+
     // nansen
     //smart money
     "getSmartMoneyNetflow",

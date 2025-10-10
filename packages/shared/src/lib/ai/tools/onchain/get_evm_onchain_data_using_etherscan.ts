@@ -43,6 +43,11 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
           etherscanOpenapidata
         );
 
+        console.log(
+          "ether scan alll paths and desc --- ",
+          etherscanAllPathsAndDesc
+        );
+
         const aiAgentResponse = await generateText({
           model: myProvider.languageModel(modelName),
           system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
@@ -121,7 +126,10 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
                     );
                   const json = await response.json();
 
-                  console.log("Fetched API response:", json);
+                  console.log(
+                    "[getEvmOnchainDataUsingEtherscan] Fetched API response:",
+                    json
+                  );
                   // Remove the input field from all elements of the result array
 
                   if (json.result == null) {

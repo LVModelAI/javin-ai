@@ -31,7 +31,9 @@ export const getEvmOnchainDataUsingZerion = (modelName: string) =>
         const zerionAllPathsAndDesc = await getAllPathsAndDesc(
           zerionOpenapidata
         );
-        
+        // number of paths
+        console.log("zerion all paths ---- ", zerionAllPathsAndDesc);
+
         const aiAgentResponse = await generateText({
           model: myProvider.languageModel(modelName),
           system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
@@ -100,7 +102,10 @@ export const getEvmOnchainDataUsingZerion = (modelName: string) =>
                       `API call failed with status ${response.status}`
                     );
                   const json = await response.json();
-                  console.log("Fetched API response:", json);
+                  console.log(
+                    "[getEvmOnchainDataUsingZerion] Fetched API response:",
+                    json
+                  );
                   return json; // Return parsed JSON data for further processing
                 } catch (error) {
                   console.error("Error fetching API data:", error);
