@@ -2,13 +2,22 @@ import {
   filterAndLimitPortfolio,
   transformToZerionPortfolio,
 } from "@javin/shared/lib/utils/utils";
-import {
-  PortfolioData,
-  BirdeyePortfolioResponse,
-} from "@javin/shared/types/wallet-actions-response";
 import { tool } from "ai";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
+import {
+  PortfolioData,
+  TokenItem,
+} from "@javin/shared/lib/ai/tools/zerion/wallets/getEvmMultiChainWalletPortfolio";
+
+export type BirdeyePortfolioResponse = {
+  success: boolean;
+  data: {
+    wallet: string;
+    totalUsd: number;
+    items: TokenItem[];
+  };
+};
 
 export const getSolanaChainWalletPortfolio = tool({
   description:

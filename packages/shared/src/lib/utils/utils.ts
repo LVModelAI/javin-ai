@@ -10,14 +10,14 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Globe, Network } from "lucide-react";
 import {
-  PortfolioData,
-  TokenItem,
-} from "@javin/shared/types/wallet-actions-response";
-import {
   BirdeyeTokenSearchResponse,
   TokenSearchData,
   TokenSearchResponse,
 } from "@javin/shared/types/token-search-response";
+import {
+  PortfolioData,
+  TokenItem,
+} from "@javin/shared/lib/ai/tools/zerion/wallets/getEvmMultiChainWalletPortfolio";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
