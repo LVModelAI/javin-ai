@@ -2,12 +2,12 @@ import {
   getAllPathsAndDesc,
   loadOpenAPI,
   loadOpenAPIFromJson,
-} from "../../utils/openapi";
+} from "@javin/shared/lib/utils/openapi";
 import { generateObject, tool } from "ai";
 import { z } from "zod";
-import { myProvider } from "../models";
+import { myProvider } from "@javin/shared/lib/ai/models";
 import * as Sentry from "@sentry/nextjs";
-import { logObjects } from "../../utils/logging";
+import { logObjects } from "@javin/shared/lib/utils/logging";
 
 export const novesSupportedChains = [
   "arbitrum",

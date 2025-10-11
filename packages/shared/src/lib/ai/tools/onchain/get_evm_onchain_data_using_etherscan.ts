@@ -1,14 +1,14 @@
 import { generateText, tool } from "ai";
 import { z } from "zod";
-import { myProvider } from "../../models";
+import { myProvider } from "@javin/shared/lib/ai/models";
 import {
   getAllPathsAndDesc,
   getPathDetails,
   loadOpenAPI,
-} from "../../../utils/openapi";
-import { etherscanBaseURL, supportedChainsAndId } from "./constant";
-import { ensToAddress } from "../ens-to-address";
+} from "@javin/shared/lib/utils/openapi";
+import { ensToAddress } from "@javin/shared/lib/ai/tools/ens-to-address";
 import * as Sentry from "@sentry/nextjs";
+import { etherscanBaseURL } from "@javin/shared/lib/utils/constants";
 
 export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
   tool({

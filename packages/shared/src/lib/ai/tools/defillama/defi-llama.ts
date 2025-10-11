@@ -7,7 +7,7 @@ import {
 } from "@javin/shared/lib/utils/openapi";
 import { generateText, tool } from "ai";
 import { z } from "zod";
-import defillamaJson from "./defillama-openapi.json";
+import defillamaJson from "@javin/shared/lib/ai/tools/defillama/defillama-openapi.json";
 import * as Sentry from "@sentry/nextjs";
 
 export const defiLlama = (modelName: string) =>

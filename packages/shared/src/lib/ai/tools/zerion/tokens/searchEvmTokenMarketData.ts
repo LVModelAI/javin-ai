@@ -1,9 +1,9 @@
-import { SUPPORTED_CURRENCY } from "../../../constants";
-import { getZerionApiKey } from "../../../utils/utils";
+import { SUPPORTED_CURRENCY } from "@javin/shared/lib/utils/constants";
+import { getZerionApiKey } from "@javin/shared/lib/utils/utils";
 import {
   TokenSearchData,
   TokenSearchResponse,
-} from "../../../../types/token-search-response";
+} from "@javin/shared/types/token-search-response";
 import { tool } from "ai";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";

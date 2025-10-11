@@ -211,7 +211,9 @@ async function testTool(
         jest.expect(result).toBeDefined();
         // Portfolio tools should return either PortfolioData object or error string
         jest.expect(result).toHaveProperty("attributes");
-        jest.expect(result.attributes).toHaveProperty("positions_distribution_by_type");
+        jest
+          .expect(result.attributes)
+          .toHaveProperty("positions_distribution_by_type");
       } else if (toolName === "searchEvmTokenMarketData") {
         // searchEvmTokenMarketData requires token_address parameter
         const testParams = {
@@ -230,13 +232,13 @@ async function testTool(
         console.log("getEvmOnchainDataUsingZerion result:", result);
         jest.expect(result).toBeDefined();
         jest.expect(result).toContain("Total Value");
-      } else if (toolName === "getEvmWalletPositionsUsingZerion") {
-        // getEvmWalletPositionsUsingZerion requires wallet_address parameter
+      } else if (toolName === "getEvmWalletPositions") {
+        // getEvmWalletPositions requires wallet_address parameter
         const testParams = {
           wallet_address: VitalikEthereumAddress,
         };
         const result = await toolConfig.execute(testParams);
-        console.log("getEvmWalletPositionsUsingZerion result:", result);
+        console.log("getEvmWalletPositions result:", result);
         jest.expect(result).toBeDefined();
         jest.expect(typeof result).toBe("object");
         jest.expect(result[0].value).toBeDefined();
@@ -289,16 +291,20 @@ async function testTool(
         // jest.expect(result).toBeDefined();
       }
     } catch (paramError) {
-        // Only treat "parameter required" or validation errors as expected
-        const msg = (paramError as Error).message || "";
-      
-        if (msg.toLowerCase().includes("missing") || msg.toLowerCase().includes("parameter")) {
-          console.log(`    ⚠️  Tool ${toolName} requires specific parameters (expected)`);
-        } else {
-          throw paramError; // ✅ rethrow actual test failures like wrong type/value
-        }
+      // Only treat "parameter required" or validation errors as expected
+      const msg = (paramError as Error).message || "";
+
+      if (
+        msg.toLowerCase().includes("missing") ||
+        msg.toLowerCase().includes("parameter")
+      ) {
+        console.log(
+          `    ⚠️  Tool ${toolName} requires specific parameters (expected)`
+        );
+      } else {
+        throw paramError; // ✅ rethrow actual test failures like wrong type/value
       }
-      
+    }
 
     const duration = Date.now() - startTime;
     return {

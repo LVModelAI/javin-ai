@@ -1,39 +1,39 @@
 import { aptosNames } from "@javin/shared/lib/ai/tools/aptos/aptos-names";
-import { SearchGroupId } from "../utils/utils";
-import { getAptosApiData } from "./tools/aptos/get-aptos-api-data";
-import { getAptosStats } from "./tools/aptos/get-stats";
-import { getCreditcoinApiData } from "./tools/creditcoin/get-creditcon-api-data";
-import { getCreditcoinStats } from "./tools/creditcoin/get-stats";
-import { ensToAddress } from "./tools/ens-to-address";
-import { searchEvmTokenMarketData } from "./tools/evm/search-token-evm";
-import { getEvmMultiChainWalletPortfolio } from "./tools/evm/wallet-portfolio-evm";
-import { getEvmOnchainDataUsingEtherscan } from "./tools/onchain/get_evm_onchain_data_using_etherscan";
-import { getEvmOnchainDataUsingZerion } from "./tools/onchain/get_evm_onchain_data_using_zerion";
-import { getEvmWalletPositionsUsingZerion } from "./tools/evm/wallet-positions-evm";
-import { getSiteContent } from "./tools/scrap-site";
-import { searchSolanaTokenMarketData } from "./tools/solana/search-token-solana";
-import { getSolanaChainWalletPortfolio } from "./tools/solana/wallet-portfolio-solana";
+import { SearchGroupId } from "@javin/shared/lib/utils/utils";
+import { getAptosApiData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-api-data";
+import { getAptosStats } from "@javin/shared/lib/ai/tools/aptos/get-stats";
+import { getCreditcoinApiData } from "@javin/shared/lib/ai/tools/creditcoin/get-creditcon-api-data";
+import { getCreditcoinStats } from "@javin/shared/lib/ai/tools/creditcoin/get-stats";
+import { ensToAddress } from "@javin/shared/lib/ai/tools/ens-to-address";
+import { searchEvmTokenMarketData } from "@javin/shared/lib/ai/tools/zerion/tokens/searchEvmTokenMarketData";
+import { getEvmMultiChainWalletPortfolio } from "@javin/shared/lib/ai/tools/zerion/wallets/getEvmMultiChainWalletPortfolio";
+import { getEvmOnchainDataUsingEtherscan } from "@javin/shared/lib/ai/tools/onchain/get_evm_onchain_data_using_etherscan";
+import { getEvmOnchainDataUsingZerion } from "@javin/shared/lib/ai/tools/zerion/get_evm_onchain_data_using_zerion";
+import { getEvmWalletPositions } from "@javin/shared/lib/ai/tools/zerion/wallets/getEvmWalletPositions";
+import { getSiteContent } from "@javin/shared/lib/ai/tools/scrap-site";
+import { searchSolanaTokenMarketData } from "@javin/shared/lib/ai/tools/solana/search-token-solana";
+import { getSolanaChainWalletPortfolio } from "@javin/shared/lib/ai/tools/solana/wallet-portfolio-solana";
 import {
   novesSupportedChains,
   translateTransactions,
-} from "./tools/translate-transactions";
-import { getVanaStats } from "./tools/vana/get-stats";
-import { getVanaApiData } from "./tools/vana/get-vana-api-data";
-import { webSearch } from "./tools/web-search";
-import { getWormholeApiData } from "./tools/wormhole/get-wormhole-api-data";
-import { getZetaStats } from "./tools/zeta/get-stats";
-import { getZetaApiData } from "./tools/zeta/get-zeta-api-data";
-import { defiLlama } from "@javin/shared/lib/ai/tools/defi-llama";
-import { getAptosScanApiData } from "./tools/aptos/get-aptoscan-api-data";
-import { getAptosPortfolio } from "./tools/aptos/get-aptos-portfolio";
+} from "@javin/shared/lib/ai/tools/translate-transactions/translate-transactions";
+import { getVanaStats } from "@javin/shared/lib/ai/tools/vana/get-stats";
+import { getVanaApiData } from "@javin/shared/lib/ai/tools/vana/get-vana-api-data";
+import { webSearch } from "@javin/shared/lib/ai/tools/web-search";
+import { getWormholeApiData } from "@javin/shared/lib/ai/tools/wormhole/get-wormhole-api-data";
+import { getZetaStats } from "@javin/shared/lib/ai/tools/zeta/get-stats";
+import { getZetaApiData } from "@javin/shared/lib/ai/tools/zeta/get-zeta-api-data";
+import { defiLlama } from "@javin/shared/lib/ai/tools/defillama/defi-llama";
+import { getAptosScanApiData } from "@javin/shared/lib/ai/tools/aptos/get-aptoscan-api-data";
+import { getAptosPortfolio } from "@javin/shared/lib/ai/tools/aptos/get-aptos-portfolio";
 import { getAptosGraphqlData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-graphql-data";
-import { getSolanaOnchainDataUsingBirdeye } from "./tools/solana/get-birdeye-solana";
-import { getNexusApiData } from "./tools/nexus/get-nexus-api-data";
-import { getNexusStats } from "./tools/nexus/get-stats";
-import { snsToAddress } from "./tools/solana/sns-to-address";
-import { supportedChainsAndId } from "@javin/shared/lib/ai/tools/onchain/constant";
+import { getSolanaOnchainDataUsingBirdeye } from "@javin/shared/lib/ai/tools/solana/get-birdeye-solana";
+import { getNexusApiData } from "@javin/shared/lib/ai/tools/nexus/get-nexus-api-data";
+import { getNexusStats } from "@javin/shared/lib/ai/tools/nexus/get-stats";
+import { snsToAddress } from "@javin/shared/lib/ai/tools/solana/sns-to-address";
+import { supportedChainsAndId } from "@javin/shared/lib/utils/constants";
 import { getCryptoInfluencersData } from "@javin/shared/lib/ai/tools/misc/getCryptoInfluencersData";
-import { getSmartMoneyNetflow } from "./tools/nansen/smart-money/getSmartMoneyNetflows";
+import { getSmartMoneyNetflow } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyNetflows";
 import { getSmartMoneyHoldings } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyHoldings";
 import { getSmartMoneyDexTrades } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDexTrades";
 import { getSmartMoneyDCAs } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDCAs";
@@ -101,7 +101,7 @@ const groupTools = {
     //evm
     //portfolio
     "getEvmMultiChainWalletPortfolio",
-    "getEvmWalletPositionsUsingZerion",
+    "getEvmWalletPositions",
     //token market data
     "searchEvmTokenMarketData",
     //onchain data using zerion
@@ -197,7 +197,7 @@ export const getAllToolsWithConfigs = ({
     // get portfolio using zerion
     getEvmMultiChainWalletPortfolio,
     // get wallet positions accoross protocols
-    getEvmWalletPositionsUsingZerion,
+    getEvmWalletPositions,
     searchEvmTokenMarketData,
     translateTransactions: translateTransactions("gpt-4o"),
     defiLlama: defiLlama("gpt-4o-mini"),
@@ -334,7 +334,7 @@ Comply with user requests to the best of your abilities using the appropriate to
   - Get list of NFTs
   - Get single NFT by ID
 
-  ## Get wallet positions using getEvmWalletPositionsUsingZerion:
+  ## Get wallet positions using getEvmWalletPositions:
   - When to use: User asks for staked assets, liquidity pools, vaults, yield farming, restaking, validator delegations, or other "complex" positions on EVM chains.
   - Inputs:
     - wallet_address: EVM address starting with "0x" (required). If user provides ENS, resolve it first via ensToAddress and then pass the resolved address.

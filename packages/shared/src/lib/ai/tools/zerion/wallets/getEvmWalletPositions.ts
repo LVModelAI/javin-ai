@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { SUPPORTED_CURRENCY } from "../../../constants";
-import { getZerionApiKey } from "../../../utils/utils";
+import { SUPPORTED_CURRENCY } from "@javin/shared/lib/utils/constants";
+import { getZerionApiKey } from "@javin/shared/lib/utils/utils";
 import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
 import * as Sentry from "@sentry/nextjs";
 
@@ -93,7 +93,7 @@ export type WalletPositionSummary = {
   app?: { name?: string; icon_url?: string; url?: string };
 };
 
-export const getEvmWalletPositionsUsingZerion = tool({
+export const getEvmWalletPositions = tool({
   description:
     "Fetch complex (staked, LP, etc.) fungible positions for an EVM wallet.",
   parameters: z.object({
@@ -123,8 +123,7 @@ export const getEvmWalletPositionsUsingZerion = tool({
     } as const;
 
     logInfo(
-      "fetching positions using tool getEvmWalletPositionsUsingZerion - " +
-        wallet_address
+      "fetching positions using tool getEvmWalletPositions - " + wallet_address
     );
 
     try {
@@ -205,7 +204,7 @@ export const getEvmWalletPositionsUsingZerion = tool({
       }
 
       // logObjects(
-      //   "positions summary from getEvmWalletPositionsUsingZerion of wallet " +
+      //   "positions summary from getEvmWalletPositions of wallet " +
       //     wallet_address,
       //   summaries
       // );

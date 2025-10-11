@@ -1,4 +1,4 @@
-import { getStatPageScreenshot } from "../../../utils/get-stat-page-sceenshot";
+import { getStatPageScreenshot } from "@javin/shared/lib/utils/get-stat-page-sceenshot";
 import { tool } from "ai";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";

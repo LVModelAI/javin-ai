@@ -3,9 +3,12 @@ import { z } from "zod";
 import {
   PortfolioData,
   PortfolioResponse,
-} from "../../../../types/wallet-actions-response";
-import { filterAndLimitPortfolio, getZerionApiKey } from "../../../utils/utils";
-import { SUPPORTED_CURRENCY } from "../../../constants";
+} from "@javin/shared/types/wallet-actions-response";
+import {
+  filterAndLimitPortfolio,
+  getZerionApiKey,
+} from "@javin/shared/lib/utils/utils";
+import { SUPPORTED_CURRENCY } from "@javin/shared/lib/utils/constants";
 import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
 import * as Sentry from "@sentry/nextjs";
 

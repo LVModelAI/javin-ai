@@ -2,8 +2,8 @@ import { tool } from "ai";
 import { z } from "zod";
 import { tavily } from "@tavily/core";
 import * as Sentry from "@sentry/nextjs";
-import { logInfo } from "../../utils/logging";
-import { SearchGroupId } from "../../utils/utils";
+import { logInfo } from "@javin/shared/lib/utils/logging";
+import { SearchGroupId } from "@javin/shared/lib/utils/utils";
 
 function sanitizeUrl(url: string): string {
   return url.replace(/\s+/g, "%20");

@@ -1,3 +1,34 @@
+export const BIRDEYE_SUPPORTED_CHAINS = [
+  "all",
+  "ethereum",
+  "arbitrum",
+  "avalanche",
+  "bsc",
+  "optimism",
+  "polygon",
+  "base",
+  "zksync",
+] as const;
+
+export const SUPPORTED_CURRENCY = [
+  "eth",
+  "btc",
+  "usd",
+  "eur",
+  "krw",
+  "rub",
+  "gbp",
+  "aud",
+  "cad",
+  "inr",
+  "jpy",
+  "nzd",
+  "try",
+  "zar",
+  "cny",
+  "chf",
+] as const;
+
 export const etherscanBaseURL = "https://api.etherscan.io/v2/api";
 export const zerionBaseURL = "https://api.zerion.io";
 export const chains = [42161, 8453, 10];

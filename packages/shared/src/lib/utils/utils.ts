@@ -9,12 +9,15 @@ import type {
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Globe, Network } from "lucide-react";
-import { PortfolioData, TokenItem } from "../../types/wallet-actions-response";
+import {
+  PortfolioData,
+  TokenItem,
+} from "@javin/shared/types/wallet-actions-response";
 import {
   BirdeyeTokenSearchResponse,
   TokenSearchData,
   TokenSearchResponse,
-} from "../../types/token-search-response";
+} from "@javin/shared/types/token-search-response";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

@@ -1,11 +1,11 @@
 import {
   filterAndLimitPortfolio,
   transformToZerionPortfolio,
-} from "../../../utils/utils";
+} from "@javin/shared/lib/utils/utils";
 import {
   PortfolioData,
   BirdeyePortfolioResponse,
-} from "../../../../types/wallet-actions-response";
+} from "@javin/shared/types/wallet-actions-response";
 import { tool } from "ai";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
