@@ -1,7 +1,7 @@
-import { multichainEnsLookup } from "../../utils/multichain-ens-lookup";
+import { multichainEnsLookup } from "@javin/shared/lib/utils/multichain-ens-lookup";
 import { tool } from "ai";
 import { z } from "zod";
-import { logInfo } from "../../utils/logging";
+import { logInfo } from "@javin/shared/lib/utils/logging";
 
 export const ensToAddress = tool({
   description: "Get the address corresponding to ENS",

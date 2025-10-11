@@ -1,15 +1,15 @@
 import { generateText, tool } from "ai";
 import { z } from "zod";
-import { myProvider } from "../../models";
+import { myProvider } from "@javin/shared/lib/ai/models";
 import {
   getAllPathsAndDesc,
   getPathDetails,
   loadOpenAPIFromJson,
-} from "../../../utils/openapi";
-import zerionJson from "./zerion-openapi.json";
-import { zerionBaseURL } from "./constant";
-import { getZerionApiKey } from "../../../utils/utils";
-import { ensToAddress } from "../ens-to-address";
+} from "@javin/shared/lib/utils/openapi";
+import zerionJson from "@javin/shared/lib/ai/tools/zerion/zerion-openapi.json";
+import { zerionBaseURL } from "@javin/shared/lib/utils/constants";
+import { getZerionApiKey } from "@javin/shared/lib/utils/utils";
+import { ensToAddress } from "@javin/shared/lib/ai/tools/ens-to-address";
 import * as Sentry from "@sentry/nextjs";
 import { logInfo } from "@javin/shared/lib/utils/logging";
 

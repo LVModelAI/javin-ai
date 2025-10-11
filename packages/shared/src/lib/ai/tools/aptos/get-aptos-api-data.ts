@@ -1,11 +1,11 @@
 import { generateText, tool } from "ai";
 import { z } from "zod";
-import { myProvider } from "../../models";
+import { myProvider } from "@javin/shared/lib/ai/models";
 import {
   getAllPathsAndDesc,
   getPathDetails,
   loadOpenAPI,
-} from "../../../utils/openapi";
+} from "@javin/shared/lib/utils/openapi";
 import * as Sentry from "@sentry/nextjs";
 
 //@ts-ignore

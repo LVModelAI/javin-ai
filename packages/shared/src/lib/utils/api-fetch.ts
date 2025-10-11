@@ -1,4 +1,4 @@
-import { getZerionApiKey } from "../../../utils/utils";
+import { getZerionApiKey } from "@javin/shared/lib/utils/utils";
 import * as Sentry from "@sentry/nextjs";
 
 export const fetchApi = async ({

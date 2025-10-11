@@ -1,4 +1,4 @@
-import { WalletPositionSummary } from "@javin/shared/lib/ai/tools/evm/wallet-positions-evm";
+import { WalletPositionSummary } from "@javin/shared/lib/ai/tools/zerion/wallets/getEvmWalletPositions";
 import Image from "next/image";
 import React from "react";
 

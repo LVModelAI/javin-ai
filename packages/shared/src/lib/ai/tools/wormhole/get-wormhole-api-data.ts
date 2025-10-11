@@ -1,12 +1,12 @@
 import { generateObject, generateText, tool } from "ai";
 import { z } from "zod";
-import { myProvider } from "../../models";
+import { myProvider } from "@javin/shared/lib/ai/models";
 import {
   getAllPaths,
   loadOpenAPI,
   loadOpenAPIFromJson,
-} from "../../../utils/openapi";
-import { makeBlockscoutApiRequest } from "../../../utils/make-blockscout-api-request";
+} from "@javin/shared/lib/utils/openapi";
+import { makeBlockscoutApiRequest } from "@javin/shared/lib/utils/make-blockscout-api-request";
 import * as Sentry from "@sentry/nextjs";
 
 function scaleLargeNumbersInJson(jsonString: string): string {

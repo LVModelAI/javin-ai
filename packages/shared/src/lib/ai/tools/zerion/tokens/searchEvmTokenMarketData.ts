@@ -1,9 +1,12 @@
-import { SUPPORTED_CURRENCY } from "../../../constants";
-import { getZerionApiKey } from "../../../utils/utils";
+import {
+  SUPPORTED_CURRENCY,
+  zerionBaseURL,
+} from "@javin/shared/lib/utils/constants";
+import { getZerionApiKey } from "@javin/shared/lib/utils/utils";
 import {
   TokenSearchData,
   TokenSearchResponse,
-} from "../../../../types/token-search-response";
+} from "@javin/shared/types/token-search-response";
 import { tool } from "ai";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
@@ -52,7 +55,7 @@ export const searchEvmTokenMarketData = tool({
     token_chain_id,
     token_address,
   }): Promise<TokenSearchData[] | string> => {
-    const url = new URL("https://api.zerion.io/v1/fungibles");
+    const url = new URL(`${zerionBaseURL}/fungibles`);
     url.searchParams.append("currency", currency);
     if (search_query)
       url.searchParams.append("filter[search_query]", search_query);

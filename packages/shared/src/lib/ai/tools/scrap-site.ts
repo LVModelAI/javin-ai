@@ -1,4 +1,4 @@
-import { scrapeSite } from "../../utils/scrape-site";
+import { scrapeSite } from "@javin/shared/lib/utils/scrape-site";
 import { tool } from "ai";
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";

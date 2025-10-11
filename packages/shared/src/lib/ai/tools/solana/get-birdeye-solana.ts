@@ -1,15 +1,13 @@
 import { generateObject, generateText, tool } from "ai";
 import { z } from "zod";
-import { myProvider } from "../../models";
+import { myProvider } from "@javin/shared/lib/ai/models";
 import {
   getAllPathsAndDesc,
   getPathDetails,
-  loadOpenAPI,
   loadOpenAPIFromJson,
-} from "../../../utils/openapi";
-import { translateTransactions } from "../translate-transactions";
-import birdEyeOpenApiSPec from "./birdeye_openapi.json";
-import { snsToAddress } from "./sns-to-address";
+} from "@javin/shared/lib/utils/openapi";
+import birdEyeOpenApiSPec from "@javin/shared/lib/ai/tools/solana/birdeye_openapi.json";
+import { snsToAddress } from "@javin/shared/lib/ai/tools/solana/sns-to-address";
 
 const BIRDEYE_BASE_URL = "https://public-api.birdeye.so";
 
