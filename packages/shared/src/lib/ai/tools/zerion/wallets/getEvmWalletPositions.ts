@@ -1,6 +1,9 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { SUPPORTED_CURRENCY } from "@javin/shared/lib/utils/constants";
+import {
+  SUPPORTED_CURRENCY,
+  zerionBaseURL,
+} from "@javin/shared/lib/utils/constants";
 import { getZerionApiKey } from "@javin/shared/lib/utils/utils";
 import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
 import * as Sentry from "@sentry/nextjs";
@@ -127,7 +130,7 @@ export const getEvmWalletPositions = tool({
     );
 
     try {
-      const url = `https://api.zerion.io/v1/wallets/${wallet_address}/positions/?filter[positions]=only_complex&currency=${currency}&filter[trash]=only_non_trash&sort=value`;
+      const url = `${zerionBaseURL}/wallets/${wallet_address}/positions/?filter[positions]=only_complex&currency=${currency}&filter[trash]=only_non_trash&sort=value`;
       logInfo("url is " + url);
 
       const response = await fetch(url, options);

@@ -1,20 +1,134 @@
 import { tool } from "ai";
 import { z } from "zod";
 import {
-  PortfolioData,
-  PortfolioResponse,
-} from "@javin/shared/types/wallet-actions-response";
-import {
   filterAndLimitPortfolio,
   getZerionApiKey,
 } from "@javin/shared/lib/utils/utils";
-import { SUPPORTED_CURRENCY } from "@javin/shared/lib/utils/constants";
+import {
+  SUPPORTED_CURRENCY,
+  zerionBaseURL,
+} from "@javin/shared/lib/utils/constants";
 import { logInfo, logObjects } from "@javin/shared/lib/utils/logging";
 import * as Sentry from "@sentry/nextjs";
 
+/* -------------------------------------------------------------------------- */
+/*                                 Type Definitions                           */
+/* -------------------------------------------------------------------------- */
+
+export type PortfolioData = {
+  type: "portfolio";
+  id: string;
+  currency: string;
+  attributes: {
+    positions_distribution_by_type: {
+      wallet: number;
+      deposited: number;
+      borrowed: number;
+      locked: number;
+      staked: number;
+    };
+    positions_distribution_by_chain: {
+      [key: string]: number | undefined;
+    };
+    total: {
+      positions: number | null;
+    };
+    changes: {
+      absolute_1d: number;
+      percent_1d: number;
+    };
+  };
+};
+
+export type PortfolioResponse = {
+  links: {
+    self: string;
+  };
+  data: PortfolioData;
+};
+
+/* ---------- New Types for /positions API ---------- */
+
+export type PositionItem = {
+  type: string;
+  id: string;
+  attributes: {
+    name: string;
+    position_type: string;
+    quantity: {
+      int: string;
+      decimals: number;
+      float: number;
+      numeric: string;
+    };
+    value: number;
+    price: number;
+    changes: {
+      absolute_1d: number;
+      percent_1d: number;
+    };
+    fungible_info: {
+      name: string;
+      symbol: string;
+      icon?: {
+        url: string;
+      };
+      implementations?: Array<{
+        chain_id: string;
+        address: string;
+        decimals: number;
+      }>;
+    };
+  };
+  relationships: {
+    chain: {
+      data: {
+        type: string;
+        id: string;
+      };
+    };
+  };
+};
+
+export type PositionsResponse = {
+  links: {
+    self: string;
+  };
+  data: PositionItem[];
+};
+
+/* ---------- Existing Birdeye Type (unchanged) ---------- */
+
+export type TokenItem = {
+  address: string;
+  decimals: number;
+  balance: number;
+  uiAmount: number;
+  chainId: string;
+  name: string;
+  symbol: string;
+  logoURI?: string;
+  icon?: string;
+  priceUsd: number;
+  valueUsd: number;
+};
+
+export type BirdeyePortfolioResponse = {
+  success: boolean;
+  data: {
+    wallet: string;
+    totalUsd: number;
+    items: TokenItem[];
+  };
+};
+
+/* -------------------------------------------------------------------------- */
+/*                              Tool Definition                               */
+/* -------------------------------------------------------------------------- */
+
 export const getEvmMultiChainWalletPortfolio = tool({
   description:
-    "Fetch the multi-chain wallet portfolio of a given wallet address across all EVM  chains.",
+    "Fetch both the summary and detailed multi-chain wallet portfolio of a given wallet address across all EVM chains.",
   parameters: z.object({
     wallet_address: z
       .string()
@@ -31,41 +145,91 @@ export const getEvmMultiChainWalletPortfolio = tool({
   }: {
     wallet_address: string;
     currency: string;
-  }): Promise<PortfolioData | string> => {
+  }): Promise<
+    | {
+        summary: PortfolioData;
+        positions: Array<{
+          id: string;
+          chain: string;
+          name: string;
+          symbol: string;
+          value: number;
+          quantity: number;
+          price: number;
+          percent_change_1d: number;
+          icon?: string;
+        }>;
+        currency: string;
+      }
+    | string
+  > => {
     const apiKey = getZerionApiKey();
-    const options = {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        authorization: `Basic ${apiKey}`,
-      },
+    const headers = {
+      accept: "application/json",
+      authorization: `Basic ${apiKey}`,
     };
+
     logInfo(
-      "fetching portfoio of using tool getEvmMultiChainWalletPortfolio - " +
-        wallet_address
+      `Fetching portfolio (summary + positions) for wallet ${wallet_address}`
     );
+
     try {
-      const url = `https://api.zerion.io/v1/wallets/${wallet_address}/portfolio?currency=${currency}`;
-      logInfo("url is " + url);
-      const response = await fetch(url, options);
-      const portfolioData: PortfolioResponse = await response.json();
+      const summaryUrl = `${zerionBaseURL}/wallets/${wallet_address}/portfolio?currency=${currency}`;
+      const positionsUrl = `${zerionBaseURL}/wallets/${wallet_address}/positions/?filter[positions]=only_simple&filter[trash]=only_non_trash&sort=value&currency=${currency}`;
+
+      logInfo("Summary URL: " + summaryUrl);
+      logInfo("Positions URL: " + positionsUrl);
+
+      // Fetch both in parallel
+      const [summaryRes, positionsRes] = await Promise.all([
+        fetch(summaryUrl, { method: "GET", headers }),
+        fetch(positionsUrl, { method: "GET", headers }),
+      ]);
+
+      const [summaryData, positionsData]: [
+        PortfolioResponse,
+        PositionsResponse
+      ] = await Promise.all([summaryRes.json(), positionsRes.json()]);
+
       logObjects(
-        "portfolioData from getEvmMultiChainWalletPortfolio of wallet " +
-          wallet_address,
-        portfolioData
+        `summaryData from getEvmMultiChainWalletPortfolio of wallet ${wallet_address}`,
+        summaryData
       );
-      if (!portfolioData || !portfolioData?.data?.attributes) {
+      logObjects(
+        `positionsData from getEvmMultiChainWalletPortfolio of wallet ${wallet_address}`,
+        positionsData
+      );
+
+      if (!summaryData?.data?.attributes) {
         return "No results found. Check address and try again.";
       }
 
-      if (portfolioData?.data?.attributes?.total?.positions == 0) {
+      if (summaryData?.data?.attributes?.total?.positions === 0) {
         return "Wallet has no balances.";
       }
 
-      // filter for tokens with < 1 usd and only show top 10
-      const filteredPortfolio = filterAndLimitPortfolio(portfolioData.data);
+      // Filter + limit summary
+      const filteredSummary = filterAndLimitPortfolio(summaryData.data);
 
-      return { ...filteredPortfolio, currency };
+      // Extract clean positions array
+      const detailedPositions =
+        positionsData?.data?.map((p) => ({
+          id: p.id,
+          chain: p.relationships?.chain?.data?.id,
+          name: p.attributes?.fungible_info?.name,
+          symbol: p.attributes?.fungible_info?.symbol,
+          value: p.attributes?.value,
+          quantity: p.attributes?.quantity?.float,
+          price: p.attributes?.price,
+          percent_change_1d: p.attributes?.changes?.percent_1d,
+          icon: p.attributes?.fungible_info?.icon?.url,
+        })) || [];
+
+      return {
+        summary: filteredSummary,
+        positions: detailedPositions,
+        currency,
+      };
     } catch (error) {
       console.error("Error fetching wallet portfolio:", error);
       Sentry.captureException(error);
