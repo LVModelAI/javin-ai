@@ -123,7 +123,7 @@ const PurePreviewMessage = ({
                             loadingMessage="Exploring the blockchain"
                             isFinished
                           />
-                        ) : toolName === "getEvmWalletPositionsUsingZerion" ? (
+                        ) : toolName === "getEvmWalletPositions" ? (
                           <WalletPositionsTable result={result} />
                         ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
                           <ToolCallLoader
@@ -222,7 +222,7 @@ const PurePreviewMessage = ({
                         toolName === "getVanaApiData" ||
                         toolName === "getEvmOnchainDataUsingZerion" ? (
                         <ToolCallLoader loadingMessage="Exploring the blockchain..." />
-                      ) : toolName === "getEvmWalletPositionsUsingZerion" ? (
+                      ) : toolName === "getEvmWalletPositions" ? (
                         <ToolCallLoader loadingMessage="Getting your wallet positions..." />
                       ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
                         <ToolCallLoader loadingMessage="Exploring ethereum..." />
