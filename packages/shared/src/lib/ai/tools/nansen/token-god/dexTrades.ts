@@ -27,7 +27,7 @@ export const dexTrades = tool({
       "sonic",
       "unichain",
       "zksync",
-      "solana",
+      // "solana",
       "ton",
       "tron",
       "starknet",

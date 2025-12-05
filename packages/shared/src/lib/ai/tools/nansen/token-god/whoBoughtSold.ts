@@ -27,7 +27,7 @@ export const whoBoughtSold = tool({
       "sonic",
       "unichain",
       "zksync",
-      "solana",
+      // "solana",
       "ton",
       "tron",
       "starknet",

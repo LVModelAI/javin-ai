@@ -36,12 +36,12 @@ export const flowIntelligence = tool({
         "sonic",
         "unichain",
         "zksync",
-        "solana",
+        // "solana",
         "ton",
         "tron",
         "starknet",
       ])
-      .describe("Blockchain to query, for example ethereum, base, solana."),
+      .describe("Blockchain to query, for example ethereum, base"),
     token_address: z
       .string()
       .describe("Token contract address on the selected chain."),

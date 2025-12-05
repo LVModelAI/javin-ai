@@ -30,7 +30,7 @@ export const getSmartMoneyDexTrades = tool({
           "sonic",
           "unichain",
           "zksync",
-          "solana",
+          // "solana",
         ])
       )
       .describe("Chains to include in the analysis."),

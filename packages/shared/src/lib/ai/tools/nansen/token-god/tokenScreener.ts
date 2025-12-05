@@ -28,7 +28,7 @@ export const tokenScreener = tool({
           "sonic",
           "unichain",
           "zksync",
-          "solana",
+          // "solana",
           "ton",
           "tron",
           "bitcoin",
@@ -37,7 +37,7 @@ export const tokenScreener = tool({
       )
       .min(1)
       .describe(
-        "List of blockchain networks to screen for tokens. Example: ['ethereum', 'base', 'solana']"
+        "List of blockchain networks to screen for tokens. Example: ['ethereum', 'base']"
       ),
 
     date: z

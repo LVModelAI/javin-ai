@@ -30,7 +30,7 @@ export const getSmartMoneyNetflow = tool({
           "sonic",
           "unichain",
           "zksync",
-          "solana",
+          // "solana",
         ])
       )
       .describe("Chains to include in the analysis."),

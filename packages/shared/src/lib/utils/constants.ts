@@ -32,6 +32,8 @@ export const SUPPORTED_CURRENCY = [
 export const etherscanBaseURL = "https://api.etherscan.io/v2/api";
 export const zerionBaseURL = "https://api.zerion.io/v1";
 export const chains = [42161, 8453, 10];
+
+// supported chains and their ids for etherscan in getEvmOnchainDataUsingEtherscan tool
 export const supportedChainsAndId: Record<string, number> = {
   ethereumMainnet: 1,
   sepoliaTestnet: 11155111,
