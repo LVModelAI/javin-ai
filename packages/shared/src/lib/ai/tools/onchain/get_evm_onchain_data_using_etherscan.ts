@@ -1,19 +1,20 @@
 import { generateText, tool } from "ai";
 import { z } from "zod";
-import { myProvider } from "@javin/shared/lib/ai/models";
+import { myProvider } from "../../models";
 import {
-  getAllPathsAndDesc,
+  getAllPaths,
   getPathDetails,
   loadOpenAPI,
-} from "@javin/shared/lib/utils/openapi";
-import { ensToAddress } from "@javin/shared/lib/ai/tools/ens-to-address";
+} from "../../../utils/openapi";
+import { chainIdToBlockscoutUrl, supportedChainsAndId } from "./constant";
+import { ensToAddress } from "../ens-to-address";
+import { makeBlockscoutApiRequest } from "../../../utils/make-blockscout-api-request";
 import * as Sentry from "@sentry/nextjs";
-import { etherscanBaseURL } from "@javin/shared/lib/utils/constants";
 
-export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
+export const getEvmOnchainDataUsingBlockscout = (modelName: string) =>
   tool({
     description:
-      "Get real-time data from Ethereum-based blockchains using Etherscan v2 API.",
+      "Get real-time data from Ethereum-based blockchains using Blockscout API v2.",
     parameters: z.object({
       userQuery: z.string().describe("Query of user."),
       chainId: z.number().describe("The blockchain chain ID.").default(1), // default to Ethereum Mainnet
@@ -25,28 +26,29 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
       userQuery?: string;
       chainId?: number;
     }) => {
-      console.log("using etherscan v2 ...");
+      console.log("using blockscout api v2 ...");
       try {
         console.log(
-          `User query for getEvmOnchainDataUsingEtherscan (chainId: ${chainId}):`,
+          `User query for getEvmOnchainDataUsingBlockscout (chainId: ${chainId}):`,
           userQuery
         );
-        const apiKey = process.env.ETHERSCAN_API_KEY;
+        const apiKey = process.env.BLOCKSCOUT_API_KEY;
         if (!apiKey) {
-          throw new Error("Etherscan API key not found");
+          throw new Error("Blockscout API key not found");
         }
 
-        const etherscanOpenapidata = await loadOpenAPI(
-          "https://raw.githubusercontent.com/PurrProof/etherscan-openapi/refs/heads/main/etherscan-openapi31-bundled.yml"
-        );
-        const etherscanAllPathsAndDesc = await getAllPathsAndDesc(
-          etherscanOpenapidata
-        );
+        // Get Blockscout base URL for this chain
+        const blockscoutBaseUrl = chainIdToBlockscoutUrl[chainId];
+        if (!blockscoutBaseUrl) {
+          throw new Error(
+            `Blockscout explorer not available for chain ID ${chainId}. Supported chains: ${Object.keys(chainIdToBlockscoutUrl).join(", ")}`
+          );
+        }
 
-        console.log(
-          "ether scan alll paths and desc --- ",
-          etherscanAllPathsAndDesc
+        const blockscoutOpenapidata = await loadOpenAPI(
+          "https://raw.githubusercontent.com/blockscout/blockscout-api-v2-swagger/main/swagger.yaml"
         );
+        const blockscoutAllPaths = await getAllPaths(blockscoutOpenapidata);
 
         const aiAgentResponse = await generateText({
           model: myProvider.languageModel(modelName),
@@ -55,15 +57,16 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
               ## How to Process User Queries:
               1. **Match User Query to API Path**:  
                  - Analyze the user's question.  
-                 - Select the API path whose description best matches the intent of the query.  
+                 - Select the API path whose summary best matches the intent of the query.  
             
               2. **Retrieve Required Parameters**:  
                  - Use the **getPathParametersAndBaseUrl** tool to fetch all necessary parameters.  
-                 - Pass the API path, e.g., '/?module=account&action=balance'
+                 - Pass the API path, e.g., '/addresses/{hash}/transactions'
                  - If any required parameters are missing, prompt the user for input.  
+                 - Replace placeholders in the path with actual values (e.g., {hash} with an actual address hash)
             
               3. **Construct and Execute API Call**:  
-                 - Form a complete API URL using the **base URL** (${etherscanBaseURL}) + **chainid** + retrieved parameters.  
+                 - Form a complete API URL using the **base URL** (${blockscoutBaseUrl}/api/v2) + the API endpoint path.  
                  - Use the **makeApiCall** tool to fetch data.
                     
               ## **Final Response Format:**  
@@ -74,7 +77,7 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
               if user is asking about a transaction, and the transaction is not found on this chain, ask the user to specify the chain on which the he is asking about.
               `,
           prompt: JSON.stringify(
-            `User query: "${userQuery}". Available API paths and descriptions: ${etherscanAllPathsAndDesc}. Base URL: ${etherscanBaseURL}?chainid=${chainId}`
+            `User query: "${userQuery}". Available API paths and summaries: ${blockscoutAllPaths}. Base URL: ${blockscoutBaseUrl}/api/v2`
           ),
           tools: {
             ensToAddress: ensToAddress,
@@ -85,63 +88,63 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
                 path: z
                   .string()
                   .describe(
-                    "The API path, e.g., '/?module=account&action=balance'"
+                    "The API path, e.g., '/addresses/{hash}/transactions'"
                   ),
               }),
               execute: async ({ path }) => {
                 console.log("Fetching parameters for path:", path);
-                const etherscanPathsDetails = await getPathDetails(
-                  etherscanOpenapidata,
+                const blockscoutPathsDetails = await getPathDetails(
+                  blockscoutOpenapidata,
                   path
                 );
-                return etherscanPathsDetails;
+                return blockscoutPathsDetails;
               },
             }),
             makeApiCall: tool({
               description:
-                "Fetch real-time blockchain data from Etherscan v2 API.",
+                "Fetch real-time blockchain data from Blockscout API v2.",
               parameters: z.object({
                 path: z
                   .string()
-                  .describe("The API path with query parameters."),
+                  .describe("The API endpoint path (e.g., '/addresses/0x.../transactions')."),
               }),
               execute: async ({ path }) => {
                 try {
-                  const options = {
-                    method: "GET",
-                    headers: {
-                      accept: "application/json",
-                    },
-                  };
-                  const cleanPath = path.startsWith("/?")
-                    ? path.slice(2)
-                    : path;
-                  const fullUrl = `${etherscanBaseURL}?chainid=${chainId}&${cleanPath}&apikey=${apiKey}`;
+                  // Ensure path starts with /
+                  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+                  const fullUrl = `${blockscoutBaseUrl}/api/v2${cleanPath}`;
 
                   console.log("fetching --- ", fullUrl);
-                  const response = await fetch(fullUrl, options);
-                  if (!response.ok)
-                    throw new Error(
-                      `API call failed with status ${response.status}`
-                    );
-                  const json = await response.json();
+                  const resultString = await makeBlockscoutApiRequest(fullUrl);
+                  const json = JSON.parse(resultString);
 
-                  console.log(
-                    "[getEvmOnchainDataUsingEtherscan] Fetched API response:",
-                    json
-                  );
-                  // Remove the input field from all elements of the result array
+                  console.log("Fetched API response:", json);
 
-                  if (json.result == null) {
+                  // Handle empty results
+                  if (!json || (Array.isArray(json) && json.length === 0)) {
                     console.log(
-                      "Transaction not found on this chain, try a different chain"
+                      "No data found for this query, try a different chain or query"
                     );
-                    return "Transaction not found on this chain, try a different chain";
+                    return "No data found for this query, try a different chain or query";
                   }
-                  // console.log("json.result", json.result);
 
-                  if (Array.isArray(json.result) && json.result[0]?.input) {
-                    const cleanedResults = json.result.map((item: any) => {
+                  // Handle items array (common in Blockscout responses)
+                  if (json.items && Array.isArray(json.items)) {
+                    // Remove input field from transaction items if present
+                    if (json.items.length > 0 && json.items[0]?.input) {
+                      const cleanedItems = json.items.map((item: any) => {
+                        const { input, ...cleanedItem } = item;
+                        return cleanedItem;
+                      });
+                      console.log("Cleaned API response:", cleanedItems);
+                      return { ...json, items: cleanedItems };
+                    }
+                    return json;
+                  }
+
+                  // Handle direct array responses
+                  if (Array.isArray(json) && json[0]?.input) {
+                    const cleanedResults = json.map((item: any) => {
                       const { input, ...cleanedItem } = item;
                       return cleanedItem;
                     });
@@ -149,25 +152,7 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
                     return cleanedResults;
                   }
 
-                  // handle single object with input
-                  if (
-                    json.result &&
-                    typeof json.result === "object" &&
-                    json.result.input
-                  ) {
-                    const { input, ...cleanedItem } = json.result;
-                    console.log("Cleaned single API response:", cleanedItem);
-                    return cleanedItem;
-                  }
-
-                  if (path.includes("action=eth_blockNumber")) {
-                    const hexBlockNumber = json.result;
-                    const blockNumber = parseInt(hexBlockNumber, 16);
-                    console.log("Block number:", blockNumber);
-                    return blockNumber;
-                  }
-
-                  return json.result;
+                  return json;
                 } catch (error) {
                   console.error("Error fetching API data:", error);
                   Sentry.captureException(error);
@@ -182,7 +167,7 @@ export const getEvmOnchainDataUsingEtherscan = (modelName: string) =>
         console.log(`AI response is `, aiAgentResponse.text);
         return aiAgentResponse.text;
       } catch (error: any) {
-        console.error("Error in getEvmOnchainDataUsingEtherscan:", error);
+        console.error("Error in getEvmOnchainDataUsingBlockscout:", error);
         Sentry.captureException(error);
         return {
           success: false,

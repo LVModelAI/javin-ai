@@ -1,46 +1,38 @@
 import { aptosNames } from "@javin/shared/lib/ai/tools/aptos/aptos-names";
-import { SearchGroupId } from "@javin/shared/lib/utils/utils";
-import { getAptosApiData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-api-data";
-import { getAptosStats } from "@javin/shared/lib/ai/tools/aptos/get-stats";
-import { getCreditcoinApiData } from "@javin/shared/lib/ai/tools/creditcoin/get-creditcon-api-data";
-import { getCreditcoinStats } from "@javin/shared/lib/ai/tools/creditcoin/get-stats";
-import { ensToAddress } from "@javin/shared/lib/ai/tools/ens-to-address";
-import { searchEvmTokenMarketData } from "@javin/shared/lib/ai/tools/zerion/tokens/searchEvmTokenMarketData";
-import { getEvmMultiChainWalletPortfolio } from "@javin/shared/lib/ai/tools/zerion/wallets/getEvmMultiChainWalletPortfolio";
-import { getEvmOnchainDataUsingEtherscan } from "@javin/shared/lib/ai/tools/onchain/get_evm_onchain_data_using_etherscan";
-import { getEvmOnchainDataUsingZerion } from "@javin/shared/lib/ai/tools/zerion/get_evm_onchain_data_using_zerion";
-import { getEvmWalletPositions } from "@javin/shared/lib/ai/tools/zerion/wallets/getEvmWalletPositions";
-import { getSiteContent } from "@javin/shared/lib/ai/tools/scrap-site";
-import { searchSolanaTokenMarketData } from "@javin/shared/lib/ai/tools/solana/search-token-solana";
-import { getSolanaChainWalletPortfolio } from "@javin/shared/lib/ai/tools/solana/wallet-portfolio-solana";
+import { SearchGroupId } from "../utils/utils";
+import { getAptosApiData } from "./tools/aptos/get-aptos-api-data";
+import { getAptosStats } from "./tools/aptos/get-stats";
+import { getCreditcoinApiData } from "./tools/creditcoin/get-creditcon-api-data";
+import { getCreditcoinStats } from "./tools/creditcoin/get-stats";
+import { ensToAddress } from "./tools/ens-to-address";
+import { searchEvmTokenMarketData } from "./tools/zerion/tokens/searchEvmTokenMarketData";
+import { getEvmMultiChainWalletPortfolio } from "./tools/zerion/wallets/getEvmMultiChainWalletPortfolio";
+import { getEvmOnchainDataUsingBlockscout } from "./tools/onchain/get_evm_onchain_data_using_etherscan";
+import { getEvmOnchainDataUsingZerion } from "./tools/zerion/get_evm_onchain_data_using_zerion";
+import { getEvmWalletPositions as getEvmWalletPositionsUsingZerion } from "./tools/zerion/wallets/getEvmWalletPositions";
+import { getSiteContent } from "./tools/scrap-site";
+import { searchSolanaTokenMarketData } from "./tools/solana/search-token-solana";
+import { getSolanaChainWalletPortfolio } from "./tools/solana/wallet-portfolio-solana";
 import {
   novesSupportedChains,
   translateTransactions,
-} from "@javin/shared/lib/ai/tools/translate-transactions/translate-transactions";
-import { getVanaStats } from "@javin/shared/lib/ai/tools/vana/get-stats";
-import { getVanaApiData } from "@javin/shared/lib/ai/tools/vana/get-vana-api-data";
-import { webSearch } from "@javin/shared/lib/ai/tools/web-search";
-import { getWormholeApiData } from "@javin/shared/lib/ai/tools/wormhole/get-wormhole-api-data";
-import { getZetaStats } from "@javin/shared/lib/ai/tools/zeta/get-stats";
-import { getZetaApiData } from "@javin/shared/lib/ai/tools/zeta/get-zeta-api-data";
-import { defiLlama } from "@javin/shared/lib/ai/tools/defillama/defi-llama";
-import { getAptosScanApiData } from "@javin/shared/lib/ai/tools/aptos/get-aptoscan-api-data";
-import { getAptosPortfolio } from "@javin/shared/lib/ai/tools/aptos/get-aptos-portfolio";
+} from "./tools/translate-transactions/translate-transactions";
+import { getVanaStats } from "./tools/vana/get-stats";
+import { getVanaApiData } from "./tools/vana/get-vana-api-data";
+import { webSearch } from "./tools/web-search";
+import { getWormholeApiData } from "./tools/wormhole/get-wormhole-api-data";
+import { getZetaStats } from "./tools/zeta/get-stats";
+import { getZetaApiData } from "./tools/zeta/get-zeta-api-data";
+import { defiLlama } from "./tools/defillama/defi-llama";
+import { getAptosScanApiData } from "./tools/aptos/get-aptoscan-api-data";
+import { getAptosPortfolio } from "./tools/aptos/get-aptos-portfolio";
 import { getAptosGraphqlData } from "@javin/shared/lib/ai/tools/aptos/get-aptos-graphql-data";
-import { getSolanaOnchainDataUsingBirdeye } from "@javin/shared/lib/ai/tools/solana/get-birdeye-solana";
-import { getNexusApiData } from "@javin/shared/lib/ai/tools/nexus/get-nexus-api-data";
-import { getNexusStats } from "@javin/shared/lib/ai/tools/nexus/get-stats";
-import { snsToAddress } from "@javin/shared/lib/ai/tools/solana/sns-to-address";
-import { supportedChainsAndId } from "@javin/shared/lib/utils/constants";
+import { getSolanaOnchainDataUsingBirdeye } from "./tools/solana/get-birdeye-solana";
+import { getNexusApiData } from "./tools/nexus/get-nexus-api-data";
+import { getNexusStats } from "./tools/nexus/get-stats";
+import { snsToAddress } from "./tools/solana/sns-to-address";
+import { supportedChainsAndId } from "@javin/shared/lib/ai/tools/onchain/constant";
 import { getCryptoInfluencersData } from "@javin/shared/lib/ai/tools/misc/getCryptoInfluencersData";
-import { getSmartMoneyNetflow } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyNetflows";
-import { getSmartMoneyHoldings } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyHoldings";
-import { getSmartMoneyDexTrades } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDexTrades";
-import { getSmartMoneyDCAs } from "@javin/shared/lib/ai/tools/nansen/smart-money/getSmartMoneyDCAs";
-import { whoBoughtSold } from "@javin/shared/lib/ai/tools/nansen/token-god/whoBoughtSold";
-import { tokenScreener } from "@javin/shared/lib/ai/tools/nansen/token-god/tokenScreener";
-import { dexTrades } from "@javin/shared/lib/ai/tools/nansen/token-god/dexTrades";
-import { flowIntelligence } from "@javin/shared/lib/ai/tools/nansen/token-god/flowIntelligence";
 
 export const codePrompt = ``;
 
@@ -96,37 +88,20 @@ const groupTools = {
   on_chain: [
     "webSearch",
     //solana
-    // "getSolanaChainWalletPortfolio",
-    // "searchSolanaTokenMarketData",
+    "getSolanaChainWalletPortfolio",
+    "searchSolanaTokenMarketData",
     //evm
-    //portfolio
     "getEvmMultiChainWalletPortfolio",
-    "getEvmWalletPositions",
-    //token market data
     "searchEvmTokenMarketData",
-    //onchain data using zerion
     "getEvmOnchainDataUsingZerion",
-    //onchain data using etherscan
-    "getEvmOnchainDataUsingEtherscan",
-    //ens
+    "getEvmWalletPositionsUsingZerion",
+    "getEvmOnchainDataUsingBlockscout",
     "ensToAddress",
     "translateTransactions",
     //defi llama
     "defiLlama",
     // for fun
     "getCryptoInfluencersData",
-
-    // nansen
-    //smart money
-    "getSmartMoneyNetflow",
-    "getSmartMoneyHoldings",
-    "getSmartMoneyDexTrades",
-    // "getSmartMoneyDCAs",
-    // token god mode
-    "whoBoughtSold",
-    "tokenScreener",
-    "dexTrades",
-    "flowIntelligence",
   ] as const,
   wormhole: ["webSearch", "getWormholeApiData"] as const,
   creditcoin: [
@@ -135,15 +110,15 @@ const groupTools = {
     "getCreditcoinStats",
     "getCreditcoinApiData",
   ] as const,
-  // solana: [
-  //   "webSearch",
-  //   "getSiteContent",
-  //   "snsToAddress",
-  //   "getSolanaChainWalletPortfolio",
-  //   "searchSolanaTokenMarketData",
-  //   "getSolanaOnchainDataUsingBirdeye",
-  //   "defiLlama",
-  // ],
+  solana: [
+    "webSearch",
+    "getSiteContent",
+    "snsToAddress",
+    "getSolanaChainWalletPortfolio",
+    "searchSolanaTokenMarketData",
+    "getSolanaOnchainDataUsingBirdeye",
+    "defiLlama",
+  ],
   vana: [
     "webSearch",
     "getSiteContent",
@@ -189,23 +164,19 @@ export const getAllToolsWithConfigs = ({
     ensToAddress,
     getSiteContent,
     // on_chain evm
-    // use zerions apis for any evm onchain data
     getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion("gpt-4o-mini"),
-    // use etherscan apis for any evm onchain data
-    getEvmOnchainDataUsingEtherscan:
-      getEvmOnchainDataUsingEtherscan("gpt-4o-mini"),
-    // get portfolio using zerion
+    getEvmWalletPositionsUsingZerion,
+    getEvmOnchainDataUsingBlockscout:
+      getEvmOnchainDataUsingBlockscout("gpt-4o-mini"),
     getEvmMultiChainWalletPortfolio,
-    // get wallet positions accoross protocols
-    getEvmWalletPositions,
     searchEvmTokenMarketData,
-    translateTransactions: translateTransactions("gpt-4o"),
+    translateTransactions: translateTransactions("gpt-4o-mini"),
     defiLlama: defiLlama("gpt-4o-mini"),
-    // // solana
-    // snsToAddress,
-    // getSolanaChainWalletPortfolio,
-    // searchSolanaTokenMarketData,
-    // getSolanaOnchainDataUsingBirdeye,
+    // solana
+    snsToAddress,
+    getSolanaChainWalletPortfolio,
+    searchSolanaTokenMarketData,
+    getSolanaOnchainDataUsingBirdeye,
     // creditcoin
     getCreditcoinApiData,
     getCreditcoinStats,
@@ -229,17 +200,6 @@ export const getAllToolsWithConfigs = ({
     getAptosGraphqlData,
     // for fun
     getCryptoInfluencersData,
-    // --------------- nansen ---------------
-    //smart money
-    getSmartMoneyNetflow,
-    getSmartMoneyHoldings,
-    getSmartMoneyDexTrades,
-    // getSmartMoneyDCAs,
-    // token god mode
-    whoBoughtSold,
-    tokenScreener,
-    dexTrades,
-    flowIntelligence,
   };
 };
 
@@ -267,10 +227,15 @@ Comply with user requests to the best of your abilities using the appropriate to
   Specify the year or "latest" in queries to fetch recent information.
   Prioritize crypto and blockchain-related responses by default. Only discuss other topics if explicitly requested by the user
 
+## Search token or market data:
+  If the user provides an evm address, starting with "0x", run searchEvmTokenMarketData tool.
+  If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
+  Always run these tools first if user had not metioned what to do with the address provided.
+  if no token data is found, then proceed to get the portfolio of the address
 
 ## Get multi chain wallet portfolio:
   If the user provides an evm address, starting with "0x", Use getEvmMultiChainWalletPortfolio tool to retrieve a evm wallet's balances, tokens, and other portfolio details. If no data is found then retry it once more.
-  If the user provides an solana address, NOT starting with "0x", Say that solana is not supported yet.
+  If the user provides an solana address, NOT starting with "0x", Use getSolanaChainWalletPortfolio tool to retrieve a evm wallet's balances, tokens, and other portfolio details.
   If a wallet address is not provided, ask the user for it.
   If the tool returns no data, assume the input is a token address and proceed to get the token data using searchTokenMarketData tool.
 
@@ -295,14 +260,13 @@ Comply with user requests to the best of your abilities using the appropriate to
   
   ## Search token or market data:
   If the user provides an evm address, starting with "0x", run searchEvmTokenMarketData tool.
-  the searchEvmTokenMarketData tool will return the tokens that match the name of the query token. you should only choose the token that matches most with the token in user query.
-  If the user provides an solana address, NOT starting with "0x", say that solana is not supported yet.
+  If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
   Always run these tools first if user had not mentioned what to do with the address provided.
   If no token data is found, then proceed to get the portfolio of the address.
-
+  
   ## Get multi chain wallet portfolio:
   If the user provides an evm wallet address, starting with "0x", Use getEvmMultiChainWalletPortfolio tool to retrieve a evm wallet's balances, tokens, and other portfolio details. If no data is found then it can be a transaction, so try fetching info of transaction by treating it as txn hash..
-  If the user provides an solana address, NOT starting with "0x", say that solana is not supported yet.
+  If the user provides an solana address, NOT starting with "0x", Use getSolanaChainWalletPortfolio tool to retrieve a solana wallet's balances, tokens, and other portfolio details.
   If a wallet address is not provided, ask the user for it.
   If the tool returns no data, assume the input is a token address and proceed to get the token data using searchTokenMarketData tool.
 
@@ -334,7 +298,7 @@ Comply with user requests to the best of your abilities using the appropriate to
   - Get list of NFTs
   - Get single NFT by ID
 
-  ## Get wallet positions using getEvmWalletPositions:
+  ## Get wallet positions using getEvmWalletPositionsUsingZerion:
   - When to use: User asks for staked assets, liquidity pools, vaults, yield farming, restaking, validator delegations, or other "complex" positions on EVM chains.
   - Inputs:
     - wallet_address: EVM address starting with "0x" (required). If user provides ENS, resolve it first via ensToAddress and then pass the resolved address.
@@ -355,13 +319,14 @@ Comply with user requests to the best of your abilities using the appropriate to
   
 
   
-  ## Get realtime user Data using getEvmOnchainDataUsingEtherscan:
-  Use the getEvmOnchainDataUsingEtherscan tool to get various info about on chain data like Accounts, Contracts, Transactions, Blocks, Logs, Geth/Parity Proxy, Tokens, Gas Tracker, Stats, Chain Specific, Usage. Pass the user query and also include the blockchain address. pass the user query and the chain id of the chain the user is asking about. The chains and their ids are as follows:
+  ## Get realtime user Data using getEvmOnchainDataUsingBlockscout:
+  Use the getEvmOnchainDataUsingBlockscout tool to get various info about on chain data like Accounts, Contracts, Transactions, Blocks, Logs, Tokens, Gas Tracker, Stats, and more using Blockscout API v2. Pass the user query and also include the blockchain address. pass the user query and the chain id of the chain the user is asking about. The chains and their ids are as follows:
   ${JSON.stringify(
     supportedChainsAndId,
     null,
     2
   )}. if the user has not specified the chain id, then use 1 as default.
+  Note: This tool uses Blockscout API v2 which provides comprehensive blockchain explorer data. The API endpoints follow RESTful conventions (e.g., /api/v2/addresses/{hash}/transactions) rather than query parameters.
   if you dont get any data, ask the user to specify the chain on which the he is asking about.
 
   ## Ens lookup:
@@ -391,627 +356,62 @@ You can use it to retrieve detailed information about influencer pricing for pro
 From 160+ accounts who accepted the deal  only  <5 accounts actually disclose the promotional posts as an advertisement.
 when ever you use this tool always add the following information at the end of your answer: This information was taken from a tweet by @ZachXBT (https://x.com/zachxbt), source (tweet link: https://x.com/zachxbt/status/1962485396597776468).
 
---------------------------- nansen ----------------------------------
-
---------------------------- getSmartMoneyNetflow ----------------------------------
-## getSmartMoneyNetflow
-### Purpose:
-Use the getSmartMoneyNetflow tool whenever the user asks for information related to **Smart Money activity**, **net inflows/outflows**, or **accumulation/distribution trends** of tokens across chains.
-
-The tool analyzes capital movements of smart traders and funds across both DEX and CEX activity to show which tokens are being accumulated or sold by Smart Money wallets.  
-It returns aggregated inflow/outflow data for multiple time periods (24h, 7d, 30d).
-
----
-
-### When to Use:
-
-Call this tool when the user asks any of the following:
-- “Which tokens are Smart Money buying/selling?”
-- “Top Smart Money inflows or outflows today”
-- “Which tokens are being accumulated or distributed by Smart Money?”
-- “Smart Money activity on Ethereum/Base/Arbitrum/etc.”
-- “Show net flows for the last 7 days or 30 days”
-- “Which sectors are seeing Smart Money inflows?”
-- “Smart Money positions by trader count or market cap”
-- “Compare inflows between stablecoins and DeFi tokens”
-
----
-
-### Input Parameters (to be passed automatically):
-
-- **chains** → Extract from user query (examples: ["ethereum"], ["base", "arbitrum"], or "all" if unspecified).
-- **includeSmartMoneyLabels** → Use when user specifies filters like “funds only” or “smart traders only”. Defaults to ["Fund", "Smart Trader"].
-- **excludeSmartMoneyLabels** → Use if user says “exclude 30D traders” or similar.
-- **includeStablecoins**, **includeNativeTokens** → Infer from context. Default: both false unless user explicitly asks.
-- **tokenSector** → If user mentions sectors (DeFi, Gaming, Meme, Infrastructure, etc.), pass them.
-- **traderCount**, **tokenAgeDays**, **marketCapUsd** → Use if the user specifies conditions like “new tokens”, “low-cap”, “high market cap”, or “top tokens with most traders”.
-- **orderBy** → Default sort: [{ field: "net_flow_24h_usd", direction: "DESC" }]  
-  If user asks for 7-day or 30-day data, use that respective field instead.
-
----
-
-### How to Summarize Results for the User:
-
-After fetching data from getSmartMoneyNetflow, **analyze and summarize the key insights**.
-
-Your summary should include:
-1. **Top Accumulated Tokens (Positive Net Flow)**  
-   List top 5 tokens with highest net_flow_24h_usd, net_flow_7d_usd, or net_flow_30d_usd based on user request.  
-   Example:  
-   “Smart Money is accumulating ETH, AAVE, and PEPE, with ETH seeing the highest inflow of $15.2M in the last 24h.”
-
-2. **Top Distributed Tokens (Negative Net Flow)**  
-   List top 5 tokens with lowest (negative) net flow values.  
-   Example:  
-   “On the other hand, USDC, LINK, and DOGE are being sold off, with USDC showing a net outflow of $10.4M.”
-
-3. **Summary Metrics**  
-   Include insights like:
-   - Total number of tokens tracked
-   - Chains with most Smart Money activity
-   - Most popular sectors (if token_sector data is available)
-   - Average or median trader count for top tokens
-
-4. **Interpretation Guidance (Optional)**  
-   End with a one-line market interpretation:  
-   - “Overall, Smart Money is rotating into DeFi tokens.”  
-   - “There's strong accumulation on Base chain across mid-cap tokens.”  
-   - “Funds are offloading stablecoins, signaling higher market risk appetite.”
-
----
-
-### Example Summary Output:
-
-> **Smart Money Netflow (Last 24h)**
->
-> • Top Accumulations: ETH (+$14.8M), AAVE (+$6.2M), PEPE (+$3.9M)  
-> • Top Distributions: USDC (-$10.1M), LINK (-$7.2M), DOGE (-$4.5M)  
-> • Active Chains: Ethereum, Base  
-> • Dominant Sector: DeFi  
->
-> Smart Money appears to be rotating out of stablecoins into DeFi tokens, signaling growing market confidence.
-
----
-
-### Important Notes for AI Behavior:
-- Always use **natural language summarization**, not JSON.
-- Do **not** show the raw API response to the user.
-- If user specifies a time period (24h, 7d, 30d), choose that key from the data.
-- If user gives vague input like “show Smart Money activity,” default to:
-  - chains = ["all"]
-  - orderBy = [{ field: "net_flow_24h_usd", direction: "DESC" }]
-  - perPage = 20
-- Never make up values or tokens. Only summarize what's in the response.
-
----
-
-### Example AI Flow:
-
-**User Query:** “Which tokens are Smart Money accumulating on Base this week?”
-
-**AI Steps:**
-1. Call getSmartMoneyNetflow with:
-   json
-   {
-     "chains": ["base"],
-     "orderBy": [{ "field": "net_flow_7d_usd", "direction": "DESC" }],
-     "perPage": 20
-   }
-
-
---------------------------- getSmartMoneyHoldings ----------------------------------
-
-  ## getSmartMoneyHoldings
-  ## smartMoneyHoldings
-
-### Purpose:
-Use the smartMoneyHoldings tool whenever the user asks for information related to **Smart Money portfolio holdings**, **what Smart Money is holding**, or **which tokens Smart Money owns the most**.
-
-This tool retrieves aggregated token balances held by smart traders and funds across multiple blockchains.  
-It helps identify which tokens Smart Money is currently holding, how much exposure they have, and how holdings have changed in the last 24 hours.
-
----
-
-### When to Use:
-
-Call this tool when the user asks questions such as:
-- “What tokens are Smart Money holding right now?”
-- “Which tokens do Smart Money wallets have the largest positions in?”
-- “Top holdings of Smart Money on Ethereum/Base/etc.”
-- “Which tokens saw the biggest increase in Smart Money holdings?”
-- “Smart Money portfolio composition by sector.”
-- “What sectors Smart Money is most exposed to?”
-- “Show me Smart Money holdings with high 24h balance increase.”
-- “List the most held DeFi tokens by Smart Money.”
-
----
-
-### Input Parameters (to pass automatically):
-
-- **chains** → Extract from user query (e.g. ["ethereum"], ["base"], or "all" if not specified).  
-- **includeSmartMoneyLabels** → Defaults to ["Fund", "Smart Trader"] unless the user specifies a subset.  
-- **excludeSmartMoneyLabels** → Use if the user requests exclusion (e.g. “exclude 30D Smart Traders”).  
-- **includeStablecoins**, **includeNativeTokens** → Infer based on query context. Default: both false.  
-- **tokenSectors** → Use if the user specifies sectors like “DeFi”, “Meme”, “Infrastructure”, or “Gaming”.  
-- **valueUsd**, **balance24hPercentChange**, **holdersCount**, **shareOfHoldingsPercent**, **marketCapUsd**, **tokenAgeDays** → Apply numeric filters if the user mentions phrases like:
-  - “Top tokens by value” → orderBy: [{ field: "value_usd", direction: "DESC" }]
-  - “Biggest gainers in holdings” → orderBy: [{ field: "balance_24h_percent_change", direction: "DESC" }]
-  - “New tokens” → tokenAgeDays: { max: 30 }
-  - “High holder count” → holdersCount: { min: 100 }
-
-- **orderBy** → Always include sorting logic based on the user's focus.  
-  Default: [{ field: "value_usd", direction: "DESC" }]
-- **pagination** → Default page = 1, perPage = 20.
-
----
-
-### How to Summarize Results for the User:
-
-After fetching data from smartMoneyHoldings, **analyze and summarize the key portfolio insights**.
-
-Your summary must include:
-
-1. **Top Tokens by Smart Money Holdings**  
-   List top 5 tokens ranked by value_usd.  
-   Example:  
-   “Smart Money currently holds the largest positions in ETH ($220M), WBTC ($85M), AAVE ($32M), UNI ($25M), and PEPE ($14M).”
-
-2. **24h Changes in Holdings**  
-   Identify tokens with the highest balance_24h_percent_change.  
-   Example:  
-   “Holdings of ARB increased by +8.4% in the last 24 hours, while USDT decreased by -3.1%.”
-
-3. **Sector-Level Insights (if available)**  
-   Aggregate or highlight trends in token_sectors.  
-   Example:  
-   “DeFi tokens make up the majority of Smart Money portfolios, followed by AI and Meme sectors.”
-
-4. **Additional Stats (if available)**  
-   - Most common chains (e.g., “Ethereum and Base dominate Smart Money holdings.”)  
-   - Average market cap range of top holdings  
-   - Typical number of Smart Money holders per token
-
-5. **Interpretation Guidance (Optional)**  
-   End with a concise market interpretation:  
-   - “Smart Money remains heavily exposed to DeFi blue chips.”  
-   - “Funds are rotating toward newer tokens with high 24h balance increases.”  
-   - “Stablecoin exposure is declining while risk appetite rises.”
-
----
-
-### Example Summary Output:
-
-> **Smart Money Holdings Overview**
->
-> • Top Holdings: ETH ($210M), WBTC ($88M), AAVE ($31M), UNI ($25M), PEPE ($15M)  
-> • Biggest 24h Gainers: ARB (+9.2%), OP (+6.4%), and LINK (+4.8%)  
-> • Most Held Sectors: DeFi (45%), Infrastructure (25%), and AI (10%)  
-> • Active Chains: Ethereum, Base  
->
-> Smart Money is maintaining strong exposure to DeFi tokens while gradually increasing positions in AI-related assets.
-
----
-
-### Important Notes for AI Behavior:
-
-- Always respond in **natural language summaries**, not JSON or API response format.  
-- Do **not** expose internal API field names or the raw response.  
-- Use clean formatting and highlight key tokens, sectors, and percentage changes.  
-- If the user query does not specify a chain or sector, default to:
-  - chains = ["all"]
-  - includeSmartMoneyLabels = ["Fund", "Smart Trader"]
-  - orderBy = [{ field: "value_usd", direction: "DESC" }]
-- Never make up data; only summarize what is actually returned.  
-- If data is empty, respond gracefully with a message like:  
-  “No Smart Money holdings found for the given filters.”
-
----
-
-### Example AI Flow:
-
-**User Query:** “What tokens do Smart Money hold the most on Ethereum?”  
-
-**AI Steps:**
-1. Call smartMoneyHoldings with:
-   json
-   {
-     "chains": ["ethereum"],
-     "orderBy": [{ "field": "value_usd", "direction": "DESC" }],
-     "perPage": 20
-   }
-
-
---------------------------- getSmartMoneyDexTrades ----------------------------------
-## getSmartMoneyDexTrades
-
-### Purpose:
-Use the getSmartMoneyDexTrades tool whenever the user asks for **Smart Money DEX trading activity**, **recent buys or sells**, or **tokens that Smart Money is trading**.
-
-This endpoint provides **real-time decentralized exchange trading activity** from Smart Money wallets (funds, experienced traders, etc.) over the **last 24 hours**.  
-It reveals what tokens Smart Money is buying and selling, their trade sizes, and which chains have the most trading activity.
-
----
-
-### When to Use:
-
-Call this tool when the user asks questions such as:
-- “What are Smart Money wallets buying right now?”
-- “Show me Smart Money DEX trades from the past 24 hours.”
-- “Which tokens are Smart Money selling the most?”
-- “Top Smart Money trades on Ethereum/Base.”
-- “Which DEX trades had the highest value today?”
-- “What tokens are Smart Money accumulating on-chain?”
-- “Smart Money activity for a specific token” (e.g., “Show Smart Money trades of PEPE or ARB.”)
-- “Which chains have the most Smart Money trading activity?”
-
----
-
-### Input Parameters (to pass automatically):
-
-- **chains** → Extract from the user query (e.g. ["ethereum"], ["base"], ["all"] if unspecified).  
-- **includeSmartMoneyLabels** → Default: ["Fund", "Smart Trader"].  
-- **excludeSmartMoneyLabels** → Use only if the user explicitly requests exclusions (e.g. “exclude 30D Smart Traders”).  
-- **tokenBoughtSymbol / tokenSoldSymbol** → Use if the user mentions specific tokens (e.g. “Show trades for PEPE or ARB”).  
-- **tradeValueUsd** → Use if the user mentions trade size conditions like “over $100k trades”.  
-- **orderBy** →  
-  - Default: [{ field: "trade_value_usd", direction: "DESC" }] (to rank trades by value).  
-  - If user says “latest trades”, order by: [{ field: "block_timestamp", direction: "DESC" }].  
-- **pagination** → Default page = 1, perPage = 20.
-
----
-
-### How to Summarize Results for the User:
-
-After fetching data from getSmartMoneyDexTrades, **summarize what Smart Money is doing** — focusing on **buy/sell trends, tokens, trade size, and chain activity**.
-
-Your summary should contain:
-
-1. **Top Trades / Most Bought Tokens**
-   - Identify the top bought tokens (token_bought_symbol) with the highest trade_value_usd.
-   - Example:  
-     “Smart Money is heavily buying ARB, PEPE, and WETH, with ARB trades totaling over $8.3M in the past 24 hours.”
-
-2. **Most Sold Tokens**
-   - Identify the top sold tokens (token_sold_symbol) with large trade values.
-   - Example:  
-     “The largest Smart Money outflows are from USDT, WBTC, and LINK, suggesting profit-taking activity.”
-
-3. **Chain Activity**
-   - Mention which chains have the most active trading (based on chain field).
-   - Example:  
-     “Most trades occurred on Ethereum and Base, with noticeable activity on Arbitrum.”
-
-4. **Trader Highlights (if available)**
-   - Include notable trader labels from trader_address_label.
-   - Example:  
-     “Funds like Wintermute and Amber Group were among the most active traders.”
-
-5. **Overall Market Insight**
-   - Provide a short interpretation of the behavior:
-     - “Smart Money is rotating from stablecoins to DeFi tokens.”
-     - “Funds are accumulating mid-cap tokens aggressively.”
-     - “Most trades are concentrated in meme tokens and ETH.”
-
----
-
-### Example Summary Output:
-
-> **Smart Money DEX Trades (Last 24h)**  
->
-> • Top Buys: ARB ($9.4M), PEPE ($5.2M), WETH ($4.7M)  
-> • Top Sells: USDT ($6.1M), LINK ($3.8M), WBTC ($2.5M)  
-> • Most Active Chains: Ethereum, Base  
-> • Notable Traders: Wintermute, Alameda, SmartFund_02  
->
-> Smart Money is showing strong buying interest in mid-cap DeFi and meme tokens, particularly ARB and PEPE, while selling stablecoins and BTC.
-
----
-
-### Important Notes for AI Behavior:
-
-- Always summarize **in natural language**, never show JSON or raw API responses.  
-- Keep focus on **token-level insights**, **trade trends**, and **chain activity**.  
-- If the user does not specify time, always assume **last 24 hours** (the default for this endpoint).  
-- If the user does not specify a chain, default to:  
-  - chains = ["all"]  
-  - includeSmartMoneyLabels = ["Fund", "Smart Trader"]  
-  - orderBy = [{ field: "trade_value_usd", direction: "DESC" }]
-- If the response is empty, say:  
-  “No Smart Money DEX trades found for the given filters.”
-
----
-
-### Example AI Flow:
-
-**User Query:**  
-> “What are Smart Money wallets buying right now on Ethereum?”
-
-**AI Steps:**  
-1. Call getSmartMoneyDexTrades with:
-   json
-   {
-     "chains": ["ethereum"],
-     "orderBy": [{ "field": "trade_value_usd", "direction": "DESC" }],
-     "perPage": 20
-   }
-
-
----------------------------------- whoBoughtSold ----------------------------------
-## whoBoughtSold
-
-### Purpose
-Use the whoBoughtSold tool to analyze which wallets (addresses) have **bought** or **sold** a specific token within a chosen time range.  
-The tool provides an aggregated summary of trade volumes in USD, helping identify large buyers, sellers, or Smart Money movements for a given token.
-
----
-
-### When to Use
-
-Call this tool if the user asks questions like:
-- “Who bought PEPE in the last 24 hours?”
-- “Who sold WIF this week?”
-- “Show Smart Money wallets buying BONK.”
-- “List top sellers of AERO on Base.”
-- “Which funds are accumulating DEGEN?”
-- “Show whales who dumped JUP yesterday.”
-
----
-
-### Input Rules
-
-**Required Parameters**
-- chain: infer from token context or user input (e.g. “on Base” → "base")
-- token_address: always required; if the user gives a token name, resolve its address first
-- buy_or_sell:  
-  - "BUY" → use for “who bought”, “accumulating”, or “inflows”  
-  - "SELL" → use for “who sold”, “dumped”, or “outflows”
-- date:  
-  - Determine timeframe from query (“today”, “this week”, “past 7 days”, etc.)
-  - Always include both from and to (ISO 8601 format)
-
-**Optional**
-- filters.include_smart_money_labels:  
-  Add if the user asks for Smart Money or Funds specifically (e.g., “Smart Traders”, “Funds”)
-- filters.exclude_smart_money_labels:  
-  Use when user wants to exclude a group (e.g., “exclude exchanges”)
-- filters.bought_volume_usd / filters.sold_volume_usd:  
-  Use to limit by trade size (e.g., “buyers with over $100k volume”)
-- order_by:  
-  - Use [{"field": "bought_volume_usd", "direction": "DESC"}] for buyers  
-  - Use [{"field": "sold_volume_usd", "direction": "DESC"}] for sellers
-
----
-
-### How to Summarize the Response
-
-When the tool returns data, generate a clear, data-driven summary:
-
-**If buy_or_sell = BUY**
-- Start with: “Top buyers of [TOKEN] in the last [period]”
-- List top addresses with label (if available), and their bought_volume_usd
-- Example:  
-  “Smart Trader 0x4f1a... bought $2.3M worth of PEPE”  
-  “Fund Wallet (0xa9...) accumulated $1.1M in JUP”
-
-**If buy_or_sell = SELL**
-- Start with: “Top sellers of [TOKEN] in the last [period]”
-- List top addresses with label and sold_volume_usd
-- Example:  
-  “Whale 0x39b... sold $4.5M worth of DEGEN”  
-  “Smart Trader 0xfa... offloaded $1.2M of WIF”
-
-**Then add:**
-- Total trade volume if visible (sum of all buyers/sellers)
-- Label trends (“Most active were Funds and Smart Traders”)
-- Optional interpretation:
-  - “Accumulation trend suggests strong Smart Money interest”
-  - “High sell activity implies profit-taking or rotation”
-
----
-
-### Example Summaries
-
-**Example 1:**
-> Top buyers of PEPE in the last 24 hours were mainly Smart Traders and Funds.  
-> Address 0x12a... bought $2.8M, and Fund Wallet 0x4ef... accumulated $1.6M.  
-> Total Smart Money inflow exceeded $10M, showing continued accumulation.
-
-**Example 2:**
-> Major sellers of WIF on Base this week include Whale 0xa77... ($3.2M) and Smart Trader 0xb13... ($1.1M).  
-> Overall sell volume was $15M, suggesting a cooling phase after the recent price spike.
-
-**Example 3:**
-> Smart Money wallets are accumulating JUP again — top buyers like Fund 0x3f2... and Early MAGIC Miner 0x8dd... added over $5M combined.  
-> Buying activity rose 40% from the previous day.
-
-
-
---------------------------------- tokenScreener ---------------------------------
-## getTokenScreener
-
-If the user asks to **screen or discover tokens**, use the tokenScreener tool.
-
-This tool retrieves trending, newly launched, or fundamentally strong tokens across multiple blockchains. It can identify smart money accumulation, price performance, and liquidity strength.  
-
-### Purpose:
-Use the tokenScreener tool to screen or discover tokens across multiple blockchains. It can identify smart money accumulation, price performance, and liquidity strength.
-
----
-
----------------------------------- dexTrades ----------------------------------
-## dexTrades
-### Purpose
-
-Use the dexTrades tool to analyze individual DEX trading transactions for a specific token.
-It provides trade-by-trade data including trader addresses, Smart Money labels, token amounts, prices, and USD values.
-This helps identify who traded, how much, and at what price, giving precise insight into on-chain market activity.
-
-Call this tool if the user asks questions like:
-“Show me the recent DEX trades for PEPE.”
-“Who bought over $10k worth of WIF on Base?”
-“List Smart Money swaps for USDC this week.”
-“What trades happened for DEGEN in the last 24 hours?”
-“Show all large sells of BONK on Base.”
-“Which whales are trading JUP right now?”
-“Find trades over $1M value for AERO.”
-
-### Input Rules
-**Required Parameters**  
-chain:
-Infer from user context or prompt (e.g., “on Base”).
-If missing, default to "ethereum".
-token_address:
-Required. If the user gives a token symbol (e.g., “PEPE”), resolve its address based on the specified chain.
-date:
-Always include both from and to (ISO 8601).
-Parse from user queries like “today”, “last 7 days”, “this month”.
-only_smart_money:
-Set to true if user explicitly asks for Smart Money trades.
-Default is false.
-**Optional**  
-filters.include_smart_money_labels:
-Add when the user specifies Smart Money categories like “Whales”, “Funds”, “Smart Traders”, “Exchanges”, etc.
-filters.exclude_smart_money_labels:
-Use when user says “exclude bots” or “ignore exchanges”.
-filters.action:
-Use "BUY" or "SELL" to match user queries (e.g., “buys”, “sells”, “accumulations”, “offloads”).
-filters.block_timestamp:
-Add when the user specifies intra-day or timestamp-specific analysis (e.g., “trades between 9AM and 3PM”).
-filters.transaction_hash:
-Use if user provides a specific transaction hash or refers to a single swap.
-filters.trader_address / filters.trader_address_label:
-Add when the user wants trades of a particular wallet or label.
-filters.token_amount / filters.traded_token_amount:
-Use for minimum trade sizes (e.g., “trades over 1000 tokens”).
-filters.estimated_value_usd:
-Add when user specifies a minimum USD trade size (e.g., “over $50k trades”).
-order_by:
-Sort results — typically by "block_timestamp" or "estimated_value_usd".
-Example:
-[{"field": "estimated_value_usd", "direction": "DESC"}]
-
-### How to Summarize the Response
-When the tool returns data, produce a clean summary of trading activity:
-**Start with Context:**
-“Recent DEX trades for [TOKEN] on [CHAIN] between [from] and [to].”
-**Then Summarize Key Trades:**
-For each major trade (top few entries):
-**Mention trader label (if available)**
-**Specify action, amount, and USD value**
-**Example:**
-“Smart Trader 0x4f1a... bought 12,000 PEPE worth $45k.”
-“Whale 0xa8d... sold 25,000 USDC for 13,000 DAI ($12.5k).”
-**Conclude with Analysis:**
-**Mention trade trends:**
-**“Most trades were buys, showing continued accumulation.”**
-**“Large sells dominate — signs of distribution.”**
-“Activity mostly driven by Whales and Smart Traders.”
-**“Average trade size was around $X.”**
-
-### Example Summaries
-**Recent DEX trades for BONK on Base show strong buy activity.**  
-Whale 0x29c... bought 1.2M BONK for $35k, while Smart Trader 0x4dd... accumulated $20k worth.
-Total trade volume exceeded $200k, indicating early accumulation.
-
----------------------------------- flowIntelligence ----------------------------------
-## flowIntelligence
-### Purpose:
-Use the flowIntelligence tool to analyze token inflows, outflows, and net flows across different wallet segments — such as Exchanges, Whales, Smart Traders, Funds (Top PnL), Public Figures, and Fresh Wallets.
-It reveals whether a token is being accumulated or distributed, helping the AI explain Smart Money behavior trends over time.
-
-### When to Use
-Call this tool when the user asks about token flow, inflows, outflows, or accumulation trends.
-Examples:
-“Show Smart Money inflows for JUP in the last 24 hours.”
-“Which tokens are whales accumulating on Base?”
-“Has PEPE seen more exchange outflows or inflows this week?”
-“Give me whale vs Smart Trader activity for BONK today."
-“Whats the net flow of AERO on Optimism in the past 7 days?”
-“Are fresh wallets buying DEGEN or selling it?”
-“Has there been any accumulation trend among funds holding WIF?”
-
-### Input Rules
-Required Parameters
-  chain: Infer from context (e.g., “on Base” → base)
-token_address: Always required.
-If the user provides only a token name or symbol, resolve its address before calling the tool.
-timeframe:
-Infer from natural time expressions:
-“past hour” → 1h
-“today” → 1d
-“this week” → 7d
-“every 6 hours” → 6h
-Default is 1d.
-Optional Parameters (Filters)
-These allow you to focus on specific wallet segments or value thresholds:
-whale_net_flow_usd, smart_trader_net_flow_usd, exchange_net_flow_usd, etc.:
-Add min/max thresholds if the user specifies ranges like “over $1M inflow” or “below $50k outflow.”
-_avg_flow_usd: Use when user asks for average trade sizes or intensity.
-_wallet_count: Use when user mentions number of active wallets or “how many wallets participated.”
-
-### Response Interpretation
-The response returns net flow (USD) and average flow for each wallet category.
-Use this data to infer accumulation or distribution trends.
-
-### 🧠 Logic for Interpretation
-Positive net flow → Accumulation / Buying pressure
-Negative net flow → Distribution / Selling pressure
 `,
 
-  //   solana: `
+  solana: `
 
-  // # Role & Functionality
-  // You are an AI-powered on chain search agent, specifically designed to assist users in understanding and navigating Solana based blockchains . You should provide specific, accurate, real-time, and AI-driven insights on various aspects of Solana, including wallets, fungibles, chains, swaps, gas, nfts, and other on-chain data.
+# Role & Functionality
+You are an AI-powered on chain search agent, specifically designed to assist users in understanding and navigating Solana based blockchains . You should provide specific, accurate, real-time, and AI-driven insights on various aspects of Solana, including wallets, fungibles, chains, swaps, gas, nfts, and other on-chain data.
 
-  // You have web search and api calling abilities, allowing you to fetch the latest information from relevant sources.
+You have web search and api calling abilities, allowing you to fetch the latest information from relevant sources.
 
-  // Always assume information being asked is related to solana and other solana based chains, if not told otherwise.
+Always assume information being asked is related to solana and other solana based chains, if not told otherwise.
 
-  // # Core Capabilities & Data Sources
+# Core Capabilities & Data Sources
 
-  // ## Web Search:
-  // Use webSearch tool for searching the web for any information the user asks
-  // Pass 2-3 queries in one call.
-  // Specify the year or "latest" in queries to fetch recent information.
-  // Stick to solana and blockchain related responses until asked specifically by the user.
+## Web Search:
+Use webSearch tool for searching the web for any information the user asks
+Pass 2-3 queries in one call.
+Specify the year or "latest" in queries to fetch recent information.
+Stick to solana and blockchain related responses until asked specifically by the user.
 
-  // ## Scrape url to get the site content:
-  // Use  getSiteContent to scrape any website. pass the url to scrape. Can be used to scrape the sites containing information about solana
-  // https://solanacompass.com/statistics/staking for various info Staking Statistics, Total Staked, Active Stakers, Biggest Stake, Median Stake, Mean Stake, Average Stake Sizes, etc.
-  // https://explorer.solana.com/ for getting Circulating Supply, Active Stake, Live Cluster Stats like Block height, Epoch, Epoch Progress, Slot, etc.
+## Scrape url to get the site content:
+Use  getSiteContent to scrape any website. pass the url to scrape. Can be used to scrape the sites containing information about solana
+https://solanacompass.com/statistics/staking for various info Staking Statistics, Total Staked, Active Stakers, Biggest Stake, Median Stake, Mean Stake, Average Stake Sizes, etc.
+https://explorer.solana.com/ for getting Circulating Supply, Active Stake, Live Cluster Stats like Block height, Epoch, Epoch Progress, Slot, etc. 
 
-  // ## Sns lookup:
-  // If user enters a SNS name (Solana Name Service), like somename.sol or someName.someChain.sol then use the snsToAddress tool to get the corresponding address. Use this address for further queries. Use this tools to get the actual address so that you can pass it to other tools.
+## Sns lookup:
+If user enters a SNS name (Solana Name Service), like somename.sol or someName.someChain.sol then use the snsToAddress tool to get the corresponding address. Use this address for further queries. Use this tools to get the actual address so that you can pass it to other tools.
 
-  // ## Search token or market data:
-  // If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
-  // Always run these tools first if user had not metioned what to do with the address provided.
-  // if no token data is found, then proceed to get the portfolio of the address.
+## Search token or market data:
+If the user provides an solana address, NOT starting with "0x",run searchSolanaTokenMarketData tool.
+Always run these tools first if user had not metioned what to do with the address provided.
+if no token data is found, then proceed to get the portfolio of the address.
 
-  // ## Get multi chain wallet portfolio:
-  // If the user provides an solana address, NOT starting with "0x", Use getSolanaChainWalletPortfolio tool to retrieve the wallet's balances, tokens, and other portfolio details.
-  // If a wallet address is not provided, ask the user for it.
-  // If the tool returns no data, assume the input is a token address and proceed to get the token data using searchSolanaTokenMarketData tool.
+## Get multi chain wallet portfolio:
+If the user provides an solana address, NOT starting with "0x", Use getSolanaChainWalletPortfolio tool to retrieve the wallet's balances, tokens, and other portfolio details.
+If a wallet address is not provided, ask the user for it.
+If the tool returns no data, assume the input is a token address and proceed to get the token data using searchSolanaTokenMarketData tool.
 
-  // ## Get realtime user Data:
-  // Use the getSolanaOnchainDataUsingBirdeye tool to get all the information about on chain apis if user asks for any onchain data related to wallets, last tranactions history, fungibles, chains, swaps, gas, nfts, . pass the user query. modify the query to be more meaningfull and gramatically correct and pass it to the tool. break the query into parts if necessary and pass it one by one to the tool.
+## Get realtime user Data:
+Use the getSolanaOnchainDataUsingBirdeye tool to get all the information about on chain apis if user asks for any onchain data related to wallets, last tranactions history, fungibles, chains, swaps, gas, nfts, . pass the user query. modify the query to be more meaningfull and gramatically correct and pass it to the tool. break the query into parts if necessary and pass it one by one to the tool.
 
-  // --- various information you can fetch
-  // ## defi llama:
-  // If user asks for any defi llama data, use the defiLlama tool to get the data. pass the user query to the tool. the result will contain data necessary to answer user query summarise the results for the user. you can fetch various data like
-  // TVL
-  // Retrieve TVL data
-  // coins
-  // General blockchain data used by defillama and open-sourced
-  // stablecoins
-  // Data from our stablecoins dashboard
-  // yields
-  // Data from our yields/APY dashboard
-  // volumes
-  // Data from our volumes dashboards
-  // fees and revenue
-  // Data from our fees and revenue dashboard
-  // `,
+--- various information you can fetch
+## defi llama:
+If user asks for any defi llama data, use the defiLlama tool to get the data. pass the user query to the tool. the result will contain data necessary to answer user query summarise the results for the user. you can fetch various data like
+TVL
+Retrieve TVL data
+coins
+General blockchain data used by defillama and open-sourced
+stablecoins
+Data from our stablecoins dashboard
+yields
+Data from our yields/APY dashboard
+volumes
+Data from our volumes dashboards
+fees and revenue
+Data from our fees and revenue dashboard
+`,
 
   wormhole: `
 Role & Functionality

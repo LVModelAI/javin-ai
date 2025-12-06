@@ -1,5 +1,5 @@
-import { getZerionApiKey } from "@javin/shared/lib/utils/utils";
-import { makeBlockscoutApiRequest } from "@javin/shared/lib/utils/make-blockscout-api-request";
+import { getZerionApiKey } from "../../../utils/utils";
+import { makeBlockscoutApiRequest } from "../../../utils/make-blockscout-api-request";
 import * as Sentry from "@sentry/nextjs";
 
 export const fetchApi = async ({

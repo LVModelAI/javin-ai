@@ -211,9 +211,7 @@ async function testTool(
         jest.expect(result).toBeDefined();
         // Portfolio tools should return either PortfolioData object or error string
         jest.expect(result).toHaveProperty("attributes");
-        jest
-          .expect(result.attributes)
-          .toHaveProperty("positions_distribution_by_type");
+        jest.expect(result.attributes).toHaveProperty("positions_distribution_by_type");
       } else if (toolName === "searchEvmTokenMarketData") {
         // searchEvmTokenMarketData requires token_address parameter
         const testParams = {
@@ -232,21 +230,21 @@ async function testTool(
         console.log("getEvmOnchainDataUsingZerion result:", result);
         jest.expect(result).toBeDefined();
         jest.expect(result).toContain("Total Value");
-      } else if (toolName === "getEvmWalletPositions") {
-        // getEvmWalletPositions requires wallet_address parameter
+      } else if (toolName === "getEvmWalletPositionsUsingZerion") {
+        // getEvmWalletPositionsUsingZerion requires wallet_address parameter
         const testParams = {
           wallet_address: VitalikEthereumAddress,
         };
         const result = await toolConfig.execute(testParams);
-        console.log("getEvmWalletPositions result:", result);
+        console.log("getEvmWalletPositionsUsingZerion result:", result);
         jest.expect(result).toBeDefined();
         jest.expect(typeof result).toBe("object");
         jest.expect(result[0].value).toBeDefined();
-      } else if (toolName === "getEvmOnchainDataUsingEtherscan") {
-        // getEvmOnchainDataUsingEtherscan requires userQuery parameter
+      } else if (toolName === "getEvmOnchainDataUsingBlockscout") {
+        // getEvmOnchainDataUsingBlockscout (uses Blockscout API v2) requires userQuery parameter
         const testParams = { userQuery: "Get latest block number" };
         const result = await toolConfig.execute(testParams);
-        console.log("getEvmOnchainDataUsingEtherscan result:", result);
+        console.log("getEvmOnchainDataUsingBlockscout (Blockscout) result:", result);
         jest.expect(result).toBeDefined();
         jest.expect(result).toContain("block number");
 
@@ -255,7 +253,7 @@ async function testTool(
             "Get the transaction details for 0x1808017091f3091d92b66b47e197854241beb98611b35635105dd0637fc61d2e",
         };
         const result2 = await toolConfig.execute(testParams2);
-        console.log("getEvmOnchainDataUsingEtherscan result2:", result2);
+        console.log("getEvmOnchainDataUsingBlockscout (Blockscout) result2:", result2);
         jest.expect(result2).toBeDefined();
         jest.expect(result2).toContain("Block Hash");
         jest
@@ -291,20 +289,16 @@ async function testTool(
         // jest.expect(result).toBeDefined();
       }
     } catch (paramError) {
-      // Only treat "parameter required" or validation errors as expected
-      const msg = (paramError as Error).message || "";
-
-      if (
-        msg.toLowerCase().includes("missing") ||
-        msg.toLowerCase().includes("parameter")
-      ) {
-        console.log(
-          `    ⚠️  Tool ${toolName} requires specific parameters (expected)`
-        );
-      } else {
-        throw paramError; // ✅ rethrow actual test failures like wrong type/value
+        // Only treat "parameter required" or validation errors as expected
+        const msg = (paramError as Error).message || "";
+      
+        if (msg.toLowerCase().includes("missing") || msg.toLowerCase().includes("parameter")) {
+          console.log(`    ⚠️  Tool ${toolName} requires specific parameters (expected)`);
+        } else {
+          throw paramError; // ✅ rethrow actual test failures like wrong type/value
+        }
       }
-    }
+      
 
     const duration = Date.now() - startTime;
     return {
