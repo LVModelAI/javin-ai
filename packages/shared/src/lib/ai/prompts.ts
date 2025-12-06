@@ -7,7 +7,7 @@ import { getCreditcoinStats } from "./tools/creditcoin/get-stats";
 import { ensToAddress } from "./tools/ens-to-address";
 import { searchEvmTokenMarketData } from "./tools/zerion/tokens/searchEvmTokenMarketData";
 import { getEvmMultiChainWalletPortfolio } from "./tools/zerion/wallets/getEvmMultiChainWalletPortfolio";
-import { getEvmOnchainDataUsingBlockscout } from "./tools/onchain/get_evm_onchain_data_using_etherscan";
+import { getEvmOnchainDataUsingBlockscout } from "./tools/onchain/get_evm_onchain_data_using_blockscout";
 import { getEvmOnchainDataUsingZerion } from "./tools/zerion/get_evm_onchain_data_using_zerion";
 import { getEvmWalletPositions as getEvmWalletPositionsUsingZerion } from "./tools/zerion/wallets/getEvmWalletPositions";
 import { getSiteContent } from "./tools/scrap-site";
