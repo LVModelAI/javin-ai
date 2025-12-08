@@ -123,9 +123,9 @@ const PurePreviewMessage = ({
                             loadingMessage="Exploring the blockchain"
                             isFinished
                           />
-                        ) : toolName === "getEvmWalletPositions" ? (
+                        ) : toolName === "getEvmWalletPositionsUsingZerion" ? (
                           <WalletPositionsTable result={result} />
-                        ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
+                        ) : toolName === "getEvmOnchainDataUsingBlockscout" ? (
                           <ToolCallLoader
                             loadingMessage="Exploring ethereum"
                             isFinished
@@ -152,46 +152,6 @@ const PurePreviewMessage = ({
                             loadingMessage="Getting relevant data"
                             isFinished
                           />
-                        ) : toolName === "getSmartMoneyNetflow" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting smart money netflow data"
-                            isFinished
-                          />
-                        ) : toolName === "getSmartMoneyHoldings" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting smart money holdings data"
-                            isFinished
-                          />
-                        ) : toolName === "getSmartMoneyDexTrades" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting smart money dex trades data"
-                            isFinished
-                          />
-                        ) : toolName === "getSmartMoneyDCAs" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting smart money DCAs data"
-                            isFinished
-                          />
-                        ) : toolName === "whoBoughtSold" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting who bought/sold data"
-                            isFinished
-                          />
-                        ) : toolName === "tokenScreener" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting token screener data"
-                            isFinished
-                          />
-                        ) : toolName === "dexTrades" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting DEX trades data"
-                            isFinished
-                          />
-                        ) : toolName === "flowIntelligence" ? (
-                          <ToolCallLoader
-                            loadingMessage="Getting flow intelligence data"
-                            isFinished
-                          />
                         ) : (
                           <ToolCallLoader
                             loadingMessage="Finding info"
@@ -209,11 +169,6 @@ const PurePreviewMessage = ({
                         <div className="mt-4">
                           <MultiSearch result={null} args={args} />
                         </div>
-                      ) : toolName === "searchEvmTokenMarketData" ||
-                        toolName === "searchSolanaTokenMarketData" ? (
-                        <div className="mt-4">
-                          <ToolCallLoader loadingMessage="Fetching token data..." />
-                        </div>
                       ) : toolName === "getSolanaChainWalletPortfolio" ||
                         toolName === "getEvmMultiChainWalletPortfolio" ||
                         toolName === "getAptosPortfolio" ? (
@@ -222,9 +177,9 @@ const PurePreviewMessage = ({
                         toolName === "getVanaApiData" ||
                         toolName === "getEvmOnchainDataUsingZerion" ? (
                         <ToolCallLoader loadingMessage="Exploring the blockchain..." />
-                      ) : toolName === "getEvmWalletPositions" ? (
+                      ) : toolName === "getEvmWalletPositionsUsingZerion" ? (
                         <ToolCallLoader loadingMessage="Getting your wallet positions..." />
-                      ) : toolName === "getEvmOnchainDataUsingEtherscan" ? (
+                      ) : toolName === "getEvmOnchainDataUsingBlockscout" ? (
                         <ToolCallLoader loadingMessage="Exploring ethereum..." />
                       ) : toolName === "creditCoinApiFetch" ||
                         toolName === "vanaApiFetch" ||
@@ -239,22 +194,6 @@ const PurePreviewMessage = ({
                         <ToolCallLoader loadingMessage="Exploring the protocol..." />
                       ) : toolName === "getCryptoInfluencersData" ? (
                         <ToolCallLoader loadingMessage="Getting relevant data..." />
-                      ) : toolName === "getSmartMoneyNetflow" ? (
-                        <ToolCallLoader loadingMessage="Getting smart money netflow data..." />
-                      ) : toolName === "getSmartMoneyHoldings" ? (
-                        <ToolCallLoader loadingMessage="Getting smart money holdings data..." />
-                      ) : toolName === "getSmartMoneyDexTrades" ? (
-                        <ToolCallLoader loadingMessage="Getting smart money dex trades data..." />
-                      ) : toolName === "getSmartMoneyDCAs" ? (
-                        <ToolCallLoader loadingMessage="Getting smart money DCAs data..." />
-                      ) : toolName === "whoBoughtSold" ? (
-                        <ToolCallLoader loadingMessage="Getting who bought/sold data..." />
-                      ) : toolName === "tokenScreener" ? (
-                        <ToolCallLoader loadingMessage="Getting token screener data..." />
-                      ) : toolName === "dexTrades" ? (
-                        <ToolCallLoader loadingMessage="Getting DEX trades data..." />
-                      ) : toolName === "flowIntelligence" ? (
-                        <ToolCallLoader loadingMessage="Getting flow intelligence data..." />
                       ) : (
                         <ToolCallLoader loadingMessage="Finding info..." />
                       )}
