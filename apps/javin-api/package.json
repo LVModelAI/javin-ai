@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "tsx src/lib/db/migrate && next build",
+    "build": "tsx src/lib/db/migrate && next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
@@ -24,7 +24,7 @@
     "ai": "4.1.17",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.34.1",
-    "next": "15.2.1-canary.2",
+    "next": "15.6.0-canary.58",
     "postgres": "^3.4.5",
     "react": "19.0.0-rc-45804af1-20241021",
     "react-dom": "19.0.0-rc-45804af1-20241021",
