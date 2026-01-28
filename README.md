@@ -17,10 +17,6 @@ An open-source, no-nonsense AI search and assistant for crypto and blockchain. J
 - `apps/javin-api`: API app (Next.js). AI completions and chat/stream endpoints.
 - `packages/shared`: Shared TypeScript library with AI tools, utilities, and types.
 
-Supporting files:
-- `pnpm-workspace.yaml`, `turbo.json`: Monorepo and task orchestration.
-- `LICENSE`: MIT license for the repository.
-
 ---
 
 ## Tech stack
@@ -53,5 +49,5 @@ Issues and PRs are welcome! Please open an issue to discuss substantial changes.
 
 ## License
 
-MIT © 2026 Javin AI contributors
+MIT © 2026 Javin AI
 
