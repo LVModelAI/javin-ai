@@ -5,6 +5,7 @@
     "apps/*",
     "packages/*"
   ],
+  "license": "MIT",
   "scripts": {
     "dev": "turbo run dev",
     "dev:javin": "turbo run dev --filter=javin",
