@@ -1,3 +1,4 @@
+import "server-only";
 import { tool } from "ai";
 import { z } from "zod";
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";

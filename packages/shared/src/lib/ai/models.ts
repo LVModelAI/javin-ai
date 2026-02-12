@@ -20,7 +20,7 @@ export const myProvider: any = customProvider({
     "title-model": openai("gpt-4-turbo"),
     "block-model": openai("gpt-4o-mini"),
     //@ts-ignore
-    "gemini-2.0-flash": google("gemini-2.0-flash"),
+    "gemini-2.5-flash-lite": google("gemini-2.5-flash-lite"),
     "llama-v3p1-70b-instruct": wrapLanguageModel({
       model: fireworks("accounts/fireworks/models/llama-v3p1-70b-instruct"),
       middleware: extractReasoningMiddleware({ tagName: "think" }),
@@ -51,9 +51,9 @@ export const chatModels: Array<ChatModel> = [
     description: "Large model for complex, multi-step tasks",
   },
   {
-    id: "gemini-2.0-flash",
-    name: "Gemini 2.0 Flash",
-    description: "Google's Gemini 2.0 Flash model",
+    id: "gemini-2.5-flash-lite",
+    name: "Gemini 2.5 Flash Lite",
+    description: "Google's Gemini 2.5 Flash Lite model",
   },
 ];
 

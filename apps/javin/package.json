@@ -26,6 +26,7 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.36.5",
     "@javin/shared": "workspace:^",
+    "@keyv/offline": "^4.0.2",
     "@radix-ui/react-accordion": "^1.2.4",
     "@radix-ui/react-alert-dialog": "^1.1.7",
     "@radix-ui/react-dialog": "^1.1.7",
