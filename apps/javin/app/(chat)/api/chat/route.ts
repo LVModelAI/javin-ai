@@ -6,7 +6,10 @@ import {
 } from "ai";
 import { auth } from "@/app/(auth)/auth";
 import { myProvider } from "@javin/shared/lib/ai/models";
-import { getAllToolsWithConfigs, getGroupConfig } from "@javin/shared/lib/ai/prompts";
+import {
+  getAllToolsWithConfigs,
+  getGroupConfig,
+} from "@javin/shared/lib/ai/prompts";
 import { logObjects, logInfo } from "@javin/shared/lib/utils/logging";
 import {
   decrementRemainingMessageCount,
@@ -128,11 +131,15 @@ export async function POST(request: Request) {
         system: systemPrompt,
         messages,
         maxSteps: 5,
+        temperature: 1,
         experimental_activeTools:
           modelToUse === "chat-model-reasoning" ? [] : [...activeTools],
         experimental_transform: smoothStream({ chunking: "word" }),
         experimental_generateMessageId: generateUUID,
-        tools: getAllToolsWithConfigs({ modelName: "gpt-4o-mini", mode: group }),
+        tools: getAllToolsWithConfigs({
+          modelName: modelToUse,
+          mode: group,
+        }),
         onStepFinish(event) {
           logInfo("Step finished.");
           // logObjects("Step Event:", event);
@@ -162,9 +169,9 @@ export async function POST(request: Request) {
                       sanitizedResponseMessages.length - 1
                     ].role == "assistant"
                       ? sanitizedResponseMessages[
-                        sanitizedResponseMessages.length - 1
-                        // @ts-ignore
-                      ].content[0].text
+                          sanitizedResponseMessages.length - 1
+                          // @ts-ignore
+                        ].content[0].text
                       : "Couldnt capture",
                   toolsCalled: sanitizedResponseMessages
                     .filter((a) => a.role === "tool")

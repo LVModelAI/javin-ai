@@ -11,6 +11,8 @@ export const DEFAULT_CHAT_MODEL: string = "gpt-4o";
 
 export const myProvider: any = customProvider({
   languageModels: {
+    "gpt-5-2025-08-07": openai("gpt-5-2025-08-07"),
+    "gpt-5-mini-2025-08-07": openai("gpt-5-mini-2025-08-07"),
     "gpt-4o-mini": openai("gpt-4o-mini"),
     "gpt-4o": openai("gpt-4o"),
     "chat-model-reasoning": wrapLanguageModel({
@@ -21,6 +23,8 @@ export const myProvider: any = customProvider({
     "block-model": openai("gpt-4o-mini"),
     //@ts-ignore
     "gemini-2.5-flash-lite": google("gemini-2.5-flash-lite"),
+    //@ts-ignore
+    "gemini-3-flash-preview": google("gemini-3-flash-preview"),
     "llama-v3p1-70b-instruct": wrapLanguageModel({
       model: fireworks("accounts/fireworks/models/llama-v3p1-70b-instruct"),
       middleware: extractReasoningMiddleware({ tagName: "think" }),
@@ -40,6 +44,21 @@ interface ChatModel {
 }
 
 export const chatModels: Array<ChatModel> = [
+  {
+    id: "gpt-5-2025-08-07",
+    name: "Gpt 5",
+    description: "Large model for complex, multi-step tasks",
+  },
+  {
+    id: "gpt-5-mini-2025-08-07",
+    name: "Gpt 5 Mini",
+    description: "Small model for fast, lightweight tasks",
+  },
+  {
+    id: "gemini-3-flash-preview",
+    name: "Gemini 3 Flash Preview",
+    description: "Google's Gemini 3 Flash Preview model",
+  },
   {
     id: "gpt-4o-mini",
     name: "Gpt 4o mini",
