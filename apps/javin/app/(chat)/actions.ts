@@ -24,13 +24,19 @@ export async function checkLegacyChatModelCookie() {
   if (!legacyChatModel) return;
   // Check if the cookie value is one of the legacy chat models
   logObjects("Legacy chat model cookie found:", legacyChatModel.value);
-  if (legacyChatModel?.value === "chat-model-small") {
+  if (
+    legacyChatModel?.value === "chat-model-small" ||
+    legacyChatModel?.value === "gpt-4o-mini"
+  ) {
     cookieStore.delete("chat-model");
-    cookieStore.set("chat-model", "gpt-4o-mini");
+    cookieStore.set("chat-model", "gpt-5-mini-2025-08-07");
   }
-  if (legacyChatModel?.value === "chat-model-large") {
+  if (
+    legacyChatModel?.value === "chat-model-large" ||
+    legacyChatModel?.value === "gpt-4o"
+  ) {
     cookieStore.delete("chat-model");
-    cookieStore.set("chat-model", "gpt-4o");
+    cookieStore.set("chat-model", "gpt-5-2025-08-07");
   }
 }
 
