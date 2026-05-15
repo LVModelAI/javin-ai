@@ -16,8 +16,6 @@ const KEYV_OPTIONAL_ADAPTER_PACKAGES = [
 ] as const;
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
-
   serverExternalPackages: [
     "@keyv/redis",
     "@keyv/mongo",
