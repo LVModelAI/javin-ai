@@ -7,7 +7,7 @@
     "dev": "next dev -p 3000",
     "devt": "next dev --turbopack",
     "deve": "next dev --experimental-https",
-    "build": "tsx lib/db/migrate && next build --webpack",
+    "build": "tsx lib/db/migrate && next build",
     "start": "next start",
     "lint": "next lint && biome lint --write --unsafe",
     "lint:fix": "next lint --fix && biome lint --write --unsafe",
