@@ -173,12 +173,9 @@ async function testTool(
         const result = await toolConfig.execute(testParams);
         console.log("getSiteContent result:", result);
         jest.expect(result).toBeDefined();
-        // getSiteContent should return content or error message
-        jest
-          .expect(result.pageContent)
-          .toContain(
-            "This domain is for use in illustrative examples in documents."
-          );
+        // Check for the stable page heading rather than the body copy, which
+        // IANA has changed wording on before and can change again.
+        jest.expect(result.pageContent).toContain("Example Domain");
       } else if (toolName === "getSolanaChainWalletPortfolio") {
         // getSolanaChainWalletPortfolio requires wallet_address parameter
         const testParams = {
@@ -209,9 +206,12 @@ async function testTool(
         const result = await toolConfig.execute(testParams);
         console.log("getEvmMultiChainWalletPortfolio result:", result);
         jest.expect(result).toBeDefined();
-        // Portfolio tools should return either PortfolioData object or error string
-        jest.expect(result).toHaveProperty("attributes");
-        jest.expect(result.attributes).toHaveProperty("positions_distribution_by_type");
+        // Tool returns { summary: PortfolioData, positions: [...], currency }
+        jest.expect(result).toHaveProperty("summary");
+        jest.expect(result.summary).toHaveProperty("attributes");
+        jest
+          .expect(result.summary.attributes)
+          .toHaveProperty("positions_distribution_by_type");
       } else if (toolName === "searchEvmTokenMarketData") {
         // searchEvmTokenMarketData requires token_address parameter
         const testParams = {
@@ -255,11 +255,11 @@ async function testTool(
         const result2 = await toolConfig.execute(testParams2);
         console.log("getEvmOnchainDataUsingBlockscout (Blockscout) result2:", result2);
         jest.expect(result2).toBeDefined();
-        jest.expect(result2).toContain("Block Hash");
+        jest.expect(result2).toContain("Transaction Hash");
         jest
           .expect(result2)
           .toContain(
-            "0xe41da62d6f3d94eaca1d433a366a74d2af54a6c1712aa89acbc51e86fa820004"
+            "0x1808017091f3091d92b66b47e197854241beb98611b35635105dd0637fc61d2e"
           );
       } else if (toolName === "translateTransactions") {
         // translateTransactions requires transactionDetails, chain, and userQuery parameters
