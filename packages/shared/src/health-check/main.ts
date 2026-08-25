@@ -322,7 +322,7 @@ async function runToolTests(): Promise<ToolTestResult[]> {
 
   // Get all tools with default configuration
   const tools = getAllToolsWithConfigs({
-    modelName: "gpt-4o-mini",
+    modelName: "gpt-5-mini-2025-08-07",
     mode: "on_chain" as SearchGroupId,
   });
 

@@ -26,11 +26,11 @@ export async function checkLegacyChatModelCookie() {
   logObjects("Legacy chat model cookie found:", legacyChatModel.value);
   if (legacyChatModel?.value === "chat-model-small") {
     cookieStore.delete("chat-model");
-    cookieStore.set("chat-model", "gpt-4o-mini");
+    cookieStore.set("chat-model", "gpt-5-mini-2025-08-07");
   }
   if (legacyChatModel?.value === "chat-model-large") {
     cookieStore.delete("chat-model");
-    cookieStore.set("chat-model", "gpt-4o");
+    cookieStore.set("chat-model", "gpt-5-2025-08-07");
   }
 }
 

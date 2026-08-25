@@ -164,14 +164,16 @@ export const getAllToolsWithConfigs = ({
     ensToAddress,
     getSiteContent,
     // on_chain evm
-    getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion("gpt-4o-mini"),
+    getEvmOnchainDataUsingZerion: getEvmOnchainDataUsingZerion(
+      "gpt-5-mini-2025-08-07"
+    ),
     getEvmWalletPositionsUsingZerion,
     getEvmOnchainDataUsingBlockscout:
-      getEvmOnchainDataUsingBlockscout("gpt-4o-mini"),
+      getEvmOnchainDataUsingBlockscout("gpt-5-mini-2025-08-07"),
     getEvmMultiChainWalletPortfolio,
     searchEvmTokenMarketData,
-    translateTransactions: translateTransactions("gpt-4o-mini"),
-    defiLlama: defiLlama("gpt-4o-mini"),
+    translateTransactions: translateTransactions("gpt-5-mini-2025-08-07"),
+    defiLlama: defiLlama("gpt-5-mini-2025-08-07"),
     // solana
     snsToAddress,
     getSolanaChainWalletPortfolio,

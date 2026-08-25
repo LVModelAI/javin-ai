@@ -105,12 +105,12 @@ export async function POST(request: Request) {
   // check if the selected model is a legacy model
   let modelToUse = selectedChatModel;
   if (selectedChatModel === "chat-model-small") {
-    logInfo("Legacy model ID detected. Switching to 'gpt-4o-mini'.");
-    modelToUse = "gpt-4o-mini";
+    logInfo("Legacy model ID detected. Switching to 'gpt-5-mini-2025-08-07'.");
+    modelToUse = "gpt-5-mini-2025-08-07";
   }
   if (selectedChatModel === "chat-model-large") {
-    logInfo("Legacy model ID detected. Switching to 'gpt-4o'.");
-    modelToUse = "gpt-4o";
+    logInfo("Legacy model ID detected. Switching to 'gpt-5-2025-08-07'.");
+    modelToUse = "gpt-5-2025-08-07";
   }
 
   logInfo("Preparing to stream text with model: " + modelToUse);
