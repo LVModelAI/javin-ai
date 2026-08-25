@@ -32,6 +32,7 @@ export const getWormholeApiData = tool({
       console.log("use prompt is -- ", userQuery);
       const { object: apiEndpointsArray } = await generateObject({
         model: myProvider.languageModel("gpt-5-mini-2025-08-07"),
+        temperature: 1,
         output: "array",
         schema: z.string().describe("the api endpoint"),
         system: `\n
@@ -60,6 +61,7 @@ export const getWormholeApiData = tool({
 
       const { text } = await generateText({
         model: myProvider.languageModel("gpt-5-mini-2025-08-07"),
+        temperature: 1,
         system: `you will be provided with the response from wormhole. summarize the response. do not modify it in any way.`,
         prompt: `User query was = ${userQuery}. The apis were = ${limitedApiEndpointsArray}. The api response is = ${JSON.stringify(
           results

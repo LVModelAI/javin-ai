@@ -61,6 +61,7 @@ export const getAptosApiData = tool({
 
       const aiAgentResponse = await generateText({
         model: myProvider.languageModel("gpt-5-mini-2025-08-07"),
+        temperature: 1,
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant aptos blockchain data in a user-friendly format.
       
          you can use the below tools to get the required data:

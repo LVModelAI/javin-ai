@@ -30,6 +30,7 @@ export const getCreditcoinApiData = tool({
       console.log("use prompt is -- ", userQuery);
       const { object: apiEndpointsArray } = await generateObject({
         model: myProvider.languageModel("gpt-5-mini-2025-08-07"),
+        temperature: 1,
         output: "array",
         schema: z.string().describe("the api endpoint"),
 
