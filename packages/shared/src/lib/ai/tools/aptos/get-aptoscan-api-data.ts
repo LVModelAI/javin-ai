@@ -99,6 +99,7 @@ export const getAptosScanApiData = tool({
 
       const aiAgentResponse = await generateText({
         model: myProvider.languageModel("gpt-5-mini-2025-08-07"),
+        temperature: 1,
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant aptos blockchain data in a user-friendly format.
       
         you have a variety of tools available, using them you can get : the  transactions made by a given address, transaction data by id or block version,  coin and fungible asset information for a given address, the total count of fungible assets for a given address, the total count of tokens held by an account, detailed information of tokens held by an account, , transaction balance change information for a given transaction version,
