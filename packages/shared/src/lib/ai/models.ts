@@ -7,20 +7,21 @@ import {
 } from "ai";
 import { google } from "@ai-sdk/google";
 
-export const DEFAULT_CHAT_MODEL: string = "gpt-4o";
+export const DEFAULT_CHAT_MODEL: string = "gpt-5-2025-08-07";
 
 export const myProvider: any = customProvider({
   languageModels: {
     "gpt-5-2025-08-07": openai("gpt-5-2025-08-07"),
     "gpt-5-mini-2025-08-07": openai("gpt-5-mini-2025-08-07"),
+    "gpt-5-nano-2025-08-07": openai("gpt-5-nano-2025-08-07"),
     "gpt-4o-mini": openai("gpt-4o-mini"),
     "gpt-4o": openai("gpt-4o"),
     "chat-model-reasoning": wrapLanguageModel({
       model: fireworks("accounts/fireworks/models/deepseek-r1"),
       middleware: extractReasoningMiddleware({ tagName: "think" }),
     }),
-    "title-model": openai("gpt-4-turbo"),
-    "block-model": openai("gpt-4o-mini"),
+    "title-model": openai("gpt-5-nano-2025-08-07"),
+    "block-model": openai("gpt-5-mini-2025-08-07"),
     //@ts-ignore
     "gemini-2.5-flash-lite": google("gemini-2.5-flash-lite"),
     //@ts-ignore
@@ -80,8 +81,8 @@ export const getModelByConsumerMode = (consumerMode: string): string => {
   switch (consumerMode) {
     case "on_chain":
       // return "llama-v3p1-70b-instruct";
-      return "gpt-4o-mini";
+      return "gpt-5-mini-2025-08-07";
     default:
-      return "gpt-4o-mini";
+      return "gpt-5-mini-2025-08-07";
   }
 };

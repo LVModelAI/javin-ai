@@ -60,7 +60,7 @@ export const getAptosApiData = tool({
       const aptosBaseUrl = "https://api.mainnet.aptoslabs.com/v1";
 
       const aiAgentResponse = await generateText({
-        model: myProvider.languageModel("gpt-4o-mini"),
+        model: myProvider.languageModel("gpt-5-mini-2025-08-07"),
         system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant aptos blockchain data in a user-friendly format.
       
          you can use the below tools to get the required data:
