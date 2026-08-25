@@ -110,6 +110,7 @@ export const translateTransactions = (modelName: string) =>
 
         const { object: apiEndpointsArray } = await generateObject({
           model: myProvider.languageModel(modelName),
+          temperature: 1,
           output: "array",
           schema: z.string().describe("the api endpoint"),
           system: `\n
