@@ -52,6 +52,7 @@ export const getEvmOnchainDataUsingBlockscout = (modelName: string) =>
 
         const aiAgentResponse = await generateText({
           model: myProvider.languageModel(modelName),
+          temperature: 1,
           system: `You are an intelligent API assistant. Your job is to process user queries and provide the most relevant blockchain data in a user-friendly format.
             
               ## How to Process User Queries:
